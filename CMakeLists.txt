@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(amk)
+project(putm_ev_amk_2023)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -8,17 +8,27 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(sensor_msgs REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
+find_package(putm_ev_amk_2023 REQUIRED)
+# uncomment the following section in order to fill in
+# further dependencies manually.
+# find_package(<dependency> REQUIRED)
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/Front.msg"
+)
 
 add_executable(amk_node src/amk_node.cpp src/amk_startup.cpp)
-ament_target_dependencies(amk_node rclcpp sensor_msgs)
 target_include_directories(amk_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-target_compile_features(amk_node PUBLIC c_std_99 cxx_std_17)  # Require C99 and C++17
+ament_target_dependencies(amk_node rclcpp putm_ev_amk_2023) 
 
-install(TARGETS amk_node
-  DESTINATION lib/${PROJECT_NAME})
+add_executable(amk_bridge_node src/amk_bridge_node.cpp)
+target_include_directories(amk_bridge_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(amk_bridge_node rclcpp putm_ev_amk_2023) 
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

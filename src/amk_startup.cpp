@@ -37,7 +37,6 @@ void SetTorque(uint16_t _torque)
 
     can_tx.transmit(front_left_amk_setpoints);
     can_tx.transmit(front_right_amk_setpoints);
-
 }
 
 
@@ -53,7 +52,7 @@ void AMK_Startup()
 
     AmkFrontLeftActualValues1 front_left_values_1;
     AmkFrontRightActualValues1 front_right_values_1;
-    
+
     if (frame.can_id == FRONT_LEFT_AMK_ACTUAL_VALUES_1_CAN_ID)
     {
       front_left_values_1 = convert<AmkFrontLeftActualValues1>(frame);
@@ -103,7 +102,6 @@ void AMK_Startup()
 
           front_left_amk_setpoints.AMK_Control.AMK_bInverterOn = 1;
           front_right_amk_setpoints.AMK_Control.AMK_bInverterOn = 1;
-          
           std::cout << "Both are enabled, enabling inverter" << std::endl;
 
         amk_state = states::STATE4;
@@ -123,7 +121,6 @@ void AMK_Startup()
     }
     can_tx.transmit(front_left_amk_setpoints);
     can_tx.transmit(front_right_amk_setpoints);
-
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
     }
