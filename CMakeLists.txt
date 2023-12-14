@@ -14,21 +14,21 @@ find_package(putm_ev_amk_2023 REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/Front.msg"
+  "msg/AmkStatus.msg"
+  "msg/AmkControl.msg"
 )
 
 add_executable(amk_node src/amk_node.cpp src/amk_startup.cpp)
 target_include_directories(amk_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_node rclcpp putm_ev_amk_2023) 
+ament_target_dependencies(amk_node rclcpp putm_ev_amk_2023)
 
 add_executable(amk_bridge_node src/amk_bridge_node.cpp)
 target_include_directories(amk_bridge_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_bridge_node rclcpp putm_ev_amk_2023) 
-
+ament_target_dependencies(amk_bridge_node rclcpp putm_ev_amk_2023)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

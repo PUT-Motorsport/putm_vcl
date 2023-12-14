@@ -1,0 +1,4 @@
+bool amk_control_binverter_on
+bool amk_control_bdc_on
+bool amk_control_benable
+bool amk_control_amkb_error_reset
