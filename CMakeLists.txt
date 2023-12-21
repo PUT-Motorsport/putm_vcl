@@ -9,7 +9,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-# find_package(putm_ev_amk_2023 REQUIRED)
+find_package(putm_ev_amk_2023 REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
@@ -22,7 +22,7 @@ add_executable(amk_node src/amk_node/amk_node.cpp)
 target_include_directories(amk_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_node rclcpp)
+ament_target_dependencies(amk_node rclcpp putm_ev_amk_2023)
 
 add_executable(amk_bridge_node src/amk_bridge_node/amk_bridge_node.cpp)
 target_include_directories(amk_bridge_node PUBLIC
