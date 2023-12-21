@@ -32,44 +32,44 @@ class AmkStatusSubscriber : public rclcpp::Node
   private:
     void AmkStatusCallback(const putm_ev_amk_2023::msg::AmkStatus::SharedPtr msg) const
     {
-      /* 1. Check if any of the inverter have error*/
-      for (uint8_t inverter = 0; inverter < 4; inverter++)
-      {
-        if (!msg->amk_status_bsystem_ready){
-          state = InverterState::ERROR;
-          break;
-        }
-      }
-      /* 2. Run state machine */
-      state = InverterState::OK;
-      switch(state)
-      {
-        /* Inverter state undefined*/
-        case InverterState::UNDEFINED:
-        {
+      // /* 1. Check if any of the inverter have error*/
+      // for (uint8_t inverter = 0; inverter < 4; inverter++)
+      // {
+      //   if (!msg->amk_status_bsystem_ready){
+      //     state = InverterState::ERROR;
+      //     break;
+      //   }
+      // }
+      // /* 2. Run state machine */
+      // state = InverterState::OK;
+      // switch(state)
+      // {
+      //   /* Inverter state undefined*/
+      //   case InverterState::UNDEFINED:
+      //   {
           
-        }
-        break;
-        /* Inverter state ok*/
-        case InverterState::OK:
-        {
-          /* Wait for rtd */
-        }
-        break;
-        /* Inverter state error*/
-        case InverterState::ERROR:
-        {
+      //   }
+      //   break;
+      //   /* Inverter state ok*/
+      //   case InverterState::OK:
+      //   {
+      //     /* Wait for rtd */
+      //   }
+      //   break;
+      //   /* Inverter state error*/
+      //   case InverterState::ERROR:
+      //   {
           
 
-        }
-        break;
-        /* default case */
-        default:
-        {
+      //   }
+      //   break;
+      //   /* default case */
+      //   default:
+      //   {
 
-        }
-        break;
-      }
+      //   }
+      //   break;
+      // }
     
     }
     rclcpp::Subscription<putm_ev_amk_2023::msg::AmkStatus>::SharedPtr subscription_;

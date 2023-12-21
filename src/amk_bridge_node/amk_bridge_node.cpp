@@ -4,14 +4,12 @@
 #include "can_library/can_tx.hpp"
 
 #include "rclcpp/rclcpp.hpp"
-
+#include "putm_ev_amk_2023/msg/amk_status.hpp"
 
 using namespace PUTM_CAN;
 
-// rclcpp::Publisher<putm_ev_amk_2023::msg::Front>::SharedPtr FrontLeftInverterpublisher_;
-// rclcpp::Publisher<std_msgs::msg::String>::SharedPtr FrontRightInverterpublisher_;
-// rclcpp::Publisher<std_msgs::msg::String>::SharedPtr RearLeftInverterpublisher_;
-// rclcpp::Publisher<std_msgs::msg::String>::SharedPtr RearRightInverterpublisher_;
+rclcpp::Publisher<putm_ev_amk_2023::msg::AmkStatus>::SharedPtr FrontLeftInverterpublisher_;
+
 
 int main(int argc, char ** argv)
 {
