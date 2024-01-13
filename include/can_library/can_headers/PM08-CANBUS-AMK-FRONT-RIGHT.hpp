@@ -1,5 +1,5 @@
-#ifndef AMK_RIGHT
-#define AMK_RIGHT
+#ifndef AMK_FRONT_RIGHT
+#define AMK_FRONT_RIGHT
 
 #include <cstdint>
 

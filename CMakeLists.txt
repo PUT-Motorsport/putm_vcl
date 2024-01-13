@@ -16,19 +16,33 @@ find_package(putm_ev_amk_2023 REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/AmkStatus.msg"
   "msg/AmkControl.msg"
+  "msg/AmkData.msg"
 )
 
-add_executable(amk_node src/amk_node/amk_node.cpp)
+add_executable(amk_node src/amk_node/amk_node.cpp src/amk_node/amk_startup.cpp)
 target_include_directories(amk_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(amk_node rclcpp putm_ev_amk_2023)
 
-add_executable(amk_bridge_node src/amk_bridge_node/amk_bridge_node.cpp)
-target_include_directories(amk_bridge_node PUBLIC
+add_executable(amk_bridge_rx_node src/amk_bridge_node/amk_bridge_rx.cpp)
+target_include_directories(amk_bridge_rx_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_bridge_node rclcpp putm_ev_amk_2023)
+ament_target_dependencies(amk_bridge_rx_node rclcpp putm_ev_amk_2023)
+
+add_executable(amk_bridge_tx_node src/amk_bridge_node/amk_bridge_tx.cpp)
+target_include_directories(amk_bridge_tx_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(amk_bridge_tx_node rclcpp putm_ev_amk_2023)
+
+install(TARGETS
+  amk_node
+  amk_bridge_rx_node
+  amk_bridge_tx_node
+  DESTINATION lib/${PROJECT_NAME}/
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

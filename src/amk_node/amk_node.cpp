@@ -2,6 +2,8 @@
 
 #include "rclcpp/rclcpp.hpp" 
 #include "putm_ev_amk_2023/msg/amk_status.hpp"
+#include "putm_ev_amk_2023/msg/amk_control.hpp"
+#include "amk_startup.hpp"
 
 using std::placeholders::_1;
 
@@ -81,15 +83,23 @@ int main(int argc, char ** argv) {
   (void) argv;
 
   rclcpp::init(argc, argv);
-  // AMK_Startup();
+
+  auto node = std::make_shared<rclcpp::Node>("amk_node");
+  rclcpp::Publisher<putm_ev_amk_2023::msg::AmkControl>::SharedPtr AmkControlPublisher = node->create_publisher<putm_ev_amk_2023::msg::AmkControl>("amk_control", 10);
+
+  putm_ev_amk_2023::msg::AmkControl amk_control;
+  amk_control.amk_control_bdc_on = {1,1,1,1};
+
+  while(true)
+  {
+    AmkControlPublisher->publish(amk_control);
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
+  }
+  AMK_Startup();
 
   // 1. Check for errors
   // 2. if no errors, wait for HV voltage on dc link capacitors.
   // 3. Wait for RTD condition, to enable inverters
   // 4. 
-
-
-
-
   }
 

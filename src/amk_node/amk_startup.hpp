@@ -1,8 +1,7 @@
-#include "can_library/can_rx.hpp"
-#include "can_library/can_tx.hpp"
 #include <iostream>
 #include <chrono>
 #include <thread>
 
 void AMK_Startup();
+void ShowValues();
 void SetTorque(uint16_t);

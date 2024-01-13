@@ -6,14 +6,3 @@ bool[4] amk_status_bdc_on
 bool[4] amk_status_bquit_inverter_on
 bool[4] amk_status_binverter_on
 bool[4] amk_status_bderating
-int16[4] amk_actual_velocity
-int16[4] amk_torque_current
-int16[4] amk_magnetizing_current
-int16[4] amk_temp_motor
-int16[4] amk_temp_inverter
-uint16[4] amk_error_info
-int16[4] amk_temp_igbt
-bool[4] amk_control_binverter_on
-bool[4] amk_control_bdc_on
-bool[4] amk_control_benable
-bool[4] amk_control_amkb_error_reset

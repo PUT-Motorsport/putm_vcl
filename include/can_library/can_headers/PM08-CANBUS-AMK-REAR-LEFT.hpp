@@ -1,5 +1,5 @@
-#ifndef AMK_LEFT
-#define AMK_LEFT
+#ifndef AMK_REAR_LEFT
+#define AMK_REAR_LEFT
 
 #include <cstdint>
 
@@ -57,11 +57,11 @@ struct __attribute__((packed)) AmkRearLeftSetpoints1 {
 
 // n = {1, 2, 5, 6} (inverter 1, 2 ,3 ,4)
 
-constexpr uint16_t REAR_LEFT_AMK_ACTUAL_VALUES_1_CAN_ID = 0x282 + 2;  // + n
+constexpr uint16_t REAR_LEFT_AMK_ACTUAL_VALUES_1_CAN_ID = 0x282 + 5;  // + n
 constexpr uint8_t  REAR_LEFT_AMK_ACTUAL_VALUES_1_CAN_DLC = sizeof(AmkRearLeftActualValues1);
-constexpr uint16_t REAR_LEFT_AMK_ACTUAL_VALUES_2_CAN_ID = 0x284 + 2;  // + n
+constexpr uint16_t REAR_LEFT_AMK_ACTUAL_VALUES_2_CAN_ID = 0x284 + 5;  // + n
 constexpr uint8_t  REAR_LEFT_AMK_ACTUAL_VALUES_2_CAN_DLC = sizeof(AmkRearLeftActualValues2);
-constexpr uint16_t REAR_LEFT_AMK_SETPOINTS_1_CAN_ID = 0x183 + 2;  // + n
+constexpr uint16_t REAR_LEFT_AMK_SETPOINTS_1_CAN_ID = 0x183 + 5;  // + n
 constexpr uint8_t  REAR_LEFT_AMK_SETPOINTS_1_CAN_DLC = sizeof(AmkRearLeftSetpoints1);
 
 }  // namespace PUTM_CAN

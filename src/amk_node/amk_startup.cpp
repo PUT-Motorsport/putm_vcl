@@ -1,4 +1,6 @@
 #include "amk_startup.hpp"
+#include "can_library/can_rx.hpp"
+#include "can_library/can_tx.hpp"
 
 using namespace PUTM_CAN;
 
@@ -16,12 +18,19 @@ using namespace PUTM_CAN;
         .AMK_TorqueLimitNegativ = 0,
   };
 
-    enum states{
+enum states{
   STATE1,
   STATE2,
   STATE3,
   STATE4
 };
+
+void ShowValues(AmkFrontLeftActualValues1 frontLeftStatus, AmkFrontRightActualValues1 frontRightStatus, AmkRearLeftActualValues1 rearLeftStatus, AmkRearRightActualValues1 rearRightStatus)
+{
+  std::cout << "AMK_bSystemReady: " << frontLeftStatus.AMK_Status.AMK_bSystemReady << "," << frontRightStatus.AMK_Status.AMK_bSystemReady << "," << rearLeftStatus.AMK_Status.AMK_bSystemReady << "," << rearRightStatus.AMK_Status.AMK_bSystemReady << "\n";
+  std::cout << "AMK_bError: " << frontLeftStatus.AMK_Status.AMK_bError << "," << frontRightStatus.AMK_Status.AMK_bError << "," << rearLeftStatus.AMK_Status.AMK_bError << "," << rearRightStatus.AMK_Status.AMK_bError << "\n";
+  std::cout << "AMK_bDcOn: " << frontLeftStatus.AMK_Status.AMK_bDcOn << "," << frontRightStatus.AMK_Status.AMK_bDcOn << "," << rearLeftStatus.AMK_Status.AMK_bDcOn << "," << rearRightStatus.AMK_Status.AMK_bDcOn << "\n";
+}
 
 CanTx can_tx("can0");
 
@@ -52,6 +61,10 @@ void AMK_Startup()
 
     AmkFrontLeftActualValues1 front_left_values_1;
     AmkFrontRightActualValues1 front_right_values_1;
+    AmkRearLeftActualValues1 rear_left_values_1;
+    AmkRearRightActualValues1 rear_right_values_1;
+
+    ShowValues(front_left_values_1, front_right_values_1, rear_left_values_1, rear_right_values_1);
 
     if (frame.can_id == FRONT_LEFT_AMK_ACTUAL_VALUES_1_CAN_ID)
     {
@@ -60,6 +73,14 @@ void AMK_Startup()
     else if (frame.can_id == FRONT_RIGHT_AMK_ACTUAL_VALUES_1_CAN_ID)
     {
       front_right_values_1 = convert<AmkFrontRightActualValues1>(frame);
+    }
+    else if (frame.can_id == REAR_LEFT_AMK_ACTUAL_VALUES_1_CAN_ID)
+    {
+      rear_left_values_1 = convert<AmkRearLeftActualValues1>(frame);
+    }
+    else if (frame.can_id == REAR_RIGHT_AMK_ACTUAL_VALUES_1_CAN_ID)
+    {
+      rear_right_values_1 = convert<AmkRearRightActualValues1>(frame);
     }
     switch (amk_state) 
       {

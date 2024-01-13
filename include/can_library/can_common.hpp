@@ -27,19 +27,18 @@ constexpr uint16_t can_id<AmkFrontRightActualValues2> = FRONT_RIGHT_AMK_ACTUAL_V
 template <>
 constexpr uint16_t can_id<AmkFrontRightSetpoints1> = FRONT_RIGHT_AMK_SETPOINTS_1_CAN_ID;
 
-/*
 template <>
-constexpr uint16_t can_id<AmkRearLeftActualValues1> = REAR_LEFT_AMK_VALUES_1_CAN_ID;
+constexpr uint16_t can_id<AmkRearLeftActualValues1> = REAR_LEFT_AMK_ACTUAL_VALUES_1_CAN_ID;
 template <>
 constexpr uint16_t can_id<AmkRearLeftActualValues2> = REAR_LEFT_AMK_ACTUAL_VALUES_2_CAN_ID;
 template <>
 constexpr uint16_t can_id<AmkRearLeftSetpoints1> = REAR_LEFT_AMK_SETPOINTS_1_CAN_ID;
 
 template <>
-constexpr uint16_t can_id<AmkRearRightActualValues1> = REAR_RIGHT_AMK_VALUES_1_CAN_ID;
+constexpr uint16_t can_id<AmkRearRightActualValues1> = REAR_LEFT_AMK_ACTUAL_VALUES_2_CAN_ID;
 template <>
 constexpr uint16_t can_id<AmkRearRightActualValues2> = REAR_RIGHT_AMK_ACTUAL_VALUES_2_CAN_ID;
 template <>
 constexpr uint16_t can_id<AmkRearRightSetpoints1> = REAR_RIGHT_AMK_SETPOINTS_1_CAN_ID;
-*/
+
 }  // namespace PUTM_CAN
