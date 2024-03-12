@@ -44,6 +44,9 @@ int main(int argc, char ** argv)
         amk_status.amk_status_bquit_inverter_on [Inverters::FRONT_LEFT] = frontLeftAmkActualValues1.AMK_Status.AMK_bQuitInverterOn;
         amk_status.amk_status_binverter_on      [Inverters::FRONT_LEFT] = frontLeftAmkActualValues1.AMK_Status.AMK_bInverterOn;
         amk_status.amk_status_bderating         [Inverters::FRONT_LEFT] = frontLeftAmkActualValues1.AMK_Status.AMK_bDerating;
+
+        amk_data.amk_actual_velocity            [Inverters::FRONT_LEFT] = frontLeftAmkActualValues1.AMK_ActualVelocity;
+        amk_data.amk_torque_current             [Inverters::FRONT_LEFT] = frontLeftAmkActualValues1.AMK_TorqueCurrent;
       }
       break;
 
@@ -91,5 +94,8 @@ int main(int argc, char ** argv)
     }
     AmkStatusPublisher->publish(amk_status);
     AmkDataPublisher  ->publish(amk_data);
+    std::this_thread::sleep_for(std::chrono::milliseconds(2));
+
+
   }
 }
