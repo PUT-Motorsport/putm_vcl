@@ -18,6 +18,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/AmkStatus.msg"
   "msg/AmkControl.msg"
   "msg/AmkData.msg"
+  "msg/Frontbox.msg"
 )
 
 add_executable(amk_node src/amk_node/amk_node.cpp)
@@ -26,22 +27,36 @@ target_include_directories(amk_node PUBLIC
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(amk_node rclcpp putm_ev_amk_2023 sensor_msgs)
 
-add_executable(amk_bridge_rx_node src/amk_bridge_node/amk_bridge_rx.cpp)
+add_executable(amk_bridge_rx_node src/amk_bridge/amk_rx_bridge.cpp)
 target_include_directories(amk_bridge_rx_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(amk_bridge_rx_node rclcpp putm_ev_amk_2023)
 
-add_executable(amk_bridge_tx_node src/amk_bridge_node/amk_bridge_tx.cpp)
+add_executable(amk_bridge_tx_node src/amk_bridge/amk_tx_bridge.cpp)
 target_include_directories(amk_bridge_tx_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(amk_bridge_tx_node rclcpp putm_ev_amk_2023)
 
+add_executable(can_rx_bridge_node src/can_bridge/can_rx_bridge.cpp)
+target_include_directories(can_rx_bridge_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(can_rx_bridge_node rclcpp putm_ev_amk_2023)
+
+add_executable(can_tx_bridge_node src/can_bridge/can_tx_bridge.cpp)
+target_include_directories(can_tx_bridge_node PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(can_tx_bridge_node rclcpp putm_ev_amk_2023)
+
 install(TARGETS
   amk_node
   amk_bridge_rx_node
   amk_bridge_tx_node
+  can_tx_bridge_node
+  can_rx_bridge_node
   DESTINATION lib/${PROJECT_NAME}/
 )
 

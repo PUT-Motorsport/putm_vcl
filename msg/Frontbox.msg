@@ -1,0 +1,2 @@
+float32 pedal_position
+float32 brake_pressure
