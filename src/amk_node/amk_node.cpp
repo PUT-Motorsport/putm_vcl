@@ -1,8 +1,8 @@
 #include <cstdio>
 
 #include "rclcpp/rclcpp.hpp" 
-#include "putm_ev_amk_2023/msg/amk_status.hpp"
-#include "putm_ev_amk_2023/msg/amk_control.hpp"
+#include "putm_pm09_vcl/msg/amk_status.hpp"
+#include "putm_pm09_vcl/msg/amk_control.hpp"
 #include <sensor_msgs/msg/joy.hpp>
 
 using namespace std::chrono_literals;
@@ -24,8 +24,8 @@ enum class StateMachine {
   ERROR_RESET = 6
 }state{StateMachine::UNDEFINED};
 
-putm_ev_amk_2023::msg::AmkControl AmkControlMessage;
-putm_ev_amk_2023::msg::AmkStatus AmkStatusMessage;
+putm_pm09_vcl::msg::AmkControl AmkControlMessage;
+putm_pm09_vcl::msg::AmkStatus AmkStatusMessage;
 sensor_msgs::msg::Joy Padinput {};
 
 class AmkNode : public rclcpp::Node
@@ -34,9 +34,9 @@ class AmkNode : public rclcpp::Node
     AmkNode()
     : Node("amk_main_node"), count_(0)
     {
-      subscription_ = this->create_subscription<putm_ev_amk_2023::msg::AmkStatus> ("amk_status", 10, std::bind(&AmkNode::AmkStatusCallback, this, std::placeholders::_1));
+      subscription_ = this->create_subscription<putm_pm09_vcl::msg::AmkStatus> ("amk_status", 10, std::bind(&AmkNode::AmkStatusCallback, this, std::placeholders::_1));
       joy_subscription_ = this->create_subscription<sensor_msgs::msg::Joy> ("/joy", 10, std::bind(&AmkNode::joyCallback, this, std::placeholders::_1));
-      publisher_    = this->create_publisher   <putm_ev_amk_2023::msg::AmkControl>("amk_control", 10);
+      publisher_    = this->create_publisher   <putm_pm09_vcl::msg::AmkControl>("amk_control", 10);
       AmkControlPublisherTimer = this->create_wall_timer(2ms, std::bind(&AmkNode::AmkControlCallback, this));
       AmkMainLoopTimer         = this->create_wall_timer(5ms, std::bind(&AmkNode::AmkMainLoop, this));
     }
@@ -46,7 +46,7 @@ class AmkNode : public rclcpp::Node
       AmkControlMessage.amk_target_tourqe.fill(-1.0*msg->axes[5]*1000.0 + 1000);
       Padinput = *msg;
     }
-    void AmkStatusCallback(const putm_ev_amk_2023::msg::AmkStatus::SharedPtr msg)
+    void AmkStatusCallback(const putm_pm09_vcl::msg::AmkStatus::SharedPtr msg)
     {
       AmkStatusMessage = *msg;
     }
@@ -191,8 +191,8 @@ class AmkNode : public rclcpp::Node
     rclcpp::TimerBase::SharedPtr AmkControlPublisherTimer;
     rclcpp::TimerBase::SharedPtr AmkMainLoopTimer;
     rclcpp::TimerBase::SharedPtr AmkStartupWatchdog;
-    rclcpp::Publisher<putm_ev_amk_2023::msg::AmkControl>::SharedPtr publisher_;
-    rclcpp::Subscription<putm_ev_amk_2023::msg::AmkStatus> ::SharedPtr subscription_;
+    rclcpp::Publisher<putm_pm09_vcl::msg::AmkControl>::SharedPtr publisher_;
+    rclcpp::Subscription<putm_pm09_vcl::msg::AmkStatus> ::SharedPtr subscription_;
     rclcpp::Subscription<sensor_msgs::msg::Joy> ::SharedPtr joy_subscription_;
     size_t count_;
 };

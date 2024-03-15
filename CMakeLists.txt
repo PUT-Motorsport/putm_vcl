@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
-project(putm_ev_amk_2023)
+project(putm_pm09_vcl)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -9,7 +11,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-find_package(putm_ev_amk_2023 REQUIRED)
+find_package(putm_pm09_vcl REQUIRED)
 find_package(sensor_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
@@ -25,31 +27,31 @@ add_executable(amk_node src/amk_node/amk_node.cpp)
 target_include_directories(amk_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_node rclcpp putm_ev_amk_2023 sensor_msgs)
+ament_target_dependencies(amk_node rclcpp putm_pm09_vcl sensor_msgs)
 
 add_executable(amk_bridge_rx_node src/amk_bridge/amk_rx_bridge.cpp)
 target_include_directories(amk_bridge_rx_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_bridge_rx_node rclcpp putm_ev_amk_2023)
+ament_target_dependencies(amk_bridge_rx_node rclcpp putm_pm09_vcl)
 
 add_executable(amk_bridge_tx_node src/amk_bridge/amk_tx_bridge.cpp)
 target_include_directories(amk_bridge_tx_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_bridge_tx_node rclcpp putm_ev_amk_2023)
+ament_target_dependencies(amk_bridge_tx_node rclcpp putm_pm09_vcl)
 
 add_executable(can_rx_bridge_node src/can_bridge/can_rx_bridge.cpp)
 target_include_directories(can_rx_bridge_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(can_rx_bridge_node rclcpp putm_ev_amk_2023)
+ament_target_dependencies(can_rx_bridge_node rclcpp putm_pm09_vcl)
 
 add_executable(can_tx_bridge_node src/can_bridge/can_tx_bridge.cpp)
 target_include_directories(can_tx_bridge_node PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(can_tx_bridge_node rclcpp putm_ev_amk_2023)
+ament_target_dependencies(can_tx_bridge_node rclcpp putm_pm09_vcl)
 
 install(TARGETS
   amk_node

@@ -4,7 +4,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 
-#include "putm_ev_amk_2023/msg/amk_control.hpp"
+#include "putm_pm09_vcl/msg/amk_control.hpp"
 
 using namespace PUTM_CAN;
 
@@ -13,7 +13,7 @@ using namespace std::chrono_literals;
 
 CanTx can_tx("can0");
 
-// void topic_callback(const putm_ev_amk_2023::msg::AmkControl msg)
+// void topic_callback(const putm_pm09_vcl::msg::AmkControl msg)
 // {
 //     AmkFrontLeftSetpoints1 front_left_amk_setpoints{
 //         .AMK_Control = {0, msg.amk_control_binverter_on[0], msg.amk_control_bdc_on[0], msg.amk_control_benable[0], msg.amk_control_amkb_error_reset[0], 0},
@@ -59,11 +59,11 @@ class AmkBridgeTxNode : public rclcpp::Node
     AmkBridgeTxNode()
     : Node("amk_tx_bridge")
     {
-        subscription_ = this->create_subscription<putm_ev_amk_2023::msg::AmkControl>("amk_control", 10, std::bind(&AmkBridgeTxNode::amk_control_callback, this, _1));
+        subscription_ = this->create_subscription<putm_pm09_vcl::msg::AmkControl>("amk_control", 10, std::bind(&AmkBridgeTxNode::amk_control_callback, this, _1));
         timer_ = this->create_wall_timer(10ms, std::bind(&AmkBridgeTxNode::amk_can_tx, this));
     }
   private:
-    void amk_control_callback(const putm_ev_amk_2023::msg::AmkControl msg) const
+    void amk_control_callback(const putm_pm09_vcl::msg::AmkControl msg) const
     {
         front_left_amk_setpoints.AMK_Control = {0, msg.amk_control_binverter_on[0], msg.amk_control_bdc_on[0], msg.amk_control_benable[0], msg.amk_control_amkb_error_reset[0], 0};
         front_left_amk_setpoints.AMK_TargetVelocity = msg.amk_target_tourqe[0];
@@ -96,14 +96,14 @@ class AmkBridgeTxNode : public rclcpp::Node
         can_tx.transmit(rear_left_amk_setpoints);
         can_tx.transmit(rear_right_amk_setpoints);
     }
-    rclcpp::Subscription<putm_ev_amk_2023::msg::AmkControl>::SharedPtr subscription_;
+    rclcpp::Subscription<putm_pm09_vcl::msg::AmkControl>::SharedPtr subscription_;
     rclcpp::TimerBase::SharedPtr timer_;
 };
 int main(int argc, char ** argv)
 {
     rclcpp::init(argc, argv);
     // auto node = std::make_shared<rclcpp::Node>("amk_bridge_tx_node");
-    // rclcpp::Subscription<putm_ev_amk_2023::msg::AmkControl>::SharedPtr AmkControlSubscriber = node->create_subscription<putm_ev_amk_2023::msg::AmkControl>("amk_control", 10, std::bind(&topic_callback, std::placeholders::_1));
+    // rclcpp::Subscription<putm_pm09_vcl::msg::AmkControl>::SharedPtr AmkControlSubscriber = node->create_subscription<putm_ev_amk_2023::msg::AmkControl>("amk_control", 10, std::bind(&topic_callback, std::placeholders::_1));
     rclcpp::spin(std::make_shared<AmkBridgeTxNode>());
     // rclcpp::spin(node);
     rclcpp::shutdown();
