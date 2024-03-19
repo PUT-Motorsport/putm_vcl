@@ -32,7 +32,7 @@ class AmkNode : public rclcpp::Node
 {
   public:
     AmkNode()
-    : Node("amk_main_node"), count_(0)
+    : Node("amk_main_node")
     {
       subscription_ = this->create_subscription<putm_pm09_vcl::msg::AmkStatus> ("amk_status", 10, std::bind(&AmkNode::AmkStatusCallback, this, std::placeholders::_1));
       joy_subscription_ = this->create_subscription<sensor_msgs::msg::Joy> ("/joy", 10, std::bind(&AmkNode::joyCallback, this, std::placeholders::_1));
@@ -194,7 +194,6 @@ class AmkNode : public rclcpp::Node
     rclcpp::Publisher<putm_pm09_vcl::msg::AmkControl>::SharedPtr publisher_;
     rclcpp::Subscription<putm_pm09_vcl::msg::AmkStatus> ::SharedPtr subscription_;
     rclcpp::Subscription<sensor_msgs::msg::Joy> ::SharedPtr joy_subscription_;
-    size_t count_;
 };
 
 int main(int argc, char ** argv) 
