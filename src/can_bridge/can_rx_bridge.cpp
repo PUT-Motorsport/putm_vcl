@@ -21,7 +21,6 @@ class CanRxNode : public rclcpp::Node
     void CanRxNodeMainLoop()
     {
     	can_frame frame = can_rx.receive();
-      std::cout << frame.can_id << std::endl;
     	switch(frame.can_id)
     	{
       	case FRONTBOX_MAIN_CAN_ID:
