@@ -26,7 +26,6 @@ int main(int argc, char ** argv)
   (void) argc;
   (void) argv;
 
-  CanTx can_tx("can0");
   CanRx can_rx("can0", NO_TIMEOUT);
 
   putm_pm09_vcl::msg::AmkStatus amk_status;
@@ -35,6 +34,7 @@ int main(int argc, char ** argv)
   while(true)
   {
     can_frame frame = can_rx.receive();
+    std::cout << frame.can_id << "\n";
 
     switch(frame.can_id)
     {
