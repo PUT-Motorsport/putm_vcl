@@ -33,7 +33,7 @@ add_executable(amk_node src/amk_node/amk_node.cpp)
 target_include_directories(
   amk_node PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_node rclcpp sensor_msgs)
+ament_target_dependencies(amk_node rclcpp putm_pm09_driver)
 target_link_libraries(amk_node "${cpp_typesupport_target}")
 
 add_executable(amk_bridge_rx_node src/amk_bridge/amk_rx_bridge.cpp)
