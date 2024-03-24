@@ -13,6 +13,7 @@ find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(putm_pm09_driver REQUIRED)
+find_package(putm_pm09_vcl REQUIRED)
 
 rosidl_generate_interfaces(
   ${PROJECT_NAME} 
@@ -20,7 +21,8 @@ rosidl_generate_interfaces(
   "msg/AmkControl.msg" 
   "msg/AmkData.msg"
   "msg/Frontbox.msg"
-  "msg/Dash.msg")
+  "msg/Dash.msg"
+  "msg/Rtd.msg")
 
 ament_export_dependencies(rosidl_default_runtime)
 
@@ -74,8 +76,17 @@ target_include_directories(
 ament_target_dependencies(joy_control_node rclcpp sensor_msgs)
 target_link_libraries(joy_control_node "${cpp_typesupport_target}")
 
+add_executable(rtd_node src/can_node/rtd.cpp)
+target_include_directories(
+  rtd_node
+  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+         $<INSTALL_INTERFACE:include>)
+ament_target_dependencies(rtd_node rclcpp)
+target_link_libraries(rtd_node "${cpp_typesupport_target}")
+
 install(TARGETS amk_node amk_bridge_rx_node amk_bridge_tx_node
                 can_tx_bridge_node can_rx_bridge_node joy_control_node
+                rtd_node
         DESTINATION lib/${PROJECT_NAME}/)
 
 if(BUILD_TESTING)
