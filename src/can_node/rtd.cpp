@@ -31,7 +31,6 @@ class Rtd : public rclcpp::Node
     {
       auto rtdMsg = putm_pm09_vcl::msg::Rtd();
       /* Entry condition */
-      RCLCPP_INFO(this->get_logger(), "Entry status: '%f', '%d'", brake_pressure_rear, rtd_button_state);
       if ((brake_pressure_front >= 100.0) or (brake_pressure_rear >=100.0))
       {
         RCLCPP_INFO(this->get_logger(), "Braking...");
