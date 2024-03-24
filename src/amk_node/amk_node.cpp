@@ -1,8 +1,10 @@
 #include <cstdio>
 
+#include "putm_pm09_vcl/msg/detail/rtd__struct.hpp"
 #include "rclcpp/rclcpp.hpp" 
 #include "putm_pm09_vcl/msg/amk_status.hpp"
 #include "putm_pm09_vcl/msg/amk_control.hpp"
+#include "putm_pm09_vcl/msg/rtd.hpp"
 
 using namespace std::chrono_literals;
 
@@ -30,9 +32,10 @@ class AmkNode : public rclcpp::Node
 {
   public:
     AmkNode()
-    : Node("amk_main_node")
+    : Node("amk_main_node"), rtd_state(false)
     {
       subscription_ = this->create_subscription<putm_pm09_vcl::msg::AmkStatus> ("amk_status", 10, std::bind(&AmkNode::AmkStatusCallback, this, std::placeholders::_1));
+      rtdSubscription =this->create_subscription<putm_pm09_vcl::msg::Rtd>("rtd", 10, std::bind(&AmkNode::rtdCallback, this, std::placeholders::_1));
       publisher_    = this->create_publisher   <putm_pm09_vcl::msg::AmkControl>("amk_control", 10);
       AmkControlPublisherTimer = this->create_wall_timer(2ms, std::bind(&AmkNode::AmkControlCallback, this));
       AmkMainLoopTimer         = this->create_wall_timer(5ms, std::bind(&AmkNode::AmkMainLoop, this));
@@ -51,6 +54,11 @@ class AmkNode : public rclcpp::Node
       state = StateMachine::UNDEFINED;
       RCLCPP_INFO(this->get_logger(), "Startup Watchodg triggered");
       AmkStartupWatchdog->cancel();
+    }
+    void rtdCallback(const putm_pm09_vcl::msg::Rtd msg)
+    {
+      RCLCPP_INFO(this->get_logger(), "rtd message received");
+      rtd_state = msg.rtd_state;
     }
     void AmkMainLoop()
     {
@@ -90,11 +98,11 @@ class AmkNode : public rclcpp::Node
         case StateMachine::IDLING: 
         {
           /* Check for RTD*/
-          // if(Padinput.buttons[0] == 1)
-          // {
-          //   state = StateMachine::STARTUP;
-          //   AmkStartupWatchdog = this->create_wall_timer(5000ms, std::bind(&AmkNode::AmkStartupWatchdogCallback, this));
-          // }
+          if(rtd_state == 1)
+          {
+            state = StateMachine::STARTUP;
+            AmkStartupWatchdog = this->create_wall_timer(5000ms, std::bind(&AmkNode::AmkStartupWatchdogCallback, this));
+          }
         }
         break;
         case StateMachine::STARTUP:
@@ -141,10 +149,10 @@ class AmkNode : public rclcpp::Node
           if(!(AmkStatusMessage.amk_status_binverter_on[0] && AmkStatusMessage.amk_status_binverter_on[1] && AmkStatusMessage.amk_status_binverter_on[2] && AmkStatusMessage.amk_status_binverter_on[3])) {state = StateMachine::SWITCH_OFF;}
           AmkControlMessage.amk_tourqe_positive_limit.fill(2000);
 
-          // if(Padinput.buttons[0] == 1) 
-          // { 
-          //   state = StateMachine::SWITCH_OFF;
-          // }
+          if(rtd_state != 1) 
+          { 
+            state = StateMachine::SWITCH_OFF;
+          }
           std::this_thread::sleep_for(std::chrono::milliseconds(5));
 
         }
@@ -180,11 +188,13 @@ class AmkNode : public rclcpp::Node
         break;
       }
     }
+    bool rtd_state;
     rclcpp::TimerBase::SharedPtr AmkControlPublisherTimer;
     rclcpp::TimerBase::SharedPtr AmkMainLoopTimer;
     rclcpp::TimerBase::SharedPtr AmkStartupWatchdog;
     rclcpp::Publisher<putm_pm09_vcl::msg::AmkControl>::SharedPtr publisher_;
     rclcpp::Subscription<putm_pm09_vcl::msg::AmkStatus> ::SharedPtr subscription_;
+    rclcpp::Subscription<putm_pm09_vcl::msg::Rtd>::SharedPtr rtdSubscription;
 };
 
 int main(int argc, char ** argv) 
