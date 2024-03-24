@@ -21,13 +21,14 @@ class CanRxNode : public rclcpp::Node
     void CanRxNodeMainLoop()
     {
     	can_frame frame = can_rx.receive();
+      std::cout << frame.can_id << std::endl;
     	switch(frame.can_id)
     	{
       	case FRONTBOX_MAIN_CAN_ID:
       	{
           auto can_frontbox = PUTM_CAN::convert<PUTM_CAN::Frontbox_main>(frame);
           putm_pm09_vcl::msg::Frontbox frontbox;
-          frontbox.pedal_position = can_frontbox.pedal_position;
+          frontbox.pedal_position = (((can_frontbox.pedal_position) / 500.0)*100.0);
           FrontBoxPublisher->publish(frontbox);
       	}
     	}
