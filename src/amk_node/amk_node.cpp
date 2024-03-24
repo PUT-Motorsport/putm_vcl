@@ -5,6 +5,7 @@
 #include "putm_pm09_vcl/msg/amk_status.hpp"
 #include "putm_pm09_vcl/msg/amk_control.hpp"
 #include "putm_pm09_vcl/msg/rtd.hpp"
+#include "putm_pm09_driver/msg/setpoints.hpp"
 
 using namespace std::chrono_literals;
 
@@ -32,10 +33,11 @@ class AmkNode : public rclcpp::Node
 {
   public:
     AmkNode()
-    : Node("amk_main_node"), rtd_state(false)
+    : Node("amk_main_node"), rtd_state(false), tourqe_setpoints{0,0,0,0}
     {
       subscription_ = this->create_subscription<putm_pm09_vcl::msg::AmkStatus> ("amk_status", 10, std::bind(&AmkNode::AmkStatusCallback, this, std::placeholders::_1));
-      rtdSubscription =this->create_subscription<putm_pm09_vcl::msg::Rtd>("rtd", 10, std::bind(&AmkNode::rtdCallback, this, std::placeholders::_1));
+      rtdSubscription = this->create_subscription<putm_pm09_vcl::msg::Rtd>("rtd", 10, std::bind(&AmkNode::rtdCallback, this, std::placeholders::_1));
+      setpointsSubscriber = this->create_subscription<putm_pm09_driver::msg::Setpoints>("setpoints", 10, std::bind(&AmkNode::setpointsCallback, this, std::placeholders::_1));
       publisher_    = this->create_publisher   <putm_pm09_vcl::msg::AmkControl>("amk_control", 10);
       AmkControlPublisherTimer = this->create_wall_timer(2ms, std::bind(&AmkNode::AmkControlCallback, this));
       AmkMainLoopTimer         = this->create_wall_timer(5ms, std::bind(&AmkNode::AmkMainLoop, this));
@@ -59,6 +61,13 @@ class AmkNode : public rclcpp::Node
     {
       RCLCPP_INFO(this->get_logger(), "rtd message received");
       rtd_state = msg.rtd_state;
+    }
+    void setpointsCallback(const putm_pm09_driver::msg::Setpoints msg)
+    {
+      tourqe_setpoints[0] = msg.tourqes[0];   
+      tourqe_setpoints[1] = msg.tourqes[1];
+      tourqe_setpoints[2] = msg.tourqes[2];
+      tourqe_setpoints[3] = msg.tourqes[3];
     }
     void AmkMainLoop()
     {
@@ -148,7 +157,10 @@ class AmkNode : public rclcpp::Node
           /* Check some stop conditions*/
           if(!(AmkStatusMessage.amk_status_binverter_on[0] && AmkStatusMessage.amk_status_binverter_on[1] && AmkStatusMessage.amk_status_binverter_on[2] && AmkStatusMessage.amk_status_binverter_on[3])) {state = StateMachine::SWITCH_OFF;}
           AmkControlMessage.amk_tourqe_positive_limit.fill(2000);
-
+          AmkControlMessage.amk_target_tourqe[0] = tourqe_setpoints[0];
+          AmkControlMessage.amk_target_tourqe[1] = tourqe_setpoints[1];
+          AmkControlMessage.amk_target_tourqe[2] = tourqe_setpoints[2];
+          AmkControlMessage.amk_target_tourqe[3] = tourqe_setpoints[3];
           if(rtd_state != 1) 
           { 
             state = StateMachine::SWITCH_OFF;
@@ -189,12 +201,14 @@ class AmkNode : public rclcpp::Node
       }
     }
     bool rtd_state;
+    int32_t tourqe_setpoints[4];
     rclcpp::TimerBase::SharedPtr AmkControlPublisherTimer;
     rclcpp::TimerBase::SharedPtr AmkMainLoopTimer;
     rclcpp::TimerBase::SharedPtr AmkStartupWatchdog;
     rclcpp::Publisher<putm_pm09_vcl::msg::AmkControl>::SharedPtr publisher_;
     rclcpp::Subscription<putm_pm09_vcl::msg::AmkStatus> ::SharedPtr subscription_;
     rclcpp::Subscription<putm_pm09_vcl::msg::Rtd>::SharedPtr rtdSubscription;
+    rclcpp::Subscription<putm_pm09_driver::msg::Setpoints>::SharedPtr setpointsSubscriber;
 };
 
 int main(int argc, char ** argv) 
