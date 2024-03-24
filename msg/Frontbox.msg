@@ -1,2 +1,2 @@
-float32 pedal_position
-float32 brake_pressure
+uint16 pedal_position
+uint16 brake_pressure
