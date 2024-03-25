@@ -61,6 +61,12 @@ int main(int argc, char ** argv)
           FrontBoxPublisher->publish(frontbox);
       	}
         break;
+
+      default:
+        {
+
+        }
+      break;
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
