@@ -59,7 +59,6 @@ class AmkNode : public rclcpp::Node
     }
     void rtdCallback(const putm_pm09_vcl::msg::Rtd msg)
     {
-      RCLCPP_INFO(this->get_logger(), "rtd message received");
       rtd_state = msg.rtd_state;
     }
     void setpointsCallback(const putm_pm09_driver::msg::Setpoints msg)
