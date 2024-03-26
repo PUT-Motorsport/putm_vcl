@@ -34,8 +34,6 @@ int main(int argc, char ** argv)
   while(true)
   {
     can_frame frame = can_rx.receive();
-    std::cout << frame.can_id << "\n";
-
     switch(frame.can_id)
     {
       case FRONT_LEFT_AMK_ACTUAL_VALUES_1_CAN_ID:
