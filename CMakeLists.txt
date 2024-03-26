@@ -12,8 +12,6 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(putm_pm09_driver REQUIRED)
-find_package(putm_pm09_vcl REQUIRED)
 
 rosidl_generate_interfaces(
   ${PROJECT_NAME} 
@@ -22,7 +20,8 @@ rosidl_generate_interfaces(
   "msg/AmkData.msg"
   "msg/Frontbox.msg"
   "msg/Dash.msg"
-  "msg/Rtd.msg")
+  "msg/Rtd.msg"
+  "msg/Setpoints.msg")
 
 ament_export_dependencies(rosidl_default_runtime)
 
@@ -33,7 +32,7 @@ add_executable(amk_node src/amk_node/amk_node.cpp)
 target_include_directories(
   amk_node PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                   $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_node rclcpp putm_pm09_driver)
+ament_target_dependencies(amk_node rclcpp)
 target_link_libraries(amk_node "${cpp_typesupport_target}")
 
 add_executable(amk_bridge_rx_node src/amk_bridge/amk_rx_bridge.cpp)

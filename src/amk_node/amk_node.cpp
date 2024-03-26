@@ -5,7 +5,7 @@
 #include "putm_pm09_vcl/msg/amk_status.hpp"
 #include "putm_pm09_vcl/msg/amk_control.hpp"
 #include "putm_pm09_vcl/msg/rtd.hpp"
-#include "putm_pm09_driver/msg/setpoints.hpp"
+#include "putm_pm09_vcl/msg/setpoints.hpp"
 
 using namespace std::chrono_literals;
 
@@ -37,7 +37,7 @@ class AmkNode : public rclcpp::Node
     {
       subscription_ = this->create_subscription<putm_pm09_vcl::msg::AmkStatus> ("amk_status", 10, std::bind(&AmkNode::AmkStatusCallback, this, std::placeholders::_1));
       rtdSubscription = this->create_subscription<putm_pm09_vcl::msg::Rtd>("rtd", 10, std::bind(&AmkNode::rtdCallback, this, std::placeholders::_1));
-      setpointsSubscriber = this->create_subscription<putm_pm09_driver::msg::Setpoints>("setpoints", 10, std::bind(&AmkNode::setpointsCallback, this, std::placeholders::_1));
+      setpointsSubscriber = this->create_subscription<putm_pm09_vcl::msg::Setpoints>("setpoints", 10, std::bind(&AmkNode::setpointsCallback, this, std::placeholders::_1));
       publisher_    = this->create_publisher   <putm_pm09_vcl::msg::AmkControl>("amk_control", 10);
       AmkControlPublisherTimer = this->create_wall_timer(2ms, std::bind(&AmkNode::AmkControlCallback, this));
       AmkMainLoopTimer         = this->create_wall_timer(5ms, std::bind(&AmkNode::AmkMainLoop, this));
@@ -61,7 +61,7 @@ class AmkNode : public rclcpp::Node
     {
       rtd_state = msg.rtd_state;
     }
-    void setpointsCallback(const putm_pm09_driver::msg::Setpoints msg)
+    void setpointsCallback(const putm_pm09_vcl::msg::Setpoints msg)
     {
       tourqe_setpoints[0] = msg.tourqes[0];   
       tourqe_setpoints[1] = msg.tourqes[1];
@@ -207,7 +207,7 @@ class AmkNode : public rclcpp::Node
     rclcpp::Publisher<putm_pm09_vcl::msg::AmkControl>::SharedPtr publisher_;
     rclcpp::Subscription<putm_pm09_vcl::msg::AmkStatus> ::SharedPtr subscription_;
     rclcpp::Subscription<putm_pm09_vcl::msg::Rtd>::SharedPtr rtdSubscription;
-    rclcpp::Subscription<putm_pm09_driver::msg::Setpoints>::SharedPtr setpointsSubscriber;
+    rclcpp::Subscription<putm_pm09_vcl::msg::Setpoints>::SharedPtr setpointsSubscriber;
 };
 
 int main(int argc, char ** argv) 
