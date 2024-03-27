@@ -11,7 +11,6 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
-find_package(sensor_msgs REQUIRED)
 
 rosidl_generate_interfaces(
   ${PROJECT_NAME} 
@@ -24,7 +23,6 @@ rosidl_generate_interfaces(
   "msg/Setpoints.msg")
 
 ament_export_dependencies(rosidl_default_runtime)
-
 rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME}
                               rosidl_typesupport_cpp)
 
@@ -35,47 +33,39 @@ target_include_directories(
 ament_target_dependencies(amk_node rclcpp)
 target_link_libraries(amk_node "${cpp_typesupport_target}")
 
-add_executable(amk_bridge_rx_node src/amk_bridge/amk_rx_bridge.cpp)
+add_executable(amk_rx_bridge src/amk_bridge/amk_rx_bridge.cpp)
 target_include_directories(
-  amk_bridge_rx_node
+  amk_rx_bridge
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
          $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_bridge_rx_node rclcpp)
-target_link_libraries(amk_bridge_rx_node "${cpp_typesupport_target}")
+ament_target_dependencies(amk_rx_bridge rclcpp)
+target_link_libraries(amk_rx_bridge "${cpp_typesupport_target}")
 
-add_executable(amk_bridge_tx_node src/amk_bridge/amk_tx_bridge.cpp)
+add_executable(amk_tx_bridge src/amk_bridge/amk_tx_bridge.cpp)
 target_include_directories(
-  amk_bridge_tx_node
+  amk_tx_bridge
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
          $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_bridge_tx_node rclcpp)
-target_link_libraries(amk_bridge_tx_node "${cpp_typesupport_target}")
+ament_target_dependencies(amk_tx_bridge rclcpp)
+target_link_libraries(amk_tx_bridge "${cpp_typesupport_target}")
 
-add_executable(can_rx_bridge_node src/can_bridge/can_rx_bridge.cpp)
+add_executable(can_rx_bridge src/can_bridge/can_rx_bridge.cpp)
 target_include_directories(
-  can_rx_bridge_node
+  can_rx_bridge
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
          $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(can_rx_bridge_node rclcpp)
-target_link_libraries(can_rx_bridge_node "${cpp_typesupport_target}")
+ament_target_dependencies(can_rx_bridge rclcpp)
+target_link_libraries(can_rx_bridge "${cpp_typesupport_target}")
 
-add_executable(can_tx_bridge_node src/can_bridge/can_tx_bridge.cpp)
+add_executable(can_tx_bridge src/can_bridge/can_tx_bridge.cpp)
 target_include_directories(
-  can_tx_bridge_node
+  can_tx_bridge
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
          $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(can_tx_bridge_node rclcpp)
-target_link_libraries(can_tx_bridge_node "${cpp_typesupport_target}")
+ament_target_dependencies(can_tx_bridge rclcpp)
+target_link_libraries(can_tx_bridge "${cpp_typesupport_target}")
 
-add_executable(joy_control_node src/can_node/joy_control.cpp)
-target_include_directories(
-  joy_control_node
-  PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-         $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(joy_control_node rclcpp sensor_msgs)
-target_link_libraries(joy_control_node "${cpp_typesupport_target}")
-
-add_executable(rtd_node src/can_node/rtd.cpp)
+add_executable(rtd_node src/rtd_node/rtd_node.cpp)
 target_include_directories(
   rtd_node
   PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -83,10 +73,16 @@ target_include_directories(
 ament_target_dependencies(rtd_node rclcpp)
 target_link_libraries(rtd_node "${cpp_typesupport_target}")
 
-install(TARGETS amk_node amk_bridge_rx_node amk_bridge_tx_node
-                can_tx_bridge_node can_rx_bridge_node joy_control_node
+install(TARGETS amk_node 
+                amk_rx_bridge
+                amk_tx_bridge
+                can_tx_bridge
+                can_rx_bridge
                 rtd_node
         DESTINATION lib/${PROJECT_NAME}/)
+
+install(DIRECTORY launch/ 
+        DESTINATION share/${PROJECT_NAME}/)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
