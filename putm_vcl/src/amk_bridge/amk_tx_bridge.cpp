@@ -1,7 +1,7 @@
 #include <cstdio>
 
 #include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_tx.hpp"
-#include "putm_pm09_vcl/msg/amk_control.hpp"
+#include "putm_vcl_interfaces/msg/amk_control.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 using namespace PUTM_CAN;
@@ -23,13 +23,13 @@ public:
   AmkBridgeTxNode() : Node("amk_tx_bridge"), can_tx("can0")
   {
     RCLCPP_INFO_ONCE(this->get_logger(), "My log message %d", 4);
-    subscription_ = this->create_subscription<putm_pm09_vcl::msg::AmkControl>(
+    subscription_ = this->create_subscription<putm_vcl_interfaces::msg::AmkControl>(
       "amk_control", 10, std::bind(&AmkBridgeTxNode::amk_control_callback, this, _1));
     timer_ = this->create_wall_timer(10ms, std::bind(&AmkBridgeTxNode::amk_can_tx, this));
   }
 
 private:
-  void amk_control_callback(const putm_pm09_vcl::msg::AmkControl msg) const
+  void amk_control_callback(const putm_vcl_interfaces::msg::AmkControl msg) const
   {
     front_left_amk_setpoints.AMK_Control = {
       0,
@@ -83,7 +83,7 @@ private:
     can_tx.transmit(rear_right_amk_setpoints);
   }
   CanTx can_tx;
-  rclcpp::Subscription<putm_pm09_vcl::msg::AmkControl>::SharedPtr subscription_;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkControl>::SharedPtr subscription_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 int main(int argc, char ** argv)

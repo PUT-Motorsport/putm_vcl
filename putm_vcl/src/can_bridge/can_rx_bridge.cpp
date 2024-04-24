@@ -3,8 +3,8 @@
 
 #include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_headers/PM09-CANBUS-FRONTBOX.hpp"
 #include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_rx.hpp"
-#include "putm_pm09_vcl/msg/detail/frontbox__struct.hpp"
-#include "putm_pm09_vcl/msg/frontbox.hpp"
+#include "putm_vcl_interfaces/msg/detail/frontbox__struct.hpp"
+#include "putm_vcl_interfaces/msg/frontbox.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 using namespace std::chrono_literals;
@@ -16,7 +16,7 @@ public:
   CanRxNode() : Node("can_rx_node"), can_rx("can1", NO_TIMEOUT)
   {
     CanRxNodeTimer = this->create_wall_timer(1ms, std::bind(&CanRxNode::CanRxNodeMainLoop, this));
-    FrontBoxPublisher = this->create_publisher<putm_pm09_vcl::msg::Frontbox>("frontbox", 10);
+    FrontBoxPublisher = this->create_publisher<putm_vcl_interfaces::msg::Frontbox>("frontbox", 10);
   }
 
 private:
@@ -26,13 +26,13 @@ private:
     switch (frame.can_id) {
       case FRONTBOX_MAIN_CAN_ID: {
         auto can_frontbox = PUTM_CAN::convert<PUTM_CAN::Frontbox_main>(frame);
-        putm_pm09_vcl::msg::Frontbox frontbox;
+        putm_vcl_interfaces::msg::Frontbox frontbox;
         frontbox.pedal_position = (((can_frontbox.pedal_position) / 500.0) * 100.0);
         FrontBoxPublisher->publish(frontbox);
       }
     }
   }
-  rclcpp::Publisher<putm_pm09_vcl::msg::Frontbox>::SharedPtr FrontBoxPublisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::Frontbox>::SharedPtr FrontBoxPublisher;
   CanRx can_rx;
   rclcpp::TimerBase::SharedPtr CanRxNodeTimer;
 };
@@ -45,7 +45,7 @@ int main(int argc, char ** argv)
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<CanRxNode>());
   rclcpp::shutdown();
-  // rclcpp::Publisher<putm_pm09_vcl::msg::Frontbox>::SharedPtr FrontBoxPublisher = node->create_publisher<putm_pm09_vcl::msg::Frontbox>("frontbox", 10);
+  // rclcpp::Publisher<putm_vcl_interfaces::msg::Frontbox>::SharedPtr FrontBoxPublisher = node->create_publisher<putm_vcl_interfaces::msg::Frontbox>("frontbox", 10);
   //
   // CanRx can_rx("can1", NO_TIMEOUT);
   //
@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
   //     case FRONTBOX_MAIN_CAN_ID:
   //   	{
   //       auto can_frontbox = PUTM_CAN::convert<PUTM_CAN::Frontbox_main>(frame);
-  //       putm_pm09_vcl::msg::Frontbox frontbox;
+  //       putm_vcl_interfaces::msg::Frontbox frontbox;
   //       frontbox.pedal_position = ((can_frontbox.pedal_position) / 500.0);
   //       FrontBoxPublisher->publish(frontbox);
   //   	}

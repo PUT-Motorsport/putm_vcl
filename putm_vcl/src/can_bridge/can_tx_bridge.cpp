@@ -1,7 +1,7 @@
 #include <cstdio>
 
 #include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_rx.hpp"
-#include "putm_pm09_vcl/msg/frontbox.hpp"
+#include "putm_vcl_interfaces/msg/frontbox.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 using namespace std::chrono_literals;

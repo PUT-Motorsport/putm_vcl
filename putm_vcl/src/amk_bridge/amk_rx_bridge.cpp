@@ -2,8 +2,8 @@
 
 #include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_rx.hpp"
 #include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_tx.hpp"
-#include "putm_pm09_vcl/msg/amk_data.hpp"
-#include "putm_pm09_vcl/msg/amk_status.hpp"
+#include "putm_vcl_interfaces/msg/amk_data.hpp"
+#include "putm_vcl_interfaces/msg/amk_status.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 using namespace PUTM_CAN;
@@ -14,18 +14,18 @@ int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
   auto node = std::make_shared<rclcpp::Node>("amk_bridge_node");
-  rclcpp::Publisher<putm_pm09_vcl::msg::AmkStatus>::SharedPtr AmkStatusPublisher =
-    node->create_publisher<putm_pm09_vcl::msg::AmkStatus>("amk_status", 10);
-  rclcpp::Publisher<putm_pm09_vcl::msg::AmkData>::SharedPtr AmkDataPublisher =
-    node->create_publisher<putm_pm09_vcl::msg::AmkData>("amk_data", 10);
+  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkStatus>::SharedPtr AmkStatusPublisher =
+    node->create_publisher<putm_vcl_interfaces::msg::AmkStatus>("amk_status", 10);
+  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkData>::SharedPtr AmkDataPublisher =
+    node->create_publisher<putm_vcl_interfaces::msg::AmkData>("amk_data", 10);
 
   (void)argc;
   (void)argv;
 
   CanRx can_rx("can0", NO_TIMEOUT);
 
-  putm_pm09_vcl::msg::AmkStatus amk_status;
-  putm_pm09_vcl::msg::AmkData amk_data;
+  putm_vcl_interfaces::msg::AmkStatus amk_status;
+  putm_vcl_interfaces::msg::AmkData amk_data;
 
   while (true) {
     can_frame frame = can_rx.receive();

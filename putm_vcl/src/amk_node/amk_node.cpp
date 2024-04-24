@@ -1,10 +1,10 @@
 #include <cstdio>
 
-#include "putm_pm09_vcl/msg/amk_control.hpp"
-#include "putm_pm09_vcl/msg/amk_status.hpp"
-#include "putm_pm09_vcl/msg/detail/rtd__struct.hpp"
-#include "putm_pm09_vcl/msg/rtd.hpp"
-#include "putm_pm09_vcl/msg/setpoints.hpp"
+#include "putm_vcl_interfaces/msg/amk_control.hpp"
+#include "putm_vcl_interfaces/msg/amk_status.hpp"
+#include "putm_vcl_interfaces/msg/detail/rtd__struct.hpp"
+#include "putm_vcl_interfaces/msg/rtd.hpp"
+#include "putm_vcl_interfaces/msg/setpoints.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 using namespace std::chrono_literals;
@@ -21,28 +21,28 @@ enum class StateMachine {
   ERROR_RESET = 6
 } state{StateMachine::UNDEFINED};
 
-putm_pm09_vcl::msg::AmkControl AmkControlMessage;
-putm_pm09_vcl::msg::AmkStatus AmkStatusMessage;
+putm_vcl_interfaces::msg::AmkControl AmkControlMessage;
+putm_vcl_interfaces::msg::AmkStatus AmkStatusMessage;
 
 class AmkNode : public rclcpp::Node
 {
 public:
   AmkNode() : Node("amk_main_node"), rtd_state(false), tourqe_setpoints{0, 0, 0, 0}
   {
-    subscription_ = this->create_subscription<putm_pm09_vcl::msg::AmkStatus>(
+    subscription_ = this->create_subscription<putm_vcl_interfaces::msg::AmkStatus>(
       "amk_status", 10, std::bind(&AmkNode::AmkStatusCallback, this, std::placeholders::_1));
-    rtdSubscription = this->create_subscription<putm_pm09_vcl::msg::Rtd>(
+    rtdSubscription = this->create_subscription<putm_vcl_interfaces::msg::Rtd>(
       "rtd", 10, std::bind(&AmkNode::rtdCallback, this, std::placeholders::_1));
-    setpointsSubscriber = this->create_subscription<putm_pm09_vcl::msg::Setpoints>(
+    setpointsSubscriber = this->create_subscription<putm_vcl_interfaces::msg::Setpoints>(
       "setpoints", 10, std::bind(&AmkNode::setpointsCallback, this, std::placeholders::_1));
-    publisher_ = this->create_publisher<putm_pm09_vcl::msg::AmkControl>("amk_control", 10);
+    publisher_ = this->create_publisher<putm_vcl_interfaces::msg::AmkControl>("amk_control", 10);
     AmkControlPublisherTimer =
       this->create_wall_timer(2ms, std::bind(&AmkNode::AmkControlCallback, this));
     AmkMainLoopTimer = this->create_wall_timer(5ms, std::bind(&AmkNode::AmkMainLoop, this));
   }
 
 private:
-  void AmkStatusCallback(const putm_pm09_vcl::msg::AmkStatus::SharedPtr msg)
+  void AmkStatusCallback(const putm_vcl_interfaces::msg::AmkStatus::SharedPtr msg)
   {
     AmkStatusMessage = *msg;
   }
@@ -53,8 +53,8 @@ private:
     RCLCPP_INFO(this->get_logger(), "Startup Watchodg triggered");
     AmkStartupWatchdog->cancel();
   }
-  void rtdCallback(const putm_pm09_vcl::msg::Rtd msg) { rtd_state = msg.rtd_state; }
-  void setpointsCallback(const putm_pm09_vcl::msg::Setpoints msg)
+  void rtdCallback(const putm_vcl_interfaces::msg::Rtd msg) { rtd_state = msg.rtd_state; }
+  void setpointsCallback(const putm_vcl_interfaces::msg::Setpoints msg)
   {
     tourqe_setpoints[0] = msg.tourqes[0];
     tourqe_setpoints[1] = msg.tourqes[1];
@@ -192,10 +192,10 @@ private:
   rclcpp::TimerBase::SharedPtr AmkControlPublisherTimer;
   rclcpp::TimerBase::SharedPtr AmkMainLoopTimer;
   rclcpp::TimerBase::SharedPtr AmkStartupWatchdog;
-  rclcpp::Publisher<putm_pm09_vcl::msg::AmkControl>::SharedPtr publisher_;
-  rclcpp::Subscription<putm_pm09_vcl::msg::AmkStatus>::SharedPtr subscription_;
-  rclcpp::Subscription<putm_pm09_vcl::msg::Rtd>::SharedPtr rtdSubscription;
-  rclcpp::Subscription<putm_pm09_vcl::msg::Setpoints>::SharedPtr setpointsSubscriber;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkControl>::SharedPtr publisher_;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkStatus>::SharedPtr subscription_;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::Rtd>::SharedPtr rtdSubscription;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::Setpoints>::SharedPtr setpointsSubscriber;
 };
 
 int main(int argc, char ** argv)
