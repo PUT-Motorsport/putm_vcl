@@ -12,9 +12,9 @@ static AmkFrontRightSetpoints1 front_right_amk_setpoints = {amkFrontRightControl
 static AmkRearLeftSetpoints1 rear_left_amk_setpoints = {amkRearLeftControl_t{0, 0, 0, 0, 0, 0}, 0, 0, 0};
 static AmkRearRightSetpoints1 rear_right_amk_setpoints = {amkRearRightControl_t{0, 0, 0, 0, 0, 0}, 0, 0, 0};
 
-class AmkBridgeTxNode : public rclcpp::Node {
+class AmkTxNode : public rclcpp::Node {
  public:
-  AmkBridgeTxNode();
+  AmkTxNode();
 
  private:
   CanTx can_tx;
@@ -25,12 +25,12 @@ class AmkBridgeTxNode : public rclcpp::Node {
   void amk_can_tx();
 };
 
-AmkBridgeTxNode::AmkBridgeTxNode() : Node("amk_tx_bridge"), can_tx("can0") {
-  subscription_ = this->create_subscription<putm_vcl_interfaces::msg::AmkControl>("amk_control", 10, std::bind(&AmkBridgeTxNode::amk_control_callback, this, _1));
-  timer_ = this->create_wall_timer(10ms, std::bind(&AmkBridgeTxNode::amk_can_tx, this));
+AmkTxNode::AmkTxNode() : Node("amk_tx_bridge"), can_tx("can0") {
+  subscription_ = this->create_subscription<putm_vcl_interfaces::msg::AmkControl>("amk_control", 10, std::bind(&AmkTxNode::amk_control_callback, this, _1));
+  timer_ = this->create_wall_timer(10ms, std::bind(&AmkTxNode::amk_can_tx, this));
 }
 
-void AmkBridgeTxNode::amk_control_callback(const putm_vcl_interfaces::msg::AmkControl msg) const {
+void AmkTxNode::amk_control_callback(const putm_vcl_interfaces::msg::AmkControl msg) const {
   front_left_amk_setpoints.AMK_Control = {
       0, msg.amk_control_binverter_on[0], msg.amk_control_bdc_on[0], msg.amk_control_benable[0], msg.amk_control_amkb_error_reset[0], 0};
   front_left_amk_setpoints.AMK_TargetVelocity = msg.amk_target_tourqe[0];
@@ -56,7 +56,7 @@ void AmkBridgeTxNode::amk_control_callback(const putm_vcl_interfaces::msg::AmkCo
   rear_right_amk_setpoints.AMK_TorqueLimitNegativ = msg.amk_tourqe_negative_limit[3];
 }
 
-void AmkBridgeTxNode::amk_can_tx() {
+void AmkTxNode::amk_can_tx() {
   can_tx.transmit(front_left_amk_setpoints);
   can_tx.transmit(front_right_amk_setpoints);
   can_tx.transmit(rear_left_amk_setpoints);
@@ -65,7 +65,7 @@ void AmkBridgeTxNode::amk_can_tx() {
 
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<AmkBridgeTxNode>());
+  rclcpp::spin(std::make_shared<AmkTxNode>());
   rclcpp::shutdown();
 
   return 0;
