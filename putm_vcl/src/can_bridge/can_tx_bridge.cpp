@@ -1,5 +1,3 @@
-#include <cstdio>
-
 #include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_rx.hpp"
 #include "putm_vcl_interfaces/msg/frontbox.hpp"
 #include "rclcpp/rclcpp.hpp"

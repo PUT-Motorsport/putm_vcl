@@ -1,5 +1,3 @@
-#include <cstdio>
-
 #include "putm_vcl_interfaces/msg/amk_control.hpp"
 #include "putm_vcl_interfaces/msg/amk_status.hpp"
 #include "putm_vcl_interfaces/msg/detail/rtd__struct.hpp"
