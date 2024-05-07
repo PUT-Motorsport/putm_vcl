@@ -24,9 +24,9 @@ private:
       }
     }
   }
+  size_t count_;
   CanRx can_rx;
   rclcpp::TimerBase::SharedPtr CanTxNodeTimer;
-  size_t count_;
 };
 
 int main(int argc, char ** argv)
