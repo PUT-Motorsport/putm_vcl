@@ -7,33 +7,29 @@
 using namespace std::chrono_literals;
 using namespace PUTM_CAN;
 
-class CanTxNode : public rclcpp::Node
-{
-public:
-  CanTxNode() : Node("can_tx_node"), count_(0), can_rx("can1", NO_TIMEOUT)
-  {
-    CanTxNodeTimer = this->create_wall_timer(1ms, std::bind(&CanTxNode::CanTxNodeMainLoop, this));
-  }
+class CanTxNode : public rclcpp::Node {
+ public:
+  CanTxNode();
 
-private:
-  void CanTxNodeMainLoop()
-  {
-    can_frame frame = can_rx.receive();
-    switch (frame.can_id) {
-      case FRONTBOX_MAIN_CAN_ID: {
-      }
-    }
-  }
-  size_t count_;
+ private:
   CanRx can_rx;
-  rclcpp::TimerBase::SharedPtr CanTxNodeTimer;
+  rclcpp::TimerBase::SharedPtr can_tx_node_timer;
+
+  void can_tx_main_node_loop();
 };
 
-int main(int argc, char ** argv)
-{
-  (void)argc;
-  (void)argv;
+CanTxNode::CanTxNode() : Node("can_tx_node"), can_rx("can1", NO_TIMEOUT) {
+  can_tx_node_timer = this->create_wall_timer(1ms, std::bind(&CanTxNode::can_tx_main_node_loop, this));
+}
 
+void CanTxNode::can_tx_main_node_loop() {
+  can_frame frame = can_rx.receive();
+  switch (frame.can_id) {
+    // TODO: implement case when needed
+  }
+}
+
+int main(int argc, char** argv) {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<CanTxNode>());
   rclcpp::shutdown();
