@@ -15,14 +15,14 @@ class CanTxNode : public rclcpp::Node {
   CanRx can_rx;
   rclcpp::TimerBase::SharedPtr can_tx_node_timer;
 
-  void can_tx_main_node_loop();
+  void can_tx_node_main_loop();
 };
 
 CanTxNode::CanTxNode() : Node("can_tx_node"), can_rx("can1", NO_TIMEOUT) {
-  can_tx_node_timer = this->create_wall_timer(1ms, std::bind(&CanTxNode::can_tx_main_node_loop, this));
+  can_tx_node_timer = this->create_wall_timer(1ms, std::bind(&CanTxNode::can_tx_node_main_loop, this));
 }
 
-void CanTxNode::can_tx_main_node_loop() {
+void CanTxNode::can_tx_node_main_loop() {
   can_frame frame = can_rx.receive();
   switch (frame.can_id) {
     // TODO: implement case when needed
