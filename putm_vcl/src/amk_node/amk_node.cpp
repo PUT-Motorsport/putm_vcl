@@ -115,7 +115,7 @@ void AmkNode::amk_state_machine_callback() {
     } break;
     case StateMachine::IDLING: {
       /* Check for RTD*/
-      if (rtd.rtd_state == true) {
+      if (rtd.state == true) {
         state = StateMachine::STARTUP;
         amk_state_machine_watchdog->reset();
       }
@@ -165,7 +165,7 @@ void AmkNode::amk_state_machine_callback() {
       amk_control.amk_target_torque[Inverters::FRONT_RIGHT] = setpoints.torques[Inverters::FRONT_RIGHT];
       amk_control.amk_target_torque[Inverters::REAR_LEFT] = setpoints.torques[Inverters::REAR_LEFT];
       amk_control.amk_target_torque[Inverters::REAR_RIGHT] = setpoints.torques[Inverters::REAR_RIGHT];
-      if (rtd.rtd_state == false) {
+      if (rtd.state == false) {
         state = StateMachine::SWITCH_OFF;
       }
       rclcpp::sleep_for(5ms);

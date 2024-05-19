@@ -32,13 +32,13 @@ class Rtd : public rclcpp::Node {
       if ((rtd_button_state) and not(rtd_state)) {
         RCLCPP_INFO(this->get_logger(), "RTD ON");
         rtd_state = true;
-        rtdMsg.rtd_state = rtd_state;
+        rtdMsg.state = rtd_state;
         rtdPublisher->publish(rtdMsg);
       }
     } else if (rtd_state & rtd_button_state) {
       RCLCPP_INFO(this->get_logger(), "RTD OFF");
       rtd_state = false;
-      rtdMsg.rtd_state = rtd_state;
+      rtdMsg.state = rtd_state;
       rtdPublisher->publish(rtdMsg);
     }
     /* Exit conditions */

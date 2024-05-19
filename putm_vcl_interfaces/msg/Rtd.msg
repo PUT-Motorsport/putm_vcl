@@ -1,1 +1,1 @@
-bool rtd_state
+bool state
