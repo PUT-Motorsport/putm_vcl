@@ -16,32 +16,35 @@ class AmkNode : public rclcpp::Node {
  private:
   enum Inverters { FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT };
   enum class StateMachine { UNDEFINED = -1, IDLING, STARTUP, TORQUE_CONTROL, SWITCH_OFF, ERROR_HANDLER, ERROR_RESET };
-
-  void rtd_callback(const msg::Rtd::SharedPtr msg);
-  void setpoints_callback(const msg::Setpoints::SharedPtr msg);
-  void amk_status_callback(const msg::AmkStatus::SharedPtr msg);
-
-  void amk_state_machine_callback();
-  void amk_control_callback();
-
-  void amk_startup_watchdog_callback();
-
   StateMachine state;
-
   msg::AmkControl amk_control;
   msg::AmkStatus amk_status;
   msg::Setpoints setpoints;
   msg::Rtd rtd;
 
-  rclcpp::TimerBase::SharedPtr amk_control_publisher_timer;
-  rclcpp::TimerBase::SharedPtr amk_state_machine_timer;
-  rclcpp::TimerBase::SharedPtr amk_startup_watchdog;
-
+  // Publishers
   rclcpp::Publisher<msg::AmkControl>::SharedPtr publisher_amk_control;
-
+  // Subscribers
   rclcpp::Subscription<msg::Rtd>::SharedPtr subscription_rtd;
   rclcpp::Subscription<msg::Setpoints>::SharedPtr subscription_setpoints;
   rclcpp::Subscription<msg::AmkStatus>::SharedPtr subscription_amk_status;
+  // Timers
+  rclcpp::TimerBase::SharedPtr amk_state_machine_timer;
+  rclcpp::TimerBase::SharedPtr amk_control_publisher_timer;
+  // Watchdogs
+  rclcpp::TimerBase::SharedPtr setpoints_watchdog;
+  rclcpp::TimerBase::SharedPtr amk_state_machine_watchdog;
+
+  // Subscriber callbacks
+  void rtd_callback(const msg::Rtd::SharedPtr msg);
+  void setpoints_callback(const msg::Setpoints::SharedPtr msg);
+  void amk_status_callback(const msg::AmkStatus::SharedPtr msg);
+  // Watchdog callbacks
+  void setpoints_watchdog_callback();
+  void amk_state_machine_watchdog_callback();
+  // Timer callbacks
+  void amk_control_callback();
+  void amk_state_machine_callback();
 };
 
 AmkNode::AmkNode() : Node("amk_main_node"), state(StateMachine::UNDEFINED) {
@@ -53,20 +56,37 @@ AmkNode::AmkNode() : Node("amk_main_node"), state(StateMachine::UNDEFINED) {
 
   amk_state_machine_timer = this->create_wall_timer(5ms, std::bind(&AmkNode::amk_state_machine_callback, this));
   amk_control_publisher_timer = this->create_wall_timer(2ms, std::bind(&AmkNode::amk_control_callback, this));
+
+  setpoints_watchdog = this->create_wall_timer(500ms, std::bind(&AmkNode::setpoints_watchdog_callback, this));
+  amk_state_machine_watchdog = this->create_wall_timer(5000ms, std::bind(&AmkNode::amk_state_machine_watchdog_callback, this));
+
+  setpoints_watchdog->cancel();
+  amk_state_machine_watchdog->cancel();
 }
 
+// Subscriber callbacks
 void AmkNode::rtd_callback(const msg::Rtd::SharedPtr msg) { rtd = *msg; }
-void AmkNode::setpoints_callback(const msg::Setpoints::SharedPtr msg) { setpoints = *msg; }
+void AmkNode::setpoints_callback(const msg::Setpoints::SharedPtr msg) {
+  setpoints_watchdog->cancel();
+  setpoints = *msg;
+  setpoints_watchdog->reset();
+}
 void AmkNode::amk_status_callback(const msg::AmkStatus::SharedPtr msg) { amk_status = *msg; }
 
-void AmkNode::amk_control_callback() { publisher_amk_control->publish(amk_control); }
-
-void AmkNode::amk_startup_watchdog_callback() {
+// Watchdog callbacks
+void AmkNode::setpoints_watchdog_callback() {
+  RCLCPP_WARN(this->get_logger(), "Setpoints watchdog triggered");
+  setpoints.torques.fill(0);
+  setpoints_watchdog->cancel();
+}
+void AmkNode::amk_state_machine_watchdog_callback() {
+  RCLCPP_WARN(this->get_logger(), "State machine watchdog triggered");
   state = StateMachine::UNDEFINED;
-  RCLCPP_INFO(this->get_logger(), "Startup watchdog triggered");
-  amk_startup_watchdog->cancel();
+  amk_state_machine_watchdog->cancel();
 }
 
+// Timer callbacks
+void AmkNode::amk_control_callback() { publisher_amk_control->publish(amk_control); }
 void AmkNode::amk_state_machine_callback() {
   switch (state) {
     case StateMachine::UNDEFINED: {
@@ -97,7 +117,7 @@ void AmkNode::amk_state_machine_callback() {
       /* Check for RTD*/
       if (rtd.rtd_state == true) {
         state = StateMachine::STARTUP;
-        amk_startup_watchdog = this->create_wall_timer(5000ms, std::bind(&AmkNode::amk_startup_watchdog_callback, this));
+        amk_state_machine_watchdog->reset();
       }
     } break;
     case StateMachine::STARTUP: {
@@ -130,7 +150,7 @@ void AmkNode::amk_state_machine_callback() {
       } else {
         RCLCPP_INFO(this->get_logger(), "Inverters On");
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        amk_startup_watchdog->cancel();
+        amk_state_machine_watchdog->cancel();
         state = StateMachine::TORQUE_CONTROL;
       }
     } break;
@@ -170,7 +190,7 @@ void AmkNode::amk_state_machine_callback() {
     case StateMachine::ERROR_HANDLER: {
       RCLCPP_INFO(this->get_logger(), "Error handler");
       std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
+    } break;
     default:
       break;
   }
