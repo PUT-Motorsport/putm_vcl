@@ -16,7 +16,7 @@ using std::placeholders::_1;
 
 class Rtd : public rclcpp::Node {
  public:
-  Rtd() : Node("rtd"), rtd_state(false), brake_pressure_front(0.0), brake_pressure_rear(0.0), rtd_button_state(0), airs_state(false) {
+  Rtd() : Node("rtd_node"), rtd_state(false), brake_pressure_front(0.0), brake_pressure_rear(0.0), rtd_button_state(0), airs_state(false) {
     rtdPublisher = this->create_publisher<putm_vcl_interfaces::msg::Rtd>("putm_vcl/rtd", 1);
     frontboxSubscriber = this->create_subscription<putm_vcl_interfaces::msg::Frontbox>("putm_vcl/frontbox", 1, std::bind(&Rtd::frontboxCallback, this, _1));
     dashSubscriber = this->create_subscription<putm_vcl_interfaces::msg::Dash>("putm_vcl/dash", 1, std::bind(&Rtd::dashCallback, this, _1));

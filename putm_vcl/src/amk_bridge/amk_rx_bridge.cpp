@@ -24,7 +24,7 @@ class AmkRxNode : public rclcpp::Node {
   void amk_rx_node_main_loop();
 };
 
-AmkRxNode::AmkRxNode() : Node("amk_rx_node"), can_rx("can0", NO_TIMEOUT) {
+AmkRxNode::AmkRxNode() : Node("amk_rx_bridge"), can_rx("can0", NO_TIMEOUT) {
   amk_rx_node_timer = this->create_wall_timer(1ms, std::bind(&AmkRxNode::amk_rx_node_main_loop, this));
   amk_status_publisher = this->create_publisher<putm_vcl_interfaces::msg::AmkStatus>("putm_vcl/amk_status", 1);
   amk_data_publisher = this->create_publisher<putm_vcl_interfaces::msg::AmkData>("putm_vcl/amk_data", 1);

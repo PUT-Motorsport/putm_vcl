@@ -30,7 +30,7 @@ class AmkNode : public rclcpp::Node {
   rclcpp::Subscription<msg::AmkStatus>::SharedPtr subscription_amk_status;
   // Timers
   rclcpp::TimerBase::SharedPtr amk_state_machine_timer;
-  rclcpp::TimerBase::SharedPtr amk_control_publisher_timer;
+  rclcpp::TimerBase::SharedPtr amk_control_timer;
   // Watchdogs
   rclcpp::TimerBase::SharedPtr setpoints_watchdog;
   rclcpp::TimerBase::SharedPtr amk_state_machine_watchdog;
@@ -47,19 +47,17 @@ class AmkNode : public rclcpp::Node {
   void amk_state_machine_callback();
 };
 
-AmkNode::AmkNode() : Node("amk_main_node"), state(StateMachine::UNDEFINED) {
-  publisher_amk_control = this->create_publisher<msg::AmkControl>("putm_vcl/amk_control", 1);
-
-  subscription_rtd = this->create_subscription<msg::Rtd>("putm_vcl/rtd", 1, std::bind(&AmkNode::rtd_callback, this, _1));
-  subscription_setpoints = this->create_subscription<msg::Setpoints>("putm_vcl/setpoints", 1, std::bind(&AmkNode::setpoints_callback, this, _1));
-  subscription_amk_status = this->create_subscription<msg::AmkStatus>("putm_vcl/amk_status", 1, std::bind(&AmkNode::amk_status_callback, this, _1));
-
-  amk_state_machine_timer = this->create_wall_timer(5ms, std::bind(&AmkNode::amk_state_machine_callback, this));
-  amk_control_publisher_timer = this->create_wall_timer(2ms, std::bind(&AmkNode::amk_control_callback, this));
-
-  setpoints_watchdog = this->create_wall_timer(500ms, std::bind(&AmkNode::setpoints_watchdog_callback, this));
-  amk_state_machine_watchdog = this->create_wall_timer(5000ms, std::bind(&AmkNode::amk_state_machine_watchdog_callback, this));
-
+AmkNode::AmkNode()
+    : Node("amk_node"),
+      state(StateMachine::UNDEFINED),
+      publisher_amk_control(this->create_publisher<msg::AmkControl>("putm_vcl/amk_control", 1)),
+      subscription_rtd(this->create_subscription<msg::Rtd>("putm_vcl/rtd", 1, std::bind(&AmkNode::rtd_callback, this, _1))),
+      subscription_setpoints(this->create_subscription<msg::Setpoints>("putm_vcl/setpoints", 1, std::bind(&AmkNode::setpoints_callback, this, _1))),
+      subscription_amk_status(this->create_subscription<msg::AmkStatus>("putm_vcl/amk_status", 1, std::bind(&AmkNode::amk_status_callback, this, _1))),
+      amk_state_machine_timer(this->create_wall_timer(5ms, std::bind(&AmkNode::amk_state_machine_callback, this))),
+      amk_control_timer(this->create_wall_timer(2ms, std::bind(&AmkNode::amk_control_callback, this))),
+      setpoints_watchdog(this->create_wall_timer(500ms, std::bind(&AmkNode::setpoints_watchdog_callback, this))),
+      amk_state_machine_watchdog(this->create_wall_timer(5000ms, std::bind(&AmkNode::amk_state_machine_watchdog_callback, this))) {
   setpoints_watchdog->cancel();
   amk_state_machine_watchdog->cancel();
 }

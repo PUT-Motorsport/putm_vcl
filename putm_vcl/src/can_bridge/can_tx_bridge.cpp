@@ -16,7 +16,7 @@ class CanTxNode : public rclcpp::Node {
   void can_tx_node_main_loop();
 };
 
-CanTxNode::CanTxNode() : Node("can_tx_node"), can_rx("can1", NO_TIMEOUT) {
+CanTxNode::CanTxNode() : Node("can_tx_bridge"), can_rx("can1", NO_TIMEOUT) {
   can_tx_node_timer = this->create_wall_timer(1ms, std::bind(&CanTxNode::can_tx_node_main_loop, this));
 }
 
