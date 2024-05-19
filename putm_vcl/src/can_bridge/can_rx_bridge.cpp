@@ -22,7 +22,7 @@ class CanRxNode : public rclcpp::Node {
 
 CanRxNode::CanRxNode() : Node("can_rx_node"), can_rx("can1", NO_TIMEOUT) {
   can_rx_node_timer = this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_node_main_loop, this));
-  front_box_publisher = this->create_publisher<putm_vcl_interfaces::msg::Frontbox>("frontbox", 10);
+  front_box_publisher = this->create_publisher<putm_vcl_interfaces::msg::Frontbox>("putm_vcl/frontbox", 1);
 }
 
 void CanRxNode::can_rx_node_main_loop() {

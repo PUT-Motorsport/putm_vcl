@@ -26,8 +26,8 @@ class AmkRxNode : public rclcpp::Node {
 
 AmkRxNode::AmkRxNode() : Node("amk_rx_node"), can_rx("can0", NO_TIMEOUT) {
   amk_rx_node_timer = this->create_wall_timer(1ms, std::bind(&AmkRxNode::amk_rx_node_main_loop, this));
-  amk_status_publisher = this->create_publisher<putm_vcl_interfaces::msg::AmkStatus>("amk_status", 10);
-  amk_data_publisher = this->create_publisher<putm_vcl_interfaces::msg::AmkData>("amk_data", 10);
+  amk_status_publisher = this->create_publisher<putm_vcl_interfaces::msg::AmkStatus>("putm_vcl/amk_status", 1);
+  amk_data_publisher = this->create_publisher<putm_vcl_interfaces::msg::AmkData>("putm_vcl/amk_data", 1);
 }
 
 // TODO: Change case define to can_id

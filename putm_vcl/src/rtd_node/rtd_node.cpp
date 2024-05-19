@@ -1,5 +1,3 @@
-#include "putm_vcl_interfaces/msg/rtd.hpp"
-
 #include <chrono>
 #include <functional>
 #include <memory>
@@ -10,33 +8,23 @@
 #include "putm_vcl_interfaces/msg/detail/dash__struct.hpp"
 #include "putm_vcl_interfaces/msg/detail/frontbox__struct.hpp"
 #include "putm_vcl_interfaces/msg/frontbox.hpp"
+#include "putm_vcl_interfaces/msg/rtd.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
-class Rtd : public rclcpp::Node
-{
-public:
-  Rtd()
-  : Node("rtd"),
-    rtd_state(false),
-    brake_pressure_front(0.0),
-    brake_pressure_rear(0.0),
-    rtd_button_state(0),
-    airs_state(false)
-  {
-    rtdPublisher = this->create_publisher<putm_vcl_interfaces::msg::Rtd>("rtd", 10);
-    frontboxSubscriber = this->create_subscription<putm_vcl_interfaces::msg::Frontbox>(
-      "frontbox", 10, std::bind(&Rtd::frontboxCallback, this, _1));
-    dashSubscriber = this->create_subscription<putm_vcl_interfaces::msg::Dash>(
-      "dash", 10, std::bind(&Rtd::dashCallback, this, _1));
+class Rtd : public rclcpp::Node {
+ public:
+  Rtd() : Node("rtd"), rtd_state(false), brake_pressure_front(0.0), brake_pressure_rear(0.0), rtd_button_state(0), airs_state(false) {
+    rtdPublisher = this->create_publisher<putm_vcl_interfaces::msg::Rtd>("putm_vcl/rtd", 1);
+    frontboxSubscriber = this->create_subscription<putm_vcl_interfaces::msg::Frontbox>("putm_vcl/frontbox", 1, std::bind(&Rtd::frontboxCallback, this, _1));
+    dashSubscriber = this->create_subscription<putm_vcl_interfaces::msg::Dash>("putm_vcl/dash", 1, std::bind(&Rtd::dashCallback, this, _1));
     timer_ = this->create_wall_timer(100ms, std::bind(&Rtd::timer_callback, this));
   }
 
-private:
-  void timer_callback()
-  {
+ private:
+  void timer_callback() {
     auto rtdMsg = putm_vcl_interfaces::msg::Rtd();
     /* Entry condition */
     if ((brake_pressure_front >= 100.0) or (brake_pressure_rear >= 100.0)) {
@@ -60,8 +48,7 @@ private:
     //   RCLCPP_INFO(this->get_logger(), "RTD OFF");
     // }
   }
-  void frontboxCallback(const putm_vcl_interfaces::msg::Frontbox msg)
-  {
+  void frontboxCallback(const putm_vcl_interfaces::msg::Frontbox msg) {
     brake_pressure_front = msg.brake_pressure_front;
     brake_pressure_rear = msg.brake_pressure_rear;
   }
@@ -80,8 +67,7 @@ private:
   rclcpp::Subscription<putm_vcl_interfaces::msg::Dash>::SharedPtr dashSubscriber;
 };
 
-int main(int argc, char * argv[])
-{
+int main(int argc, char* argv[]) {
   rclcpp::init(argc, argv);
   rclcpp::spin(std::make_shared<Rtd>());
   rclcpp::shutdown();

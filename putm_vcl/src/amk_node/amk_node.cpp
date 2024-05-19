@@ -22,69 +22,52 @@ enum class StateMachine {
 putm_vcl_interfaces::msg::AmkControl AmkControlMessage;
 putm_vcl_interfaces::msg::AmkStatus AmkStatusMessage;
 
-class AmkNode : public rclcpp::Node
-{
-public:
-  AmkNode() : Node("amk_main_node"), rtd_state(false), tourqe_setpoints{0, 0, 0, 0}
-  {
-    subscription_ = this->create_subscription<putm_vcl_interfaces::msg::AmkStatus>(
-      "amk_status", 10, std::bind(&AmkNode::AmkStatusCallback, this, std::placeholders::_1));
-    rtdSubscription = this->create_subscription<putm_vcl_interfaces::msg::Rtd>(
-      "rtd", 10, std::bind(&AmkNode::rtdCallback, this, std::placeholders::_1));
-    setpointsSubscriber = this->create_subscription<putm_vcl_interfaces::msg::Setpoints>(
-      "setpoints", 10, std::bind(&AmkNode::setpointsCallback, this, std::placeholders::_1));
-    publisher_ = this->create_publisher<putm_vcl_interfaces::msg::AmkControl>("amk_control", 10);
-    AmkControlPublisherTimer =
-      this->create_wall_timer(2ms, std::bind(&AmkNode::AmkControlCallback, this));
+class AmkNode : public rclcpp::Node {
+ public:
+  AmkNode() : Node("amk_main_node"), rtd_state(false), tourqe_setpoints{0, 0, 0, 0} {
+    subscription_ = this->create_subscription<putm_vcl_interfaces::msg::AmkStatus>("putm_vcl/amk_status", 1,
+                                                                                   std::bind(&AmkNode::AmkStatusCallback, this, std::placeholders::_1));
+    rtdSubscription = this->create_subscription<putm_vcl_interfaces::msg::Rtd>("putm_vcl/rtd", 1, std::bind(&AmkNode::rtdCallback, this, std::placeholders::_1));
+    setpointsSubscriber =
+        this->create_subscription<putm_vcl_interfaces::msg::Setpoints>("putm_vcl/setpoints", 1, std::bind(&AmkNode::setpointsCallback, this, std::placeholders::_1));
+    publisher_ = this->create_publisher<putm_vcl_interfaces::msg::AmkControl>("putm_vcl/amk_control", 1);
+    AmkControlPublisherTimer = this->create_wall_timer(2ms, std::bind(&AmkNode::AmkControlCallback, this));
     AmkMainLoopTimer = this->create_wall_timer(5ms, std::bind(&AmkNode::AmkMainLoop, this));
   }
 
-private:
-  void AmkStatusCallback(const putm_vcl_interfaces::msg::AmkStatus::SharedPtr msg)
-  {
-    AmkStatusMessage = *msg;
-  }
+ private:
+  void AmkStatusCallback(const putm_vcl_interfaces::msg::AmkStatus::SharedPtr msg) { AmkStatusMessage = *msg; }
   void AmkControlCallback() { publisher_->publish(AmkControlMessage); }
-  void AmkStartupWatchdogCallback()
-  {
+  void AmkStartupWatchdogCallback() {
     state = StateMachine::UNDEFINED;
     RCLCPP_INFO(this->get_logger(), "Startup Watchodg triggered");
     AmkStartupWatchdog->cancel();
   }
   void rtdCallback(const putm_vcl_interfaces::msg::Rtd msg) { rtd_state = msg.rtd_state; }
-  void setpointsCallback(const putm_vcl_interfaces::msg::Setpoints msg)
-  {
+  void setpointsCallback(const putm_vcl_interfaces::msg::Setpoints msg) {
     tourqe_setpoints[0] = msg.tourqes[0];
     tourqe_setpoints[1] = msg.tourqes[1];
     tourqe_setpoints[2] = msg.tourqes[2];
     tourqe_setpoints[3] = msg.tourqes[3];
   }
-  void AmkMainLoop()
-  {
+  void AmkMainLoop() {
     /* State Machine */
     switch (state) {
       case StateMachine::UNDEFINED: {
-        if (
-          AmkStatusMessage.amk_status_berror[0] || AmkStatusMessage.amk_status_berror[1] ||
-          AmkStatusMessage.amk_status_berror[2] || AmkStatusMessage.amk_status_berror[3]) {
+        if (AmkStatusMessage.amk_status_berror[0] || AmkStatusMessage.amk_status_berror[1] || AmkStatusMessage.amk_status_berror[2] ||
+            AmkStatusMessage.amk_status_berror[3]) {
           RCLCPP_INFO(this->get_logger(), "Detected inverter error");
           state = StateMachine::ERROR_RESET;
         }
-        if (
-          AmkStatusMessage.amk_status_bsystem_ready[0] &&
-          AmkStatusMessage.amk_status_bsystem_ready[1] &&
-          AmkStatusMessage.amk_status_bsystem_ready[2] &&
-          AmkStatusMessage.amk_status_bsystem_ready[3]) {
+        if (AmkStatusMessage.amk_status_bsystem_ready[0] && AmkStatusMessage.amk_status_bsystem_ready[1] && AmkStatusMessage.amk_status_bsystem_ready[2] &&
+            AmkStatusMessage.amk_status_bsystem_ready[3]) {
           RCLCPP_INFO(this->get_logger(), "Inverters online, going to idle");
           state = StateMachine::IDLING;
         }
       } break;
       case StateMachine::ERROR_RESET: {
-        if (
-          AmkStatusMessage.amk_status_bsystem_ready[0] &&
-          AmkStatusMessage.amk_status_bsystem_ready[1] &&
-          AmkStatusMessage.amk_status_bsystem_ready[2] &&
-          AmkStatusMessage.amk_status_bsystem_ready[3]) {
+        if (AmkStatusMessage.amk_status_bsystem_ready[0] && AmkStatusMessage.amk_status_bsystem_ready[1] && AmkStatusMessage.amk_status_bsystem_ready[2] &&
+            AmkStatusMessage.amk_status_bsystem_ready[3]) {
           AmkControlMessage.amk_control_amkb_error_reset.fill(false);
           RCLCPP_INFO(this->get_logger(), "Error recovered");
           state = StateMachine::IDLING;
@@ -98,8 +81,7 @@ private:
         /* Check for RTD*/
         if (rtd_state == 1) {
           state = StateMachine::STARTUP;
-          AmkStartupWatchdog =
-            this->create_wall_timer(5000ms, std::bind(&AmkNode::AmkStartupWatchdogCallback, this));
+          AmkStartupWatchdog = this->create_wall_timer(5000ms, std::bind(&AmkNode::AmkStartupWatchdogCallback, this));
         }
       } break;
       case StateMachine::STARTUP: {
@@ -108,30 +90,24 @@ private:
         AmkControlMessage.amk_tourqe_negative_limit.fill(0);
         AmkControlMessage.amk_target_tourqe.fill(0);
 
-        if (
-          !AmkStatusMessage.amk_status_bdc_on[0] && !AmkStatusMessage.amk_status_bdc_on[1] &&
-          !AmkStatusMessage.amk_status_bdc_on[2] && !AmkStatusMessage.amk_status_bdc_on[3]) {
+        if (!AmkStatusMessage.amk_status_bdc_on[0] && !AmkStatusMessage.amk_status_bdc_on[1] && !AmkStatusMessage.amk_status_bdc_on[2] &&
+            !AmkStatusMessage.amk_status_bdc_on[3]) {
           RCLCPP_INFO(this->get_logger(), "Waiting for bdc_on");
           std::this_thread::sleep_for(std::chrono::milliseconds(10));
           break;
         }
         AmkControlMessage.amk_control_binverter_on.fill(true);
         AmkControlMessage.amk_control_benable.fill(true);
-        if (
-          !AmkStatusMessage.amk_status_binverter_on[0] &&
-          !AmkStatusMessage.amk_status_binverter_on[1] &&
-          !AmkStatusMessage.amk_status_binverter_on[2] &&
-          !AmkStatusMessage.amk_status_binverter_on[3]) {
+        if (!AmkStatusMessage.amk_status_binverter_on[0] && !AmkStatusMessage.amk_status_binverter_on[1] && !AmkStatusMessage.amk_status_binverter_on[2] &&
+            !AmkStatusMessage.amk_status_binverter_on[3]) {
           RCLCPP_INFO(this->get_logger(), "Waiting for inverter enable");
           std::this_thread::sleep_for(std::chrono::milliseconds(10));
           break;
         }
         RCLCPP_INFO(this->get_logger(), "inverters enabled");
         AmkControlMessage.amk_control_benable.fill(true);
-        if (!(AmkStatusMessage.amk_status_bquit_inverter_on[0] &&
-              AmkStatusMessage.amk_status_bquit_inverter_on[1] &&
-              AmkStatusMessage.amk_status_bquit_inverter_on[2] &&
-              AmkStatusMessage.amk_status_bquit_inverter_on[3])) {
+        if (!(AmkStatusMessage.amk_status_bquit_inverter_on[0] && AmkStatusMessage.amk_status_bquit_inverter_on[1] &&
+              AmkStatusMessage.amk_status_bquit_inverter_on[2] && AmkStatusMessage.amk_status_bquit_inverter_on[3])) {
           RCLCPP_INFO(this->get_logger(), "Waiting for bquit inverter on");
           std::this_thread::sleep_for(std::chrono::milliseconds(10));
           break;
@@ -144,9 +120,7 @@ private:
       } break;
       case StateMachine::TOURQE_CONTROL: {
         /* Check some stop conditions*/
-        if (!(AmkStatusMessage.amk_status_binverter_on[0] &&
-              AmkStatusMessage.amk_status_binverter_on[1] &&
-              AmkStatusMessage.amk_status_binverter_on[2] &&
+        if (!(AmkStatusMessage.amk_status_binverter_on[0] && AmkStatusMessage.amk_status_binverter_on[1] && AmkStatusMessage.amk_status_binverter_on[2] &&
               AmkStatusMessage.amk_status_binverter_on[3])) {
           state = StateMachine::SWITCH_OFF;
         }
@@ -196,8 +170,7 @@ private:
   rclcpp::Subscription<putm_vcl_interfaces::msg::Setpoints>::SharedPtr setpointsSubscriber;
 };
 
-int main(int argc, char ** argv)
-{
+int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
 

@@ -26,7 +26,7 @@ class AmkTxNode : public rclcpp::Node {
 };
 
 AmkTxNode::AmkTxNode() : Node("amk_tx_bridge"), can_tx("can0") {
-  subscription_ = this->create_subscription<putm_vcl_interfaces::msg::AmkControl>("amk_control", 10, std::bind(&AmkTxNode::amk_control_callback, this, _1));
+  subscription_ = this->create_subscription<putm_vcl_interfaces::msg::AmkControl>("putm_vcl/amk_control", 1, std::bind(&AmkTxNode::amk_control_callback, this, _1));
   timer_ = this->create_wall_timer(10ms, std::bind(&AmkTxNode::amk_can_tx, this));
 }
 
