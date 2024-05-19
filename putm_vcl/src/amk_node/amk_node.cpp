@@ -15,7 +15,7 @@ class AmkNode : public rclcpp::Node {
 
  private:
   enum Inverters { FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT };
-  enum class StateMachine { UNDEFINED = -1, IDLING, STARTUP, TOURQE_CONTROL, SWITCH_OFF, ERROR_HANDLER, ERROR_RESET };
+  enum class StateMachine { UNDEFINED = -1, IDLING, STARTUP, TORQUE_CONTROL, SWITCH_OFF, ERROR_HANDLER, ERROR_RESET };
 
   void rtd_callback(const msg::Rtd::SharedPtr msg);
   void setpoints_callback(const msg::Setpoints::SharedPtr msg);
@@ -102,9 +102,9 @@ void AmkNode::amk_state_machine_callback() {
     } break;
     case StateMachine::STARTUP: {
       amk_control.amk_control_bdc_on.fill(true);
-      amk_control.amk_tourqe_positive_limit.fill(0);
-      amk_control.amk_tourqe_negative_limit.fill(0);
-      amk_control.amk_target_tourqe.fill(0);
+      amk_control.amk_torque_positive_limit.fill(0);
+      amk_control.amk_torque_negative_limit.fill(0);
+      amk_control.amk_target_torque.fill(0);
 
       if (!amk_status.amk_status_bdc_on[Inverters::FRONT_LEFT] && !amk_status.amk_status_bdc_on[Inverters::FRONT_RIGHT] &&
           !amk_status.amk_status_bdc_on[Inverters::REAR_LEFT] && !amk_status.amk_status_bdc_on[Inverters::REAR_RIGHT]) {
@@ -131,20 +131,20 @@ void AmkNode::amk_state_machine_callback() {
         RCLCPP_INFO(this->get_logger(), "Inverters On");
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
         amk_startup_watchdog->cancel();
-        state = StateMachine::TOURQE_CONTROL;
+        state = StateMachine::TORQUE_CONTROL;
       }
     } break;
-    case StateMachine::TOURQE_CONTROL: {
+    case StateMachine::TORQUE_CONTROL: {
       /* Check some stop conditions*/
       if (!(amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT] && amk_status.amk_status_binverter_on[Inverters::FRONT_RIGHT] &&
             amk_status.amk_status_binverter_on[Inverters::REAR_LEFT] && amk_status.amk_status_binverter_on[Inverters::REAR_RIGHT])) {
         state = StateMachine::SWITCH_OFF;
       }
-      amk_control.amk_tourqe_positive_limit.fill(2000);
-      amk_control.amk_target_tourqe[Inverters::FRONT_LEFT] = setpoints.tourqes[Inverters::FRONT_LEFT];
-      amk_control.amk_target_tourqe[Inverters::FRONT_RIGHT] = setpoints.tourqes[Inverters::FRONT_RIGHT];
-      amk_control.amk_target_tourqe[Inverters::REAR_LEFT] = setpoints.tourqes[Inverters::REAR_LEFT];
-      amk_control.amk_target_tourqe[Inverters::REAR_RIGHT] = setpoints.tourqes[Inverters::REAR_RIGHT];
+      amk_control.amk_torque_positive_limit.fill(2000);
+      amk_control.amk_target_torque[Inverters::FRONT_LEFT] = setpoints.torques[Inverters::FRONT_LEFT];
+      amk_control.amk_target_torque[Inverters::FRONT_RIGHT] = setpoints.torques[Inverters::FRONT_RIGHT];
+      amk_control.amk_target_torque[Inverters::REAR_LEFT] = setpoints.torques[Inverters::REAR_LEFT];
+      amk_control.amk_target_torque[Inverters::REAR_RIGHT] = setpoints.torques[Inverters::REAR_RIGHT];
       if (rtd.rtd_state == false) {
         state = StateMachine::SWITCH_OFF;
       }
@@ -155,9 +155,9 @@ void AmkNode::amk_state_machine_callback() {
       amk_control.amk_control_binverter_on.fill(false);
       amk_control.amk_control_benable.fill(false);
       amk_control.amk_control_bdc_on.fill(false);
-      amk_control.amk_tourqe_positive_limit.fill(0);
-      amk_control.amk_tourqe_negative_limit.fill(0);
-      amk_control.amk_target_tourqe.fill(0);
+      amk_control.amk_torque_positive_limit.fill(0);
+      amk_control.amk_torque_negative_limit.fill(0);
+      amk_control.amk_target_torque.fill(0);
       RCLCPP_INFO(this->get_logger(), "Inverters OFF");
       /* Wait until inverter 0 is switched-off.*/
       if (amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT]) {
