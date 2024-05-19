@@ -180,7 +180,8 @@ void AmkNode::amk_state_machine_callback() {
       amk_control.amk_target_torque.fill(0);
       RCLCPP_INFO(this->get_logger(), "Inverters OFF");
       /* Wait until inverter 0 is switched-off.*/
-      if (amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT]) {
+      if (amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT] || amk_status.amk_status_binverter_on[Inverters::FRONT_RIGHT] ||
+          amk_status.amk_status_binverter_on[Inverters::REAR_LEFT] || amk_status.amk_status_binverter_on[Inverters::REAR_RIGHT]) {
         RCLCPP_INFO(this->get_logger(), "Waiting for inverter switch-off");
         rclcpp::sleep_for(5ms);
         break;
