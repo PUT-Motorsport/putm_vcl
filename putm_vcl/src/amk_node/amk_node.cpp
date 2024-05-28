@@ -1,51 +1,8 @@
-#include "putm_vcl_interfaces/msg/amk_control.hpp"
-#include "putm_vcl_interfaces/msg/amk_status.hpp"
-#include "putm_vcl_interfaces/msg/detail/rtd__struct.hpp"
-#include "putm_vcl_interfaces/msg/rtd.hpp"
-#include "putm_vcl_interfaces/msg/setpoints.hpp"
-#include "rclcpp/rclcpp.hpp"
+#include "amk_node/amk_node.hpp"
 
 using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
-using namespace std::placeholders;
-
-class AmkNode : public rclcpp::Node {
- public:
-  AmkNode();
-
- private:
-  enum Inverters { FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT };
-  enum class StateMachine { UNDEFINED = -1, IDLING, STARTUP, TORQUE_CONTROL, SWITCH_OFF, ERROR_HANDLER, ERROR_RESET };
-  StateMachine state;
-  msg::AmkControl amk_control;
-  msg::AmkStatus amk_status;
-  msg::Setpoints setpoints;
-  msg::Rtd rtd;
-
-  // Publishers
-  rclcpp::Publisher<msg::AmkControl>::SharedPtr publisher_amk_control;
-  // Subscribers
-  rclcpp::Subscription<msg::Rtd>::SharedPtr subscription_rtd;
-  rclcpp::Subscription<msg::Setpoints>::SharedPtr subscription_setpoints;
-  rclcpp::Subscription<msg::AmkStatus>::SharedPtr subscription_amk_status;
-  // Timers
-  rclcpp::TimerBase::SharedPtr amk_state_machine_timer;
-  rclcpp::TimerBase::SharedPtr amk_control_timer;
-  // Watchdogs
-  rclcpp::TimerBase::SharedPtr setpoints_watchdog;
-  rclcpp::TimerBase::SharedPtr amk_state_machine_watchdog;
-
-  // Subscriber callbacks
-  void rtd_callback(const msg::Rtd::SharedPtr msg);
-  void setpoints_callback(const msg::Setpoints::SharedPtr msg);
-  void amk_status_callback(const msg::AmkStatus::SharedPtr msg);
-  // Watchdog callbacks
-  void setpoints_watchdog_callback();
-  void amk_state_machine_watchdog_callback();
-  // Timer callbacks
-  void amk_control_callback();
-  void amk_state_machine_callback();
-};
+using std::placeholders::_1;
 
 AmkNode::AmkNode()
     : Node("amk_node"),
