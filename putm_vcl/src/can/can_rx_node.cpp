@@ -16,7 +16,7 @@ class CanRxNode : public rclcpp::Node {
   CanRxNode();
 
  private:
-  enum Inverters { FRONT_LEFT = 0, FRONT_RIGHT = 1, REAR_LEFT = 2, REAR_RIGHT = 3 };
+  enum Inverters { FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT };
 
   CanRx can_rx_amk;
   CanRx can_rx_common;
