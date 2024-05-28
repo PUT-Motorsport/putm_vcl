@@ -59,7 +59,7 @@ void CanTxNode::can_tx_amk_callback() {
 void CanTxNode::can_tx_common_callback() {
   // Add common tx in here if needed
   // Example:
-  // can_tx_common.transmit(frontbox);
+  // can_tx_common.transmit(something);
 }
 
 int main(int argc, char** argv) {

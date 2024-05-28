@@ -8,12 +8,12 @@ RtdNode::RtdNode()
     : Node("rtd_node"),
       rtd_timer(this->create_wall_timer(100ms, std::bind(&RtdNode::rtd_callback, this))),
       rtd_publisher(this->create_publisher<msg::Rtd>("putm_vcl/rtd", 1)),
-      frontbox_subscriber(this->create_subscription<msg::Frontbox>("putm_vcl/frontbox", 1, std::bind(&RtdNode::frontbox_callback, this, _1))),
+      frontbox_driver_input_subscriber(this->create_subscription<msg::FrontboxDriverInput>("putm_vcl/frontbox_driver_input", 1, std::bind(&RtdNode::frontbox_driver_input_callback, this, _1))),
       dash_subscriber(this->create_subscription<msg::Dash>("putm_vcl/dash", 1, std::bind(&RtdNode::dash_callback, this, _1))) {}
 
 void RtdNode::rtd_callback() {
   /* Entry condition */
-  if ((frontbox.brake_pressure_front >= 100.0) or (frontbox.brake_pressure_rear >= 100.0)) {
+  if ((frontbox_driver_input.brake_pressure_front >= 100.0) or (frontbox_driver_input.brake_pressure_rear >= 100.0)) {
     RCLCPP_INFO(this->get_logger(), "Braking...");
     if ((dash.rtd_button_state) and not(rtd.state)) {
       RCLCPP_INFO(this->get_logger(), "RTD ON");
@@ -32,7 +32,7 @@ void RtdNode::rtd_callback() {
   // }
 }
 
-void RtdNode::frontbox_callback(const msg::Frontbox::SharedPtr msg) { frontbox = *msg; }
+void RtdNode::frontbox_driver_input_callback(const msg::FrontboxDriverInput::SharedPtr msg) { frontbox_driver_input = *msg; }
 
 void RtdNode::dash_callback(const msg::Dash::SharedPtr msg) { dash = *msg; }
 

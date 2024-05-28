@@ -9,10 +9,11 @@ find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/AmkStatus.msg" 
-  "msg/AmkControl.msg" 
-  "msg/AmkData.msg"
-  "msg/Frontbox.msg"
+  "msg/Amk/AmkStatus.msg" 
+  "msg/Amk/AmkControl.msg" 
+  "msg/Amk/AmkData.msg"
+  "msg/Frontbox/FrontboxDriverInput.msg"
+  "msg/Frontbox/FrontboxData.msg"
   "msg/Dash.msg"
   "msg/Rtd.msg"
   "msg/Setpoints.msg"
