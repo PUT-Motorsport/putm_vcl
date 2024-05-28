@@ -4,6 +4,7 @@
 #include "putm_vcl_interfaces/msg/amk_data.hpp"
 #include "putm_vcl_interfaces/msg/amk_status.hpp"
 #include "putm_vcl_interfaces/msg/frontbox_driver_input.hpp"
+#include "putm_vcl_interfaces/msg/frontbox_data.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 class CanRxNode : public rclcpp::Node {
@@ -21,6 +22,7 @@ class CanRxNode : public rclcpp::Node {
   rclcpp::TimerBase::SharedPtr can_rx_common_timer;
 
   rclcpp::Publisher<putm_vcl_interfaces::msg::FrontboxDriverInput>::SharedPtr frontbox_driver_input_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::FrontboxData>::SharedPtr frontbox_data_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkStatus>::SharedPtr amk_status_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkData>::SharedPtr amk_data_publisher;
 

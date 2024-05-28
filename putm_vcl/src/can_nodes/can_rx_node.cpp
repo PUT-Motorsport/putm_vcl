@@ -13,6 +13,7 @@ CanRxNode::CanRxNode()
       can_rx_amk_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_amk_callback, this))),
       can_rx_common_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this))),
       frontbox_driver_input_publisher(this->create_publisher<msg::FrontboxDriverInput>("putm_vcl/frontbox_driver_input", 1)),
+      frontbox_data_publisher(this->create_publisher<msg::FrontboxData>("putm_vcl/frontbox_data", 1)),
       amk_status_publisher(this->create_publisher<msg::AmkStatus>("putm_vcl/amk_status", 1)),
       amk_data_publisher(this->create_publisher<msg::AmkData>("putm_vcl/amk_data", 1)) {}
 
@@ -24,6 +25,10 @@ void CanRxNode::can_rx_common_callback() {
       msg::FrontboxDriverInput frontbox_driver_input;
       frontbox_driver_input.pedal_position = (((can_frontbox_driver_input.pedal_position) / 500.0) * 100.0);
       frontbox_driver_input_publisher->publish(frontbox_driver_input);
+    }
+    case can_id<FrontboxData>: {
+      // auto can_frontbox_data = convert<FrontboxData>(frame);
+      // msg::FrontboxData frontbox_data;
     }
   }
 }
