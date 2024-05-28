@@ -1,39 +1,8 @@
-#include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_headers/PM09-CANBUS-FRONTBOX.hpp"
-#include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_rx.hpp"
-#include "putm_vcl_interfaces/msg/amk_data.hpp"
-#include "putm_vcl_interfaces/msg/amk_status.hpp"
-#include "putm_vcl_interfaces/msg/detail/frontbox__struct.hpp"
-#include "putm_vcl_interfaces/msg/frontbox.hpp"
-#include "rclcpp/rclcpp.hpp"
-#include "rclcpp/utilities.hpp"
+#include "can_nodes/can_rx_node.hpp"
 
 using namespace PUTM_CAN;
 using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
-
-class CanRxNode : public rclcpp::Node {
- public:
-  CanRxNode();
-
- private:
-  enum Inverters { FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT };
-
-  CanRx can_rx_amk;
-  CanRx can_rx_common;
-
-  msg::AmkStatus amk_status;
-  msg::AmkData amk_data;
-
-  rclcpp::TimerBase::SharedPtr can_rx_amk_timer;
-  rclcpp::TimerBase::SharedPtr can_rx_common_timer;
-
-  rclcpp::Publisher<msg::Frontbox>::SharedPtr frontbox_publisher;
-  rclcpp::Publisher<msg::AmkStatus>::SharedPtr amk_status_publisher;
-  rclcpp::Publisher<msg::AmkData>::SharedPtr amk_data_publisher;
-
-  void can_rx_amk_callback();
-  void can_rx_common_callback();
-};
 
 CanRxNode::CanRxNode()
     : Node("can_rx_node"),
