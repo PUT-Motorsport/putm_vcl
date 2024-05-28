@@ -1,37 +1,9 @@
-#include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_tx.hpp"
-#include "putm_vcl_interfaces/msg/amk_control.hpp"
-#include "rclcpp/rclcpp.hpp"
+#include "can_nodes/can_tx_node.hpp"
 
 using namespace PUTM_CAN;
 using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
 using std::placeholders::_1;
-
-class CanTxNode : public rclcpp::Node {
- public:
-  CanTxNode();
-
- private:
-  enum Inverters { FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT };  // TODO: Move to a common .hpp file
-
-  CanTx can_tx_amk;
-  CanTx can_tx_common;
-
-  AmkFrontLeftSetpoints1 amk_front_left_setpoints;
-  AmkFrontRightSetpoints1 amk_front_right_setpoints;
-  AmkRearLeftSetpoints1 amk_rear_left_setpoints;
-  AmkRearRightSetpoints1 amk_rear_right_setpoints;
-
-  rclcpp::TimerBase::SharedPtr can_tx_amk_timer;
-  rclcpp::TimerBase::SharedPtr can_tx_common_timer;
-
-  rclcpp::Subscription<msg::AmkControl>::SharedPtr amk_control_subscription;
-
-  void can_tx_amk_callback();
-  void can_tx_common_callback();
-
-  void amk_control_callback(const msg::AmkControl msg);
-};
 
 CanTxNode::CanTxNode()
     : Node("can_tx_node"),
