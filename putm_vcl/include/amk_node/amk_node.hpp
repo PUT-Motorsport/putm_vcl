@@ -11,7 +11,6 @@ class AmkNode : public rclcpp::Node {
   AmkNode();
 
  private:
-  enum Inverters { FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT };  // TODO: Move to separate file
   enum class StateMachine { UNDEFINED = -1, IDLING, STARTUP, TORQUE_CONTROL, SWITCH_OFF, ERROR_HANDLER, ERROR_RESET };
 
   StateMachine state;

@@ -1,13 +1,15 @@
 #include "can_nodes/can_rx_node.hpp"
+#include "putm_vcl/putm_vcl.hpp"
 
 using namespace PUTM_CAN;
+using namespace putm_vcl;
 using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
 
 CanRxNode::CanRxNode()
     : Node("can_rx_node"),
-      can_rx_amk("can0", NO_TIMEOUT),
-      can_rx_common("can1", NO_TIMEOUT),
+      can_rx_amk(can_interface_amk, NO_TIMEOUT),
+      can_rx_common(can_interface_common, NO_TIMEOUT),
       can_rx_amk_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_amk_callback, this))),
       can_rx_common_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this))),
       frontbox_publisher(this->create_publisher<msg::Frontbox>("putm_vcl/frontbox", 1)),

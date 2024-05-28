@@ -1,14 +1,16 @@
 #include "can_nodes/can_tx_node.hpp"
+#include "putm_vcl/putm_vcl.hpp"
 
 using namespace PUTM_CAN;
+using namespace putm_vcl;
 using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 CanTxNode::CanTxNode()
     : Node("can_tx_node"),
-      can_tx_amk("can0"),  // TODO: Move to a common .hpp file
-      can_tx_common("can1"),
+      can_tx_amk(can_interface_amk),
+      can_tx_common(can_interface_common),
       can_tx_amk_timer(this->create_wall_timer(10ms, std::bind(&CanTxNode::can_tx_amk_callback, this))),
       can_tx_common_timer(this->create_wall_timer(10ms, std::bind(&CanTxNode::can_tx_common_callback, this))),
       amk_control_subscription(this->create_subscription<msg::AmkControl>("putm_vcl/amk_control", 1, std::bind(&CanTxNode::amk_control_callback, this, _1))) {}

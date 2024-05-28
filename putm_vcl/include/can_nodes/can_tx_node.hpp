@@ -9,8 +9,6 @@ class CanTxNode : public rclcpp::Node {
   CanTxNode();
 
  private:
-  enum Inverters { FRONT_LEFT, FRONT_RIGHT, REAR_LEFT, REAR_RIGHT };  // TODO: Move to a common .hpp file
-
   PUTM_CAN::CanTx can_tx_amk;
   PUTM_CAN::CanTx can_tx_common;
 

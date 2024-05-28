@@ -1,5 +1,7 @@
 #include "amk_node/amk_node.hpp"
+#include "putm_vcl/putm_vcl.hpp"
 
+using namespace putm_vcl;
 using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
 using std::placeholders::_1;
