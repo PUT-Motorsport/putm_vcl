@@ -49,12 +49,12 @@ void AmkNode::amk_state_machine_callback() {
     case StateMachine::UNDEFINED: {
       if (amk_status.amk_status_berror[Inverters::FRONT_LEFT] || amk_status.amk_status_berror[Inverters::FRONT_RIGHT] ||
           amk_status.amk_status_berror[Inverters::REAR_LEFT] || amk_status.amk_status_berror[Inverters::REAR_RIGHT]) {
-        RCLCPP_INFO(this->get_logger(), "Detected inverter error");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,  "Detected inverter error");
         state = StateMachine::ERROR_RESET;
       }
       if (amk_status.amk_status_bsystem_ready[Inverters::FRONT_LEFT] && amk_status.amk_status_bsystem_ready[Inverters::FRONT_RIGHT] &&
           amk_status.amk_status_bsystem_ready[Inverters::REAR_LEFT] && amk_status.amk_status_bsystem_ready[Inverters::REAR_RIGHT]) {
-        RCLCPP_INFO(this->get_logger(), "Inverters online, going to idle");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,  "Inverters online, going to idle");
         state = StateMachine::IDLING;
       }
     } break;
@@ -62,11 +62,11 @@ void AmkNode::amk_state_machine_callback() {
       if (amk_status.amk_status_bsystem_ready[Inverters::FRONT_LEFT] && amk_status.amk_status_bsystem_ready[Inverters::FRONT_RIGHT] &&
           amk_status.amk_status_bsystem_ready[Inverters::REAR_LEFT] && amk_status.amk_status_bsystem_ready[Inverters::REAR_RIGHT]) {
         amk_control.amk_control_amkb_error_reset.fill(false);
-        RCLCPP_INFO(this->get_logger(), "Error recovered");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,  "Error recovered");
         state = StateMachine::IDLING;
       } else {
         amk_control.amk_control_amkb_error_reset.fill(true);
-        RCLCPP_INFO(this->get_logger(), "Waiting for error reset");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for error reset");
         rclcpp::sleep_for(10ms);
       }
     } break;
@@ -85,7 +85,7 @@ void AmkNode::amk_state_machine_callback() {
 
       if (!amk_status.amk_status_bdc_on[Inverters::FRONT_LEFT] && !amk_status.amk_status_bdc_on[Inverters::FRONT_RIGHT] &&
           !amk_status.amk_status_bdc_on[Inverters::REAR_LEFT] && !amk_status.amk_status_bdc_on[Inverters::REAR_RIGHT]) {
-        RCLCPP_INFO(this->get_logger(), "Waiting for bdc_on");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for bdc_on");
         rclcpp::sleep_for(10ms);
         break;
       }
@@ -93,19 +93,19 @@ void AmkNode::amk_state_machine_callback() {
       amk_control.amk_control_benable.fill(true);
       if (!amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT] && !amk_status.amk_status_binverter_on[Inverters::FRONT_RIGHT] &&
           !amk_status.amk_status_binverter_on[Inverters::REAR_LEFT] && !amk_status.amk_status_binverter_on[Inverters::REAR_RIGHT]) {
-        RCLCPP_INFO(this->get_logger(), "Waiting for inverter enable");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,  "Waiting for inverter enable");
         rclcpp::sleep_for(10ms);
         break;
       }
-      RCLCPP_INFO(this->get_logger(), "inverters enabled");
+      RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "inverters enabled");
       amk_control.amk_control_benable.fill(true);
       if (!(amk_status.amk_status_bquit_inverter_on[Inverters::FRONT_LEFT] && amk_status.amk_status_bquit_inverter_on[Inverters::FRONT_RIGHT] &&
             amk_status.amk_status_bquit_inverter_on[Inverters::REAR_LEFT] && amk_status.amk_status_bquit_inverter_on[Inverters::REAR_RIGHT])) {
-        RCLCPP_INFO(this->get_logger(), "Waiting for bquit inverter on");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for bquit inverter on");
         rclcpp::sleep_for(10ms);
         break;
       } else {
-        RCLCPP_INFO(this->get_logger(), "Inverters On");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,  "Inverters On");
         rclcpp::sleep_for(10ms);
         amk_state_machine_watchdog->cancel();
         state = StateMachine::TORQUE_CONTROL;
@@ -135,18 +135,18 @@ void AmkNode::amk_state_machine_callback() {
       amk_control.amk_torque_positive_limit.fill(0);
       amk_control.amk_torque_negative_limit.fill(0);
       amk_control.amk_target_torque.fill(0);
-      RCLCPP_INFO(this->get_logger(), "Inverters OFF");
+      RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,  "Inverters OFF");
       /* Wait until inverter 0 is switched-off.*/
       if (amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT] || amk_status.amk_status_binverter_on[Inverters::FRONT_RIGHT] ||
           amk_status.amk_status_binverter_on[Inverters::REAR_LEFT] || amk_status.amk_status_binverter_on[Inverters::REAR_RIGHT]) {
-        RCLCPP_INFO(this->get_logger(), "Waiting for inverter switch-off");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for inverter switch-off");
         rclcpp::sleep_for(5ms);
         break;
       }
       state = StateMachine::IDLING;
     } break;
     case StateMachine::ERROR_HANDLER: {
-      RCLCPP_INFO(this->get_logger(), "Error handler");
+      RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Error handler");
       rclcpp::sleep_for(1000ms);
     } break;
     default:
