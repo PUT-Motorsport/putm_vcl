@@ -18,23 +18,17 @@ target_include_directories(
                   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(amk_node rclcpp putm_vcl_interfaces)
 
-add_executable(amk_rx_bridge src/amk_bridge/amk_rx_bridge.cpp)
-target_include_directories(
-  amk_rx_bridge PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-                       $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(amk_rx_bridge rclcpp putm_vcl_interfaces)
-
 add_executable(amk_tx_bridge src/amk_bridge/amk_tx_bridge.cpp)
 target_include_directories(
   amk_tx_bridge PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                        $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(amk_tx_bridge rclcpp putm_vcl_interfaces)
 
-add_executable(can_rx_bridge src/can_bridge/can_rx_bridge.cpp)
+add_executable(can_rx_node src/can/can_rx_node.cpp)
 target_include_directories(
-  can_rx_bridge PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  can_rx_node PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
                        $<INSTALL_INTERFACE:include>)
-ament_target_dependencies(can_rx_bridge rclcpp putm_vcl_interfaces)
+ament_target_dependencies(can_rx_node rclcpp putm_vcl_interfaces)
 
 add_executable(can_tx_bridge src/can_bridge/can_tx_bridge.cpp)
 target_include_directories(
@@ -48,7 +42,7 @@ target_include_directories(
                   $<INSTALL_INTERFACE:include>)
 ament_target_dependencies(rtd_node rclcpp putm_vcl_interfaces)
 
-install(TARGETS amk_node amk_rx_bridge amk_tx_bridge can_tx_bridge can_rx_bridge
+install(TARGETS amk_node amk_tx_bridge can_tx_bridge can_rx_node
                 rtd_node DESTINATION lib/${PROJECT_NAME}/)
 
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)

@@ -1,38 +1,64 @@
+#include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_headers/PM09-CANBUS-FRONTBOX.hpp"
 #include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_rx.hpp"
-#include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_tx.hpp"
-#include "putm_vcl_interfaces/msg/amk_data.hpp"
+#include "putm_vcl_interfaces/msg/detail/frontbox__struct.hpp"
+#include "putm_vcl_interfaces/msg/frontbox.hpp"
 #include "putm_vcl_interfaces/msg/amk_status.hpp"
+#include "putm_vcl_interfaces/msg/amk_data.hpp"
 #include "rclcpp/rclcpp.hpp"
+#include "rclcpp/utilities.hpp"
 
-using namespace std::chrono_literals;
 using namespace PUTM_CAN;
+using namespace putm_vcl_interfaces;
+using namespace std::chrono_literals;
 
-class AmkRxNode : public rclcpp::Node {
+class CanRxNode : public rclcpp::Node {
  public:
-  AmkRxNode();
+  CanRxNode();
 
  private:
   enum Inverters { FRONT_LEFT = 0, FRONT_RIGHT = 1, REAR_LEFT = 2, REAR_RIGHT = 3 };
 
-  CanRx can_rx;
-  putm_vcl_interfaces::msg::AmkStatus amk_status;
-  putm_vcl_interfaces::msg::AmkData amk_data;
-  rclcpp::TimerBase::SharedPtr amk_rx_node_timer;
-  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkStatus>::SharedPtr amk_status_publisher;
-  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkData>::SharedPtr amk_data_publisher;
+  CanRx can_rx_amk;
+  CanRx can_rx_common;
 
-  void amk_rx_node_main_loop();
+  msg::AmkStatus amk_status;
+  msg::AmkData amk_data;
+
+  rclcpp::TimerBase::SharedPtr can_rx_amk_timer;
+  rclcpp::TimerBase::SharedPtr can_rx_common_timer;
+
+  rclcpp::Publisher<msg::Frontbox>::SharedPtr frontbox_publisher;
+  rclcpp::Publisher<msg::AmkStatus>::SharedPtr amk_status_publisher;
+  rclcpp::Publisher<msg::AmkData>::SharedPtr amk_data_publisher;
+
+  void can_rx_amk_callback();
+  void can_rx_common_callback();
 };
 
-AmkRxNode::AmkRxNode() : Node("amk_rx_bridge"), can_rx("can0", NO_TIMEOUT) {
-  amk_rx_node_timer = this->create_wall_timer(1ms, std::bind(&AmkRxNode::amk_rx_node_main_loop, this));
-  amk_status_publisher = this->create_publisher<putm_vcl_interfaces::msg::AmkStatus>("putm_vcl/amk_status", 1);
-  amk_data_publisher = this->create_publisher<putm_vcl_interfaces::msg::AmkData>("putm_vcl/amk_data", 1);
+CanRxNode::CanRxNode()
+    : Node("can_rx_node"),
+      can_rx_amk("can0", NO_TIMEOUT),
+      can_rx_common("can1", NO_TIMEOUT),
+      can_rx_amk_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_amk_callback, this))),
+      can_rx_common_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this))),
+      frontbox_publisher(this->create_publisher<msg::Frontbox>("putm_vcl/frontbox", 1)),
+      amk_status_publisher(this->create_publisher<msg::AmkStatus>("putm_vcl/amk_status", 1)),
+      amk_data_publisher(this->create_publisher<msg::AmkData>("putm_vcl/amk_data", 1)) {}
+
+void CanRxNode::can_rx_common_callback() {
+  can_frame frame = can_rx_common.receive();
+  switch (frame.can_id) {
+    case can_id<Frontbox_main>: {
+      auto can_frontbox = convert<Frontbox_main>(frame);
+      msg::Frontbox frontbox;
+      frontbox.pedal_position = (((can_frontbox.pedal_position) / 500.0) * 100.0);
+      frontbox_publisher->publish(frontbox);
+    }
+  }
 }
 
-// TODO: Change case define to can_id
-void AmkRxNode::amk_rx_node_main_loop() {
-  can_frame frame = can_rx.receive();
+void CanRxNode::can_rx_amk_callback() {
+  can_frame frame = can_rx_amk.receive();
   switch (frame.can_id) {
     case FRONT_LEFT_AMK_ACTUAL_VALUES_1_CAN_ID: {
       auto frontLeftAmkActualValues1 = convert<AmkFrontLeftActualValues1>(frame);
@@ -91,6 +117,6 @@ void AmkRxNode::amk_rx_node_main_loop() {
 
 int main(int argc, char** argv) {
   rclcpp::init(argc, argv);
-  rclcpp::spin(std::make_shared<AmkRxNode>());
+  rclcpp::spin(std::make_shared<CanRxNode>());
   rclcpp::shutdown();
 }
