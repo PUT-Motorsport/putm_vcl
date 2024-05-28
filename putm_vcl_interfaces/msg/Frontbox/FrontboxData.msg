@@ -1,0 +1,7 @@
+bool sense_left_kill
+bool sense_right_kill
+bool sense_driver_kill
+bool sense_inertia
+bool sense_bspd
+bool sense_overtravel
+bool sense_right_wheel
