@@ -42,46 +42,37 @@ CanTxNode::CanTxNode()
       amk_control_subscription(this->create_subscription<msg::AmkControl>("putm_vcl/amk_control", 1, std::bind(&CanTxNode::amk_control_callback, this, _1))) {}
 
 void CanTxNode::amk_control_callback(const msg::AmkControl msg) {
-  
+  amk_front_left_setpoints.AMK_Control.AMK_bInverterOn = msg.amk_control_binverter_on[Inverters::FRONT_LEFT];
+  amk_front_left_setpoints.AMK_Control.AMK_bDcOn = msg.amk_control_bdc_on[Inverters::FRONT_LEFT];
+  amk_front_left_setpoints.AMK_Control.AMK_bEnable = msg.amk_control_benable[Inverters::FRONT_LEFT];
+  amk_front_left_setpoints.AMK_Control.AMK_bErrorReset = msg.amk_control_amkb_error_reset[Inverters::FRONT_LEFT];
   amk_front_left_setpoints.AMK_TargetVelocity = msg.amk_target_torque[Inverters::FRONT_LEFT];
   amk_front_left_setpoints.AMK_TorqueLimitPositiv = msg.amk_torque_positive_limit[Inverters::FRONT_LEFT];
   amk_front_left_setpoints.AMK_TorqueLimitNegativ = msg.amk_torque_negative_limit[Inverters::FRONT_LEFT];
-  amk_front_left_setpoints.AMK_Control = {0,
-                                          msg.amk_control_binverter_on[Inverters::FRONT_LEFT],
-                                          msg.amk_control_bdc_on[Inverters::FRONT_LEFT],
-                                          msg.amk_control_benable[Inverters::FRONT_LEFT],
-                                          msg.amk_control_amkb_error_reset[Inverters::FRONT_LEFT],
-                                          0};
 
+  amk_front_right_setpoints.AMK_Control.AMK_bInverterOn = msg.amk_control_binverter_on[Inverters::FRONT_RIGHT];
+  amk_front_right_setpoints.AMK_Control.AMK_bDcOn = msg.amk_control_bdc_on[Inverters::FRONT_RIGHT];
+  amk_front_right_setpoints.AMK_Control.AMK_bEnable = msg.amk_control_benable[Inverters::FRONT_RIGHT];
+  amk_front_right_setpoints.AMK_Control.AMK_bErrorReset = msg.amk_control_amkb_error_reset[Inverters::FRONT_RIGHT];
   amk_front_right_setpoints.AMK_TargetVelocity = msg.amk_target_torque[Inverters::FRONT_RIGHT];
   amk_front_right_setpoints.AMK_TorqueLimitPositiv = msg.amk_torque_positive_limit[Inverters::FRONT_RIGHT];
   amk_front_right_setpoints.AMK_TorqueLimitNegativ = msg.amk_torque_negative_limit[Inverters::FRONT_RIGHT];
-  amk_front_right_setpoints.AMK_Control = {0,
-                                           msg.amk_control_binverter_on[Inverters::FRONT_RIGHT],
-                                           msg.amk_control_bdc_on[Inverters::FRONT_RIGHT],
-                                           msg.amk_control_benable[Inverters::FRONT_RIGHT],
-                                           msg.amk_control_amkb_error_reset[Inverters::FRONT_RIGHT],
-                                           0};
 
+  amk_rear_left_setpoints.AMK_Control.AMK_bInverterOn = msg.amk_control_binverter_on[Inverters::REAR_LEFT];
+  amk_rear_left_setpoints.AMK_Control.AMK_bDcOn = msg.amk_control_bdc_on[Inverters::REAR_LEFT];
+  amk_rear_left_setpoints.AMK_Control.AMK_bEnable = msg.amk_control_benable[Inverters::REAR_LEFT];
+  amk_rear_left_setpoints.AMK_Control.AMK_bErrorReset = msg.amk_control_amkb_error_reset[Inverters::REAR_LEFT];
   amk_rear_left_setpoints.AMK_TargetVelocity = msg.amk_target_torque[Inverters::REAR_LEFT];
   amk_rear_left_setpoints.AMK_TorqueLimitPositiv = msg.amk_torque_positive_limit[Inverters::REAR_LEFT];
   amk_rear_left_setpoints.AMK_TorqueLimitNegativ = msg.amk_torque_negative_limit[Inverters::REAR_LEFT];
-  amk_rear_left_setpoints.AMK_Control = {0,
-                                         msg.amk_control_binverter_on[Inverters::REAR_LEFT],
-                                         msg.amk_control_bdc_on[Inverters::REAR_LEFT],
-                                         msg.amk_control_benable[Inverters::REAR_LEFT],
-                                         msg.amk_control_amkb_error_reset[Inverters::REAR_LEFT],
-                                         0};
 
+  amk_rear_right_setpoints.AMK_Control.AMK_bInverterOn = msg.amk_control_binverter_on[Inverters::REAR_RIGHT];
+  amk_rear_right_setpoints.AMK_Control.AMK_bDcOn = msg.amk_control_bdc_on[Inverters::REAR_RIGHT];
+  amk_rear_right_setpoints.AMK_Control.AMK_bEnable = msg.amk_control_benable[Inverters::REAR_RIGHT];
+  amk_rear_right_setpoints.AMK_Control.AMK_bErrorReset = msg.amk_control_amkb_error_reset[Inverters::REAR_RIGHT];
   amk_rear_right_setpoints.AMK_TargetVelocity = msg.amk_target_torque[Inverters::REAR_RIGHT];
   amk_rear_right_setpoints.AMK_TorqueLimitPositiv = msg.amk_torque_positive_limit[Inverters::REAR_RIGHT];
   amk_rear_right_setpoints.AMK_TorqueLimitNegativ = msg.amk_torque_negative_limit[Inverters::REAR_RIGHT];
-  amk_rear_right_setpoints.AMK_Control = {0,
-                                          msg.amk_control_binverter_on[Inverters::REAR_RIGHT],
-                                          msg.amk_control_bdc_on[Inverters::REAR_RIGHT],
-                                          msg.amk_control_benable[Inverters::REAR_RIGHT],
-                                          msg.amk_control_amkb_error_reset[Inverters::REAR_RIGHT],
-                                          0};
 }
 
 void CanTxNode::can_tx_amk_callback() {
@@ -92,7 +83,7 @@ void CanTxNode::can_tx_amk_callback() {
 }
 
 void CanTxNode::can_tx_common_callback() {
-  // Add common tx in here
+  // Add common tx in here if needed
   // Example:
   // can_tx_common.transmit(frontbox);
 }
