@@ -1,4 +1,5 @@
 #include "can_nodes/can_rx_node.hpp"
+
 #include "putm_vcl/putm_vcl.hpp"
 
 using namespace PUTM_CAN;
@@ -23,12 +24,31 @@ void CanRxNode::can_rx_common_callback() {
     case can_id<FrontboxDriverInput>: {
       auto can_frontbox_driver_input = convert<FrontboxDriverInput>(frame);
       msg::FrontboxDriverInput frontbox_driver_input;
-      frontbox_driver_input.pedal_position = (((can_frontbox_driver_input.pedal_position) / 500.0) * 100.0);
+      frontbox_driver_input.pedal_position = can_frontbox_driver_input.pedal_position;
+      frontbox_driver_input.brake_pressure_front = can_frontbox_driver_input.brake_pressure_front;
+      frontbox_driver_input.brake_pressure_rear = can_frontbox_driver_input.brake_pressure_rear;
+      frontbox_driver_input.steering_wheel_position = can_frontbox_driver_input.steering_wheel_position;
       frontbox_driver_input_publisher->publish(frontbox_driver_input);
+      break;
     }
+
     case can_id<FrontboxData>: {
-      // auto can_frontbox_data = convert<FrontboxData>(frame);
-      // msg::FrontboxData frontbox_data;
+      auto can_frontbox_data = convert<FrontboxData>(frame);
+      msg::FrontboxData frontbox_data;
+      frontbox_data.sense_left_kill = can_frontbox_data.sense_left_kill;
+      frontbox_data.sense_right_kill = can_frontbox_data.sense_right_kill;
+      frontbox_data.sense_driver_kill = can_frontbox_data.sense_driver_kill;
+      frontbox_data.sense_inertia = can_frontbox_data.sense_inertia;
+      frontbox_data.sense_bspd = can_frontbox_data.sense_bspd;
+      frontbox_data.sense_overtravel = can_frontbox_data.sense_overtravel;
+      frontbox_data.sense_right_wheel = can_frontbox_data.sense_right_wheel;
+      frontbox_data.sc_state = can_frontbox_data.sc_state;
+      frontbox_data.front_left_suspension = can_frontbox_data.front_left_suspension;
+      frontbox_data.front_right_suspension = can_frontbox_data.front_right_suspension;
+      frontbox_data.front_left_hub_temperature = can_frontbox_data.front_left_hub_temperature;
+      frontbox_data.front_right_hub_temperature = can_frontbox_data.front_right_hub_temperature;
+      frontbox_data_publisher->publish(frontbox_data);
+      break;
     }
   }
 }
