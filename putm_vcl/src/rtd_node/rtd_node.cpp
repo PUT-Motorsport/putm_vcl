@@ -13,8 +13,8 @@ RtdNode::RtdNode()
 
 void RtdNode::rtd_callback() {
   /* Entry condition */
-  if ((frontbox_driver_input.brake_pressure_front >= 100.0) or (frontbox_driver_input.brake_pressure_rear >= 100.0)) {
-    RCLCPP_INFO_ONCE(this->get_logger(), "Braking...");
+  if ((frontbox_driver_input.brake_pressure_front >= 2200.0) or (frontbox_driver_input.brake_pressure_rear >= 2200.0)) {
+    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000,  "Braking...");
     if ((dashboard.rtd_button) and not(rtd.state)) {
       RCLCPP_INFO(this->get_logger(), "RTD ON");
       rtd.state = true;
