@@ -13,19 +13,14 @@ RtdNode::RtdNode()
       dashboard_subscriber(this->create_subscription<msg::Dashboard>("putm_vcl/dashboard", 1, std::bind(&RtdNode::dashboard_callback, this, _1))) {}
 
 void RtdNode::rtd_callback() {
-  /* Entry condition */
-  if ((frontbox_driver_input.brake_pressure_front >= 2200.0) or (frontbox_driver_input.brake_pressure_rear >= 2200.0)) {
-    RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Braking...");
-    if ((dashboard.rtd_button) and not(rtd.state)) {
-      RCLCPP_INFO(this->get_logger(), "RTD: on");
-      rtd.state = true;
-      rtd_publisher->publish(rtd);
-    }
+  if ((frontbox_driver_input.brake_pressure_front >= 2200.0 or frontbox_driver_input.brake_pressure_rear >= 2200.0) and dashboard.rtd_button and not rtd.state) {
+    RCLCPP_INFO(this->get_logger(), "RTD: on");
+    rtd.state = true;
   } else if (rtd.state and dashboard.rtd_button) {
     RCLCPP_INFO(this->get_logger(), "RTD: off");
     rtd.state = false;
-    rtd_publisher->publish(rtd);
   }
+  rtd_publisher->publish(rtd);
 }
 
 void RtdNode::frontbox_driver_input_callback(const msg::FrontboxDriverInput::SharedPtr msg) { frontbox_driver_input = *msg; }
