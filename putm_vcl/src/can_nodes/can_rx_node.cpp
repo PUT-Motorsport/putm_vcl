@@ -15,6 +15,7 @@ CanRxNode::CanRxNode()
       can_rx_common_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this))),
       frontbox_driver_input_publisher(this->create_publisher<msg::FrontboxDriverInput>("putm_vcl/frontbox_driver_input", 1)),
       frontbox_data_publisher(this->create_publisher<msg::FrontboxData>("putm_vcl/frontbox_data", 1)),
+      dashboard_publisher(this->create_publisher<msg::Dashboard>("putm_vcl/dashboard", 1)),
       amk_status_publisher(this->create_publisher<msg::AmkStatus>("putm_vcl/amk_status", 1)),
       amk_data_publisher(this->create_publisher<msg::AmkData>("putm_vcl/amk_data", 1)) {}
 
@@ -48,6 +49,16 @@ void CanRxNode::can_rx_common_callback() {
       frontbox_data.front_left_hub_temperature = can_frontbox_data.front_left_hub_temperature;
       frontbox_data.front_right_hub_temperature = can_frontbox_data.front_right_hub_temperature;
       frontbox_data_publisher->publish(frontbox_data);
+      break;
+    }
+
+    case can_id<Dashboard>: {
+      auto can_dashboard = convert<Dashboard>(frame);
+      msg::Dashboard dashboard;
+      dashboard.rtd_button = can_dashboard.rtd_button;
+      dashboard.ts_activate_button = can_dashboard.ts_activate_button;
+      dashboard.rfu_button = can_dashboard.rfu_button;
+      dashboard_publisher->publish(dashboard);
       break;
     }
   }

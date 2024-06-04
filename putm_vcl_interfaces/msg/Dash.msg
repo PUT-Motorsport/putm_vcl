@@ -1,1 +1,0 @@
-bool rtd_button_state

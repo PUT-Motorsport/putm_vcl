@@ -14,7 +14,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Amk/AmkData.msg"
   "msg/Frontbox/FrontboxDriverInput.msg"
   "msg/Frontbox/FrontboxData.msg"
-  "msg/Dash.msg"
+  "msg/Dashboard.msg"
   "msg/Rtd.msg"
   "msg/Setpoints.msg"
 )

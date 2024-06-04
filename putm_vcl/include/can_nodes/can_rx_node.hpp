@@ -3,8 +3,9 @@
 #include "PUTM_DV_CAN_LIBRARY_RAII_2024/include/can_rx.hpp"
 #include "putm_vcl_interfaces/msg/amk_data.hpp"
 #include "putm_vcl_interfaces/msg/amk_status.hpp"
-#include "putm_vcl_interfaces/msg/frontbox_driver_input.hpp"
+#include "putm_vcl_interfaces/msg/dashboard.hpp"
 #include "putm_vcl_interfaces/msg/frontbox_data.hpp"
+#include "putm_vcl_interfaces/msg/frontbox_driver_input.hpp"
 #include "rclcpp/rclcpp.hpp"
 
 class CanRxNode : public rclcpp::Node {
@@ -23,6 +24,7 @@ class CanRxNode : public rclcpp::Node {
 
   rclcpp::Publisher<putm_vcl_interfaces::msg::FrontboxDriverInput>::SharedPtr frontbox_driver_input_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::FrontboxData>::SharedPtr frontbox_data_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::Dashboard>::SharedPtr dashboard_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkStatus>::SharedPtr amk_status_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkData>::SharedPtr amk_data_publisher;
 
