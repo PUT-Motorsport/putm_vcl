@@ -17,6 +17,9 @@ class CanTxNode : public rclcpp::Node {
   PUTM_CAN::AmkRearLeftSetpoints1 amk_rear_left_setpoints;
   PUTM_CAN::AmkRearRightSetpoints1 amk_rear_right_setpoints;
 
+  PUTM_CAN::PcMainData pc_main_data;
+  PUTM_CAN::PcMainData pc_main_data2;
+
   rclcpp::TimerBase::SharedPtr can_tx_amk_timer;
   rclcpp::TimerBase::SharedPtr can_tx_common_timer;
 

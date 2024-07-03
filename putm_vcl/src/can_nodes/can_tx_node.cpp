@@ -14,7 +14,7 @@ CanTxNode::CanTxNode()
       can_tx_amk_timer(this->create_wall_timer(10ms, std::bind(&CanTxNode::can_tx_amk_callback, this))),
       can_tx_common_timer(this->create_wall_timer(10ms, std::bind(&CanTxNode::can_tx_common_callback, this))),
       amk_control_subscription(this->create_subscription<msg::AmkControl>("putm_vcl/amk_control", 1, std::bind(&CanTxNode::amk_control_callback, this, _1))) {}
-
+      
 void CanTxNode::amk_control_callback(const msg::AmkControl msg) {
   amk_front_left_setpoints.AMK_Control.AMK_bInverterOn = msg.amk_control_binverter_on[Inverters::FRONT_LEFT];
   amk_front_left_setpoints.AMK_Control.AMK_bDcOn = msg.amk_control_bdc_on[Inverters::FRONT_LEFT];
@@ -57,9 +57,8 @@ void CanTxNode::can_tx_amk_callback() {
 }
 
 void CanTxNode::can_tx_common_callback() {
-  // Add common tx in here if needed
-  // Example:
-  // can_tx_common.transmit(something);
+  can_tx_common.transmit(pc_main_data);
+  can_tx_common.transmit(pc_main_data2);
 }
 
 int main(int argc, char** argv) {
