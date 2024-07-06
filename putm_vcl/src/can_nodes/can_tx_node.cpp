@@ -81,6 +81,10 @@ void CanTxNode::amk_status_callback(const putm_vcl_interfaces::msg::AmkStatus ms
   {
     pcMainData.inverters_ready = false;
   }
+  for (uint8_t i = 0; i < 4; i++)
+  {
+    pcMainData.derating_on += msg.amk_status_bderating[i] << i;
+  }
 
 }
 
