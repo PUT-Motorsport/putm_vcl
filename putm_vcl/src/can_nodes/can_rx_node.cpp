@@ -13,12 +13,23 @@ CanRxNode::CanRxNode()
       can_rx_common(can_interface_common, NO_TIMEOUT),
       can_rx_amk_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_amk_callback, this))),
       can_rx_common_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this))),
+
       frontbox_driver_input_publisher(this->create_publisher<msg::FrontboxDriverInput>("putm_vcl/frontbox_driver_input", 1)),
       frontbox_data_publisher(this->create_publisher<msg::FrontboxData>("putm_vcl/frontbox_data", 1)),
-      dashboard_publisher(this->create_publisher<msg::Dashboard>("putm_vcl/dashboard", 1)),
-      amk_status_publisher(this->create_publisher<msg::AmkStatus>("putm_vcl/amk_status", 1)),
-      amk_data_publisher(this->create_publisher<msg::AmkData>("putm_vcl/amk_data", 1)) {}
 
+      amk_front_left_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("putm_vcl/amk/front/left/actual_values1", 1)),
+      amk_front_left_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("putm_vcl/amk/front/left/actual_values2", 1)),
+
+      amk_front_right_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("putm_vcl/amk/front/right/actual_values1", 1)),
+      amk_front_right_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("putm_vcl/amk/front/right/actual_values2", 1)),
+
+      amk_rear_left_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("putm_vcl/amk/rear/left/actual_values1", 1)),
+      amk_rear_left_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("putm_vcl/amk/rear/left/actual_values2", 1)),
+
+      amk_rear_right_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("putm_vcl/amk/rear/right/actual_values1", 1)),
+      amk_rear_right_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("putm_vcl/amk/rear/right/actual_values2", 1)),
+
+      dashboard_publisher(this->create_publisher<msg::Dashboard>("putm_vcl/dashboard", 1)) {}
 void CanRxNode::can_rx_common_callback() {
   can_frame frame = can_rx_common.receive();
   switch (frame.can_id) {
@@ -66,65 +77,118 @@ void CanRxNode::can_rx_common_callback() {
 
 void CanRxNode::can_rx_amk_callback() {
   can_frame frame = can_rx_amk.receive();
+  msg::AmkActualValues1 amk_actual_values1;
+  msg::AmkActualValues2 amk_actual_values2;
+
   switch (frame.can_id) {
     case can_id<AmkFrontLeftActualValues1>: {
       auto can_amk = convert<AmkFrontLeftActualValues1>(frame);
-      amk_status.amk_status_bsystem_ready[Inverters::FRONT_LEFT] = can_amk.AMK_Status.AMK_bSystemReady;
-      amk_status.amk_status_berror[Inverters::FRONT_LEFT] = can_amk.AMK_Status.AMK_bError;
-      amk_status.amk_status_bwarn[Inverters::FRONT_LEFT] = can_amk.AMK_Status.AMK_bWarn;
-      amk_status.amk_status_bquit_dc_on[Inverters::FRONT_LEFT] = can_amk.AMK_Status.AMK_bQuitDcOn;
-      amk_status.amk_status_bdc_on[Inverters::FRONT_LEFT] = can_amk.AMK_Status.AMK_bDcOn;
-      amk_status.amk_status_bquit_inverter_on[Inverters::FRONT_LEFT] = can_amk.AMK_Status.AMK_bQuitInverterOn;
-      amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT] = can_amk.AMK_Status.AMK_bInverterOn;
-      amk_status.amk_status_bderating[Inverters::FRONT_LEFT] = can_amk.AMK_Status.AMK_bDerating;
+      amk_actual_values1.amk_status.system_ready = can_amk.amk_status.system_ready;
+      amk_actual_values1.amk_status.error = can_amk.amk_status.error;
+      amk_actual_values1.amk_status.warn = can_amk.amk_status.warn;
+      amk_actual_values1.amk_status.quit_dc_on = can_amk.amk_status.quit_dc_on;
+      amk_actual_values1.amk_status.dc_on = can_amk.amk_status.dc_on;
+      amk_actual_values1.amk_status.quit_inverter_on = can_amk.amk_status.quit_inverter_on;
+      amk_actual_values1.amk_status.inverter_on = can_amk.amk_status.inverter_on;
+      amk_actual_values1.amk_status.derating = can_amk.amk_status.derating;
+      amk_actual_values1.actual_velocity = can_amk.actual_velocity;
+      amk_actual_values1.torque_current = can_amk.torque_current;
+      amk_actual_values1.magnetizing_current = can_amk.magnetizing_current;
+      amk_front_left_actual_values1_publisher->publish(amk_actual_values1);
+      break;
+    }
 
-      // TODO: Determine why only there
-      amk_data.amk_actual_velocity[Inverters::FRONT_LEFT] = can_amk.AMK_ActualVelocity;
-      amk_data.amk_torque_current[Inverters::FRONT_LEFT] = can_amk.AMK_TorqueCurrent;
+    case can_id<AmkFrontLeftActualValues2>: {
+      auto can_amk = convert<AmkFrontLeftActualValues2>(frame);
+      amk_actual_values2.temp_motor = can_amk.temp_motor;
+      amk_actual_values2.temp_inverter = can_amk.temp_inverter;
+      amk_actual_values2.error_info = can_amk.error_info;
+      amk_actual_values2.temp_igbt = can_amk.temp_igbt;
+      amk_front_left_actual_values2_publisher->publish(amk_actual_values2);
       break;
     }
 
     case can_id<AmkFrontRightActualValues1>: {
       auto can_amk = convert<AmkFrontRightActualValues1>(frame);
-      amk_status.amk_status_bsystem_ready[Inverters::FRONT_RIGHT] = can_amk.AMK_Status.AMK_bSystemReady;
-      amk_status.amk_status_berror[Inverters::FRONT_RIGHT] = can_amk.AMK_Status.AMK_bError;
-      amk_status.amk_status_bwarn[Inverters::FRONT_RIGHT] = can_amk.AMK_Status.AMK_bWarn;
-      amk_status.amk_status_bquit_dc_on[Inverters::FRONT_RIGHT] = can_amk.AMK_Status.AMK_bQuitDcOn;
-      amk_status.amk_status_bdc_on[Inverters::FRONT_RIGHT] = can_amk.AMK_Status.AMK_bDcOn;
-      amk_status.amk_status_bquit_inverter_on[Inverters::FRONT_RIGHT] = can_amk.AMK_Status.AMK_bQuitInverterOn;
-      amk_status.amk_status_binverter_on[Inverters::FRONT_RIGHT] = can_amk.AMK_Status.AMK_bInverterOn;
-      amk_status.amk_status_bderating[Inverters::FRONT_RIGHT] = can_amk.AMK_Status.AMK_bDerating;
+      amk_actual_values1.amk_status.system_ready = can_amk.amk_status.system_ready;
+      amk_actual_values1.amk_status.error = can_amk.amk_status.error;
+      amk_actual_values1.amk_status.warn = can_amk.amk_status.warn;
+      amk_actual_values1.amk_status.quit_dc_on = can_amk.amk_status.quit_dc_on;
+      amk_actual_values1.amk_status.dc_on = can_amk.amk_status.dc_on;
+      amk_actual_values1.amk_status.quit_inverter_on = can_amk.amk_status.quit_inverter_on;
+      amk_actual_values1.amk_status.inverter_on = can_amk.amk_status.inverter_on;
+      amk_actual_values1.amk_status.derating = can_amk.amk_status.derating;
+      amk_actual_values1.actual_velocity = can_amk.actual_velocity;
+      amk_actual_values1.torque_current = can_amk.torque_current;
+      amk_actual_values1.magnetizing_current = can_amk.magnetizing_current;
+      amk_front_right_actual_values1_publisher->publish(amk_actual_values1);
+      break;
+    }
+
+    case can_id<AmkFrontRightActualValues2>: {
+      auto can_amk = convert<AmkFrontRightActualValues2>(frame);
+      amk_actual_values2.temp_motor = can_amk.temp_motor;
+      amk_actual_values2.temp_inverter = can_amk.temp_inverter;
+      amk_actual_values2.error_info = can_amk.error_info;
+      amk_actual_values2.temp_igbt = can_amk.temp_igbt;
+      amk_front_right_actual_values2_publisher->publish(amk_actual_values2);
       break;
     }
 
     case can_id<AmkRearLeftActualValues1>: {
       auto can_amk = convert<AmkRearLeftActualValues1>(frame);
-      amk_status.amk_status_bsystem_ready[Inverters::REAR_LEFT] = can_amk.AMK_Status.AMK_bSystemReady;
-      amk_status.amk_status_berror[Inverters::REAR_LEFT] = can_amk.AMK_Status.AMK_bError;
-      amk_status.amk_status_bwarn[Inverters::REAR_LEFT] = can_amk.AMK_Status.AMK_bWarn;
-      amk_status.amk_status_bquit_dc_on[Inverters::REAR_LEFT] = can_amk.AMK_Status.AMK_bQuitDcOn;
-      amk_status.amk_status_bdc_on[Inverters::REAR_LEFT] = can_amk.AMK_Status.AMK_bDcOn;
-      amk_status.amk_status_bquit_inverter_on[Inverters::REAR_LEFT] = can_amk.AMK_Status.AMK_bQuitInverterOn;
-      amk_status.amk_status_binverter_on[Inverters::REAR_LEFT] = can_amk.AMK_Status.AMK_bInverterOn;
-      amk_status.amk_status_bderating[Inverters::REAR_LEFT] = can_amk.AMK_Status.AMK_bDerating;
+      amk_actual_values1.amk_status.system_ready = can_amk.amk_status.system_ready;
+      amk_actual_values1.amk_status.error = can_amk.amk_status.error;
+      amk_actual_values1.amk_status.warn = can_amk.amk_status.warn;
+      amk_actual_values1.amk_status.quit_dc_on = can_amk.amk_status.quit_dc_on;
+      amk_actual_values1.amk_status.dc_on = can_amk.amk_status.dc_on;
+      amk_actual_values1.amk_status.quit_inverter_on = can_amk.amk_status.quit_inverter_on;
+      amk_actual_values1.amk_status.inverter_on = can_amk.amk_status.inverter_on;
+      amk_actual_values1.amk_status.derating = can_amk.amk_status.derating;
+      amk_actual_values1.actual_velocity = can_amk.actual_velocity;
+      amk_actual_values1.torque_current = can_amk.torque_current;
+      amk_actual_values1.magnetizing_current = can_amk.magnetizing_current;
+      amk_rear_left_actual_values1_publisher->publish(amk_actual_values1);
+      break;
+    }
+
+    case can_id<AmkRearLeftActualValues2>: {
+      auto can_amk = convert<AmkRearLeftActualValues2>(frame);
+      amk_actual_values2.temp_motor = can_amk.temp_motor;
+      amk_actual_values2.temp_inverter = can_amk.temp_inverter;
+      amk_actual_values2.error_info = can_amk.error_info;
+      amk_actual_values2.temp_igbt = can_amk.temp_igbt;
+      amk_rear_left_actual_values2_publisher->publish(amk_actual_values2);
       break;
     }
 
     case can_id<AmkRearRightActualValues1>: {
       auto can_amk = convert<AmkRearRightActualValues1>(frame);
-      amk_status.amk_status_bsystem_ready[Inverters::REAR_RIGHT] = can_amk.AMK_Status.AMK_bSystemReady;
-      amk_status.amk_status_berror[Inverters::REAR_RIGHT] = can_amk.AMK_Status.AMK_bError;
-      amk_status.amk_status_bwarn[Inverters::REAR_RIGHT] = can_amk.AMK_Status.AMK_bWarn;
-      amk_status.amk_status_bquit_dc_on[Inverters::REAR_RIGHT] = can_amk.AMK_Status.AMK_bQuitDcOn;
-      amk_status.amk_status_bdc_on[Inverters::REAR_RIGHT] = can_amk.AMK_Status.AMK_bDcOn;
-      amk_status.amk_status_bquit_inverter_on[Inverters::REAR_RIGHT] = can_amk.AMK_Status.AMK_bQuitInverterOn;
-      amk_status.amk_status_binverter_on[Inverters::REAR_RIGHT] = can_amk.AMK_Status.AMK_bInverterOn;
-      amk_status.amk_status_bderating[Inverters::REAR_RIGHT] = can_amk.AMK_Status.AMK_bDerating;
+      amk_actual_values1.amk_status.system_ready = can_amk.amk_status.system_ready;
+      amk_actual_values1.amk_status.error = can_amk.amk_status.error;
+      amk_actual_values1.amk_status.warn = can_amk.amk_status.warn;
+      amk_actual_values1.amk_status.quit_dc_on = can_amk.amk_status.quit_dc_on;
+      amk_actual_values1.amk_status.dc_on = can_amk.amk_status.dc_on;
+      amk_actual_values1.amk_status.quit_inverter_on = can_amk.amk_status.quit_inverter_on;
+      amk_actual_values1.amk_status.inverter_on = can_amk.amk_status.inverter_on;
+      amk_actual_values1.amk_status.derating = can_amk.amk_status.derating;
+      amk_actual_values1.actual_velocity = can_amk.actual_velocity;
+      amk_actual_values1.torque_current = can_amk.torque_current;
+      amk_actual_values1.magnetizing_current = can_amk.magnetizing_current;
+      amk_rear_right_actual_values1_publisher->publish(amk_actual_values1);
+      break;
+    }
+
+    case can_id<AmkRearRightActualValues2>: {
+      auto can_amk = convert<AmkRearRightActualValues2>(frame);
+      amk_actual_values2.temp_motor = can_amk.temp_motor;
+      amk_actual_values2.temp_inverter = can_amk.temp_inverter;
+      amk_actual_values2.error_info = can_amk.error_info;
+      amk_actual_values2.temp_igbt = can_amk.temp_igbt;
+      amk_rear_right_actual_values2_publisher->publish(amk_actual_values2);
       break;
     }
   }
-  amk_status_publisher->publish(amk_status);
-  amk_data_publisher->publish(amk_data);
 }
 
 int main(int argc, char** argv) {

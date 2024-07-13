@@ -1,0 +1,4 @@
+AmkStatus amk_status
+int16 actual_velocity
+int16 torque_current
+int16 magnetizing_current

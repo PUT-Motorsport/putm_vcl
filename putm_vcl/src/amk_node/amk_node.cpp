@@ -16,9 +16,16 @@ AmkNode::AmkNode()
       publisher_amk_rear_left_setpoints(this->create_publisher<msg::AmkSetpoints>("putm_vcl/amk/rear/left/setpoints", 1)),
       publisher_amk_rear_right_setpoints(this->create_publisher<msg::AmkSetpoints>("putm_vcl/amk/rear/right/setpoints", 1)),
 
+      subscription_amk_front_left_actual_values1(this->create_subscription<msg::AmkActualValues1>(
+          "putm_vcl/amk/front/left/actual_values1", 1, std::bind(&AmkNode::amk_front_left_actual_values1_callback, this, _1))),
+      subscription_amk_front_right_actual_values1(this->create_subscription<msg::AmkActualValues1>(
+          "putm_vcl/amk/front/right/actual_values1", 1, std::bind(&AmkNode::amk_front_right_actual_values1_callback, this, _1))),
+      subscription_amk_rear_left_actual_values1(this->create_subscription<msg::AmkActualValues1>(
+          "putm_vcl/amk/rear/left/actual_values1", 1, std::bind(&AmkNode::amk_rear_left_actual_values1_callback, this, _1))),
+      subscription_amk_rear_right_actual_values1(this->create_subscription<msg::AmkActualValues1>(
+          "putm_vcl/amk/rear/right/actual_values1", 1, std::bind(&AmkNode::amk_rear_right_actual_values1_callback, this, _1))),
+
       subscription_rtd(this->create_subscription<msg::Rtd>("putm_vcl/rtd", 1, std::bind(&AmkNode::rtd_callback, this, _1))),
-      subscription_setpoints(this->create_subscription<msg::Setpoints>("putm_vcl/setpoints", 1, std::bind(&AmkNode::setpoints_callback, this, _1))),
-      subscription_amk_status(this->create_subscription<msg::AmkStatus>("putm_vcl/amk_status", 1, std::bind(&AmkNode::amk_status_callback, this, _1))),
       amk_state_machine_timer(this->create_wall_timer(5ms, std::bind(&AmkNode::amk_state_machine_callback, this))),
       amk_setpoints_timer(this->create_wall_timer(2ms, std::bind(&AmkNode::amk_setpoints_callback, this))),
       setpoints_watchdog(this->create_wall_timer(500ms, std::bind(&AmkNode::setpoints_watchdog_callback, this))),
@@ -34,7 +41,10 @@ void AmkNode::setpoints_callback(const msg::Setpoints::SharedPtr msg) {
   setpoints = *msg;
   setpoints_watchdog->reset();
 }
-void AmkNode::amk_status_callback(const msg::AmkStatus::SharedPtr msg) { amk_status = *msg; }
+void AmkNode::amk_front_left_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg) { amk_front_left_actual_values1 = *msg; }
+void AmkNode::amk_front_right_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg) { amk_front_right_actual_values1 = *msg; }
+void AmkNode::amk_rear_left_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg) { amk_rear_left_actual_values1 = *msg; }
+void AmkNode::amk_rear_right_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg) { amk_rear_right_actual_values1 = *msg; }
 
 // Watchdog callbacks
 void AmkNode::setpoints_watchdog_callback() {
@@ -61,20 +71,20 @@ void AmkNode::amk_setpoints_callback() {
 void AmkNode::amk_state_machine_callback() {
   switch (state) {
     case StateMachine::UNDEFINED: {
-      if (amk_status.amk_status_berror[Inverters::FRONT_LEFT] || amk_status.amk_status_berror[Inverters::FRONT_RIGHT] ||
-          amk_status.amk_status_berror[Inverters::REAR_LEFT] || amk_status.amk_status_berror[Inverters::REAR_RIGHT]) {
+      if (amk_front_left_actual_values1.amk_status.error || amk_front_right_actual_values1.amk_status.error || amk_rear_left_actual_values1.amk_status.error ||
+          amk_rear_right_actual_values1.amk_status.error) {
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Detected inverter error");
         state = StateMachine::ERROR_RESET;
       }
-      if (amk_status.amk_status_bsystem_ready[Inverters::FRONT_LEFT] && amk_status.amk_status_bsystem_ready[Inverters::FRONT_RIGHT] &&
-          amk_status.amk_status_bsystem_ready[Inverters::REAR_LEFT] && amk_status.amk_status_bsystem_ready[Inverters::REAR_RIGHT]) {
+      if (amk_front_left_actual_values1.amk_status.system_ready && amk_front_right_actual_values1.amk_status.system_ready &&
+          amk_rear_left_actual_values1.amk_status.system_ready && amk_rear_right_actual_values1.amk_status.system_ready) {
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Inverters online, going to idle");
         state = StateMachine::IDLING;
       }
     } break;
     case StateMachine::ERROR_RESET: {
-      if (amk_status.amk_status_bsystem_ready[Inverters::FRONT_LEFT] && amk_status.amk_status_bsystem_ready[Inverters::FRONT_RIGHT] &&
-          amk_status.amk_status_bsystem_ready[Inverters::REAR_LEFT] && amk_status.amk_status_bsystem_ready[Inverters::REAR_RIGHT]) {
+      if (amk_front_left_actual_values1.amk_status.system_ready && amk_front_right_actual_values1.amk_status.system_ready &&
+          amk_rear_left_actual_values1.amk_status.system_ready && amk_rear_left_actual_values1.amk_status.system_ready) {
         amk_front_left_setpoints.amk_control.error_reset = false;
         amk_front_right_setpoints.amk_control.error_reset = false;
         amk_rear_left_setpoints.amk_control.error_reset = false;
@@ -118,8 +128,8 @@ void AmkNode::amk_state_machine_callback() {
       amk_rear_right_setpoints.torque_negative_limit = 0;
       amk_rear_right_setpoints.target_torque = 0;
 
-      if (!amk_status.amk_status_bdc_on[Inverters::FRONT_LEFT] && !amk_status.amk_status_bdc_on[Inverters::FRONT_RIGHT] &&
-          !amk_status.amk_status_bdc_on[Inverters::REAR_LEFT] && !amk_status.amk_status_bdc_on[Inverters::REAR_RIGHT]) {
+      if (!amk_front_left_actual_values1.amk_status.dc_on && !amk_front_right_actual_values1.amk_status.dc_on && !amk_rear_left_actual_values1.amk_status.dc_on &&
+          !amk_rear_right_actual_values1.amk_status.dc_on) {
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for bdc_on");
         rclcpp::sleep_for(10ms);
         break;
@@ -136,8 +146,8 @@ void AmkNode::amk_state_machine_callback() {
       amk_rear_right_setpoints.amk_control.inverter_on = true;
       amk_rear_right_setpoints.amk_control.enable = true;
 
-      if (!amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT] && !amk_status.amk_status_binverter_on[Inverters::FRONT_RIGHT] &&
-          !amk_status.amk_status_binverter_on[Inverters::REAR_LEFT] && !amk_status.amk_status_binverter_on[Inverters::REAR_RIGHT]) {
+      if (!amk_front_left_actual_values1.amk_status.inverter_on && !amk_front_right_actual_values1.amk_status.inverter_on &&
+          !amk_rear_left_actual_values1.amk_status.inverter_on && !amk_rear_right_actual_values1.amk_status.inverter_on) {
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for inverter enable");
         rclcpp::sleep_for(10ms);
         break;
@@ -149,8 +159,8 @@ void AmkNode::amk_state_machine_callback() {
       amk_rear_left_setpoints.amk_control.enable = true;
       amk_rear_right_setpoints.amk_control.enable = true;
 
-      if (!(amk_status.amk_status_bquit_inverter_on[Inverters::FRONT_LEFT] && amk_status.amk_status_bquit_inverter_on[Inverters::FRONT_RIGHT] &&
-            amk_status.amk_status_bquit_inverter_on[Inverters::REAR_LEFT] && amk_status.amk_status_bquit_inverter_on[Inverters::REAR_RIGHT])) {
+      if (!(amk_front_left_actual_values1.amk_status.quit_inverter_on && amk_front_right_actual_values1.amk_status.quit_inverter_on &&
+            amk_rear_left_actual_values1.amk_status.quit_inverter_on && amk_rear_right_actual_values1.amk_status.quit_inverter_on)) {
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for bquit inverter on");
         rclcpp::sleep_for(10ms);
         break;
@@ -163,8 +173,8 @@ void AmkNode::amk_state_machine_callback() {
     } break;
     case StateMachine::TORQUE_CONTROL: {
       /* Check some stop conditions*/
-      if (!(amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT] && amk_status.amk_status_binverter_on[Inverters::FRONT_RIGHT] &&
-            amk_status.amk_status_binverter_on[Inverters::REAR_LEFT] && amk_status.amk_status_binverter_on[Inverters::REAR_RIGHT])) {
+      if (!(amk_front_left_actual_values1.amk_status.inverter_on && amk_front_right_actual_values1.amk_status.inverter_on &&
+            amk_rear_left_actual_values1.amk_status.inverter_on && amk_rear_right_actual_values1.amk_status.inverter_on)) {
         state = StateMachine::SWITCH_OFF;
       }
       amk_front_left_setpoints.torque_positive_limit = 2000;
@@ -209,8 +219,8 @@ void AmkNode::amk_state_machine_callback() {
 
       RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Inverters OFF");
       /* Wait until inverter 0 is switched-off.*/
-      if (amk_status.amk_status_binverter_on[Inverters::FRONT_LEFT] || amk_status.amk_status_binverter_on[Inverters::FRONT_RIGHT] ||
-          amk_status.amk_status_binverter_on[Inverters::REAR_LEFT] || amk_status.amk_status_binverter_on[Inverters::REAR_RIGHT]) {
+      if (amk_front_left_actual_values1.amk_status.inverter_on || amk_front_right_actual_values1.amk_status.inverter_on ||
+          amk_rear_left_actual_values1.amk_status.inverter_on || amk_rear_right_actual_values1.amk_status.inverter_on) {
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for inverter switch-off");
         rclcpp::sleep_for(5ms);
         break;

@@ -12,8 +12,9 @@ rosidl_generate_interfaces(
   ${PROJECT_NAME}
   "msg/Amk/AmkSetpoints/AmkControl.msg"
   "msg/Amk/AmkSetpoints/AmkSetpoints.msg"
-  "msg/Amk/AmkStatus.msg"
-  "msg/Amk/AmkData.msg"
+  "msg/Amk/AmkActualValues1/AmkStatus.msg"
+  "msg/Amk/AmkActualValues1/AmkActualValues1.msg"
+  "msg/Amk/AmkActualValues2.msg"
   "msg/Frontbox/FrontboxDriverInput.msg"
   "msg/Frontbox/FrontboxData.msg"
   "msg/Setpoints/Setpoints.msg"
