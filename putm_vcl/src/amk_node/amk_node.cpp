@@ -33,7 +33,10 @@ void AmkNode::amk_status_callback(const msg::AmkStatus::SharedPtr msg) { amk_sta
 // Watchdog callbacks
 void AmkNode::setpoints_watchdog_callback() {
   RCLCPP_WARN(this->get_logger(), "Setpoints watchdog triggered");
-  setpoints.torques.fill(0);
+  setpoints.front_left.torque = 0;
+  setpoints.front_right.torque = 0;
+  setpoints.rear_left.torque = 0;
+  setpoints.rear_right.torque = 0;
   setpoints_watchdog->cancel();
 }
 void AmkNode::amk_state_machine_watchdog_callback() {
@@ -118,10 +121,10 @@ void AmkNode::amk_state_machine_callback() {
         state = StateMachine::SWITCH_OFF;
       }
       amk_control.amk_torque_positive_limit.fill(2000);
-      amk_control.amk_target_torque[Inverters::FRONT_LEFT] = setpoints.torques[Inverters::FRONT_LEFT];
-      amk_control.amk_target_torque[Inverters::FRONT_RIGHT] = setpoints.torques[Inverters::FRONT_RIGHT];
-      amk_control.amk_target_torque[Inverters::REAR_LEFT] = setpoints.torques[Inverters::REAR_LEFT];
-      amk_control.amk_target_torque[Inverters::REAR_RIGHT] = setpoints.torques[Inverters::REAR_RIGHT];
+      amk_control.amk_target_torque[Inverters::FRONT_LEFT] = setpoints.front_left.torque;
+      amk_control.amk_target_torque[Inverters::FRONT_RIGHT] = setpoints.front_right.torque;
+      amk_control.amk_target_torque[Inverters::REAR_LEFT] = setpoints.rear_left.torque;
+      amk_control.amk_target_torque[Inverters::REAR_RIGHT] = setpoints.rear_right.torque;
       if (rtd.state == false) {
         state = StateMachine::SWITCH_OFF;
       }

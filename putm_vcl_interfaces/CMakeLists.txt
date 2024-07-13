@@ -14,9 +14,10 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Amk/AmkData.msg"
   "msg/Frontbox/FrontboxDriverInput.msg"
   "msg/Frontbox/FrontboxData.msg"
+  "msg/Setpoints/Setpoints.msg"
+  "msg/Setpoints/Setpoint.msg"
   "msg/Dashboard.msg"
   "msg/Rtd.msg"
-  "msg/Setpoints.msg"
 )
 
 if(BUILD_TESTING)
