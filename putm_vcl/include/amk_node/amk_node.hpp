@@ -1,6 +1,6 @@
 #pragma once
 
-#include <putm_vcl_interfaces/msg/amk_control.hpp>
+#include <putm_vcl_interfaces/msg/amk_setpoints.hpp>
 #include <putm_vcl_interfaces/msg/amk_status.hpp>
 #include <putm_vcl_interfaces/msg/rtd.hpp>
 #include <putm_vcl_interfaces/msg/setpoints.hpp>
@@ -15,20 +15,27 @@ class AmkNode : public rclcpp::Node {
 
   StateMachine state;
 
-  putm_vcl_interfaces::msg::AmkControl amk_control;
+  putm_vcl_interfaces::msg::AmkSetpoints amk_front_left_setpoints;
+  putm_vcl_interfaces::msg::AmkSetpoints amk_front_right_setpoints;
+  putm_vcl_interfaces::msg::AmkSetpoints amk_rear_left_setpoints;
+  putm_vcl_interfaces::msg::AmkSetpoints amk_rear_right_setpoints;
+
   putm_vcl_interfaces::msg::AmkStatus amk_status;
   putm_vcl_interfaces::msg::Setpoints setpoints;
   putm_vcl_interfaces::msg::Rtd rtd;
 
   // Publishers
-  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkControl>::SharedPtr publisher_amk_control;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr publisher_amk_front_left_setpoints;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr publisher_amk_front_right_setpoints;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr publisher_amk_rear_left_setpoints;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr publisher_amk_rear_right_setpoints;
   // Subscribers
   rclcpp::Subscription<putm_vcl_interfaces::msg::Rtd>::SharedPtr subscription_rtd;
   rclcpp::Subscription<putm_vcl_interfaces::msg::Setpoints>::SharedPtr subscription_setpoints;
   rclcpp::Subscription<putm_vcl_interfaces::msg::AmkStatus>::SharedPtr subscription_amk_status;
   // Timers
   rclcpp::TimerBase::SharedPtr amk_state_machine_timer;
-  rclcpp::TimerBase::SharedPtr amk_control_timer;
+  rclcpp::TimerBase::SharedPtr amk_setpoints_timer;
   // Watchdogs
   rclcpp::TimerBase::SharedPtr setpoints_watchdog;
   rclcpp::TimerBase::SharedPtr amk_state_machine_watchdog;
@@ -41,6 +48,6 @@ class AmkNode : public rclcpp::Node {
   void setpoints_watchdog_callback();
   void amk_state_machine_watchdog_callback();
   // Timer callbacks
-  void amk_control_callback();
+  void amk_setpoints_callback();
   void amk_state_machine_callback();
 };

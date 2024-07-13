@@ -8,17 +8,18 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
-rosidl_generate_interfaces(${PROJECT_NAME}
-  "msg/Amk/AmkStatus.msg" 
-  "msg/Amk/AmkControl.msg" 
+rosidl_generate_interfaces(
+  ${PROJECT_NAME}
+  "msg/Amk/AmkSetpoints/AmkControl.msg"
+  "msg/Amk/AmkSetpoints/AmkSetpoints.msg"
+  "msg/Amk/AmkStatus.msg"
   "msg/Amk/AmkData.msg"
   "msg/Frontbox/FrontboxDriverInput.msg"
   "msg/Frontbox/FrontboxData.msg"
   "msg/Setpoints/Setpoints.msg"
   "msg/Setpoints/Setpoint.msg"
   "msg/Dashboard.msg"
-  "msg/Rtd.msg"
-)
+  "msg/Rtd.msg")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
