@@ -4,11 +4,13 @@ using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
 using std::placeholders::_1;
 
-RtdNode::RtdNode() : Node("rtd_node"), rtd_publisher(this->create_publisher<msg::Rtd>("rtd", 1)) {
-  this->create_subscription<msg::FrontboxDriverInput>("frontbox_driver_input", 1, std::bind(&RtdNode::frontbox_driver_input_callback, this, _1));
-  this->create_subscription<msg::Dashboard>("dashboard", 1, std::bind(&RtdNode::dashboard_callback, this, _1));
-  this->create_wall_timer(100ms, std::bind(&RtdNode::rtd_callback, this));
-}
+RtdNode::RtdNode()
+    : Node("rtd_node"),
+      rtd_publisher(this->create_publisher<msg::Rtd>("rtd", 1)),
+      frontbox_driver_input_subscription(
+          this->create_subscription<msg::FrontboxDriverInput>("frontbox_driver_input", 1, std::bind(&RtdNode::frontbox_driver_input_callback, this, _1))),
+      dashboard_subscription(this->create_subscription<msg::Dashboard>("dashboard", 1, std::bind(&RtdNode::dashboard_callback, this, _1))),
+      rtd_timer(this->create_wall_timer(100ms, std::bind(&RtdNode::rtd_callback, this))) {}
 
 void RtdNode::rtd_callback() {
   if ((frontbox_driver_input.brake_pressure_front >= 2200.0 or frontbox_driver_input.brake_pressure_rear >= 2200.0) and dashboard.rtd_button and not rtd.state) {

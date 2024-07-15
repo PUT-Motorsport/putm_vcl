@@ -16,15 +16,27 @@ AmkNode::AmkNode()
       amk_front_right_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/front/right/setpoints", 1)),
       amk_rear_left_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/rear/left/setpoints", 1)),
       amk_rear_right_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/rear/right/setpoints", 1)),
+      // clang-format off
+      amk_front_left_actual_values1_subscriber(
+          this->create_subscription<msg::AmkActualValues1>("amk/front/left/actual_values1", 1, 
+                                                           amk_actual_values1_callback_factory(amk_front_left_actual_values1))),
+      amk_front_right_actual_values1_subscriber(
+          this->create_subscription<msg::AmkActualValues1>("amk/front/right/actual_values1", 1, 
+                                                           amk_actual_values1_callback_factory(amk_front_right_actual_values1))),
+      amk_rear_left_actual_values1_subscriber(
+          this->create_subscription<msg::AmkActualValues1>("amk/rear/left/actual_values1", 1, 
+                                                           amk_actual_values1_callback_factory(amk_rear_left_actual_values1))),
+      amk_rear_right_actual_values1_subscriber(
+          this->create_subscription<msg::AmkActualValues1>("amk/rear/right/actual_values1", 1, 
+                                                           amk_actual_values1_callback_factory(amk_rear_right_actual_values1))),
+      // clang-format on
+      rtd_subscriber(this->create_subscription<msg::Rtd>("rtd", 1, std::bind(&AmkNode::rtd_callback, this, _1))),
+      setpoints_subscriber(this->create_subscription<msg::Setpoints>("setpoints", 1, std::bind(&AmkNode::setpoints_callback, this, _1))),
+
       setpoints_watchdog(this->create_wall_timer(500ms, std::bind(&AmkNode::setpoints_watchdog_callback, this))),
-      amk_state_machine_watchdog(this->create_wall_timer(5000ms, std::bind(&AmkNode::amk_state_machine_watchdog_callback, this))) {
-  this->create_subscription<msg::AmkActualValues1>("amk/front/left/actual_values1", 1, amk_actual_values1_callback_factory(amk_front_left_actual_values1));
-  this->create_subscription<msg::AmkActualValues1>("amk/front/right/actual_values1", 1, amk_actual_values1_callback_factory(amk_front_right_actual_values1));
-  this->create_subscription<msg::AmkActualValues1>("amk/rear/left/actual_values1", 1, amk_actual_values1_callback_factory(amk_rear_left_actual_values1));
-  this->create_subscription<msg::AmkActualValues1>("amk/rear/right/actual_values1", 1, amk_actual_values1_callback_factory(amk_rear_right_actual_values1));
-  this->create_subscription<msg::Rtd>("rtd", 1, std::bind(&AmkNode::rtd_callback, this, _1));
-  this->create_wall_timer(5ms, std::bind(&AmkNode::amk_state_machine_callback, this));
-  this->create_wall_timer(2ms, std::bind(&AmkNode::amk_setpoints_callback, this));
+      amk_state_machine_watchdog(this->create_wall_timer(5000ms, std::bind(&AmkNode::amk_state_machine_watchdog_callback, this))),
+      amk_state_machine_timer(this->create_wall_timer(5ms, std::bind(&AmkNode::amk_state_machine_callback, this))),
+      amk_setpoints_timer(this->create_wall_timer(2ms, std::bind(&AmkNode::amk_setpoints_callback, this))) {
   setpoints_watchdog->cancel();
   amk_state_machine_watchdog->cancel();
 }

@@ -33,6 +33,9 @@ class CanRxNode : public rclcpp::Node {
 
   rclcpp::Publisher<putm_vcl_interfaces::msg::Dashboard>::SharedPtr dashboard_publisher;
 
+  rclcpp::TimerBase::SharedPtr can_rx_amk_timer;
+  rclcpp::TimerBase::SharedPtr can_rx_common_timer;
+
   void can_rx_amk_callback();
   void can_rx_common_callback();
 

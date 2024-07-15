@@ -27,10 +27,11 @@ CanRxNode::CanRxNode()
       amk_rear_right_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("amk/rear/right/actual_values1", 1)),
       amk_rear_right_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("amk/rear/right/actual_values2", 1)),
 
-      dashboard_publisher(this->create_publisher<msg::Dashboard>("dashboard", 1)) {
-  this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_amk_callback, this));
-  this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this));
-}
+      dashboard_publisher(this->create_publisher<msg::Dashboard>("dashboard", 1)),
+
+      can_rx_amk_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_amk_callback, this))),
+      can_rx_common_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this))) {}
+
 void CanRxNode::can_rx_common_callback() {
   can_frame frame = can_rx_common.receive();
   switch (frame.can_id) {

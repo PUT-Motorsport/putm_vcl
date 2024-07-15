@@ -15,26 +15,34 @@ class AmkNode : public rclcpp::Node {
   enum class StateMachine { UNDEFINED = -1, IDLING, STARTUP, TORQUE_CONTROL, SWITCH_OFF, ERROR_HANDLER, ERROR_RESET };
 
   StateMachine state;
-  putm_vcl_interfaces::msg::Setpoints setpoints;
-  putm_vcl_interfaces::msg::Rtd rtd;
-
-  putm_vcl_interfaces::msg::AmkSetpoints amk_front_left_setpoints;
-  putm_vcl_interfaces::msg::AmkSetpoints amk_front_right_setpoints;
-  putm_vcl_interfaces::msg::AmkSetpoints amk_rear_left_setpoints;
-  putm_vcl_interfaces::msg::AmkSetpoints amk_rear_right_setpoints;
 
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr amk_front_left_setpoints_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr amk_front_right_setpoints_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr amk_rear_left_setpoints_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr amk_rear_right_setpoints_publisher;
 
+  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_front_left_actual_values1_subscriber;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_front_right_actual_values1_subscriber;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_rear_left_actual_values1_subscriber;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_rear_right_actual_values1_subscriber;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::Rtd>::SharedPtr rtd_subscriber;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::Setpoints>::SharedPtr setpoints_subscriber;
+
+  rclcpp::TimerBase::SharedPtr setpoints_watchdog;
+  rclcpp::TimerBase::SharedPtr amk_state_machine_watchdog;
+  rclcpp::TimerBase::SharedPtr amk_state_machine_timer;
+  rclcpp::TimerBase::SharedPtr amk_setpoints_timer;
+
+  putm_vcl_interfaces::msg::AmkSetpoints amk_front_left_setpoints;
+  putm_vcl_interfaces::msg::AmkSetpoints amk_front_right_setpoints;
+  putm_vcl_interfaces::msg::AmkSetpoints amk_rear_left_setpoints;
+  putm_vcl_interfaces::msg::AmkSetpoints amk_rear_right_setpoints;
   putm_vcl_interfaces::msg::AmkActualValues1 amk_front_left_actual_values1;
   putm_vcl_interfaces::msg::AmkActualValues1 amk_front_right_actual_values1;
   putm_vcl_interfaces::msg::AmkActualValues1 amk_rear_left_actual_values1;
   putm_vcl_interfaces::msg::AmkActualValues1 amk_rear_right_actual_values1;
-
-  rclcpp::TimerBase::SharedPtr setpoints_watchdog;
-  rclcpp::TimerBase::SharedPtr amk_state_machine_watchdog;
+  putm_vcl_interfaces::msg::Setpoints setpoints;
+  putm_vcl_interfaces::msg::Rtd rtd;
 
   void rtd_callback(const putm_vcl_interfaces::msg::Rtd::SharedPtr msg);
   void setpoints_callback(const putm_vcl_interfaces::msg::Setpoints::SharedPtr msg);
