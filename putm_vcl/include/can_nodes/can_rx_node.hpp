@@ -16,9 +16,6 @@ class CanRxNode : public rclcpp::Node {
   PUTM_CAN::CanRx can_rx_amk;
   PUTM_CAN::CanRx can_rx_common;
 
-  rclcpp::TimerBase::SharedPtr can_rx_amk_timer;
-  rclcpp::TimerBase::SharedPtr can_rx_common_timer;
-
   rclcpp::Publisher<putm_vcl_interfaces::msg::FrontboxDriverInput>::SharedPtr frontbox_driver_input_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::FrontboxData>::SharedPtr frontbox_data_publisher;
 
@@ -38,4 +35,9 @@ class CanRxNode : public rclcpp::Node {
 
   void can_rx_amk_callback();
   void can_rx_common_callback();
+
+  template <typename T>
+  putm_vcl_interfaces::msg::AmkActualValues1 create_amk_actual_values1_msg(const T& can_amk);
+  template <typename T>
+  putm_vcl_interfaces::msg::AmkActualValues2 create_amk_actual_values2_msg(const T& data);
 };

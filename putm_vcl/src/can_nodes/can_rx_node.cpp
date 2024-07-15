@@ -11,25 +11,26 @@ CanRxNode::CanRxNode()
     : Node("can_rx_node"),
       can_rx_amk(can_interface_amk, NO_TIMEOUT),
       can_rx_common(can_interface_common, NO_TIMEOUT),
-      can_rx_amk_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_amk_callback, this))),
-      can_rx_common_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this))),
 
-      frontbox_driver_input_publisher(this->create_publisher<msg::FrontboxDriverInput>("putm_vcl/frontbox_driver_input", 1)),
-      frontbox_data_publisher(this->create_publisher<msg::FrontboxData>("putm_vcl/frontbox_data", 1)),
+      frontbox_driver_input_publisher(this->create_publisher<msg::FrontboxDriverInput>("frontbox_driver_input", 1)),
+      frontbox_data_publisher(this->create_publisher<msg::FrontboxData>("frontbox_data", 1)),
 
-      amk_front_left_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("putm_vcl/amk/front/left/actual_values1", 1)),
-      amk_front_left_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("putm_vcl/amk/front/left/actual_values2", 1)),
+      amk_front_left_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("amk/front/left/actual_values1", 1)),
+      amk_front_left_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("amk/front/left/actual_values2", 1)),
 
-      amk_front_right_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("putm_vcl/amk/front/right/actual_values1", 1)),
-      amk_front_right_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("putm_vcl/amk/front/right/actual_values2", 1)),
+      amk_front_right_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("amk/front/right/actual_values1", 1)),
+      amk_front_right_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("amk/front/right/actual_values2", 1)),
 
-      amk_rear_left_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("putm_vcl/amk/rear/left/actual_values1", 1)),
-      amk_rear_left_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("putm_vcl/amk/rear/left/actual_values2", 1)),
+      amk_rear_left_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("amk/rear/left/actual_values1", 1)),
+      amk_rear_left_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("amk/rear/left/actual_values2", 1)),
 
-      amk_rear_right_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("putm_vcl/amk/rear/right/actual_values1", 1)),
-      amk_rear_right_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("putm_vcl/amk/rear/right/actual_values2", 1)),
+      amk_rear_right_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("amk/rear/right/actual_values1", 1)),
+      amk_rear_right_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("amk/rear/right/actual_values2", 1)),
 
-      dashboard_publisher(this->create_publisher<msg::Dashboard>("putm_vcl/dashboard", 1)) {}
+      dashboard_publisher(this->create_publisher<msg::Dashboard>("dashboard", 1)) {
+  this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_amk_callback, this));
+  this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this));
+}
 void CanRxNode::can_rx_common_callback() {
   can_frame frame = can_rx_common.receive();
   switch (frame.can_id) {
@@ -77,118 +78,91 @@ void CanRxNode::can_rx_common_callback() {
 
 void CanRxNode::can_rx_amk_callback() {
   can_frame frame = can_rx_amk.receive();
-  msg::AmkActualValues1 amk_actual_values1;
-  msg::AmkActualValues2 amk_actual_values2;
 
   switch (frame.can_id) {
     case can_id<AmkFrontLeftActualValues1>: {
       auto can_amk = convert<AmkFrontLeftActualValues1>(frame);
-      amk_actual_values1.amk_status.system_ready = can_amk.amk_status.system_ready;
-      amk_actual_values1.amk_status.error = can_amk.amk_status.error;
-      amk_actual_values1.amk_status.warn = can_amk.amk_status.warn;
-      amk_actual_values1.amk_status.quit_dc_on = can_amk.amk_status.quit_dc_on;
-      amk_actual_values1.amk_status.dc_on = can_amk.amk_status.dc_on;
-      amk_actual_values1.amk_status.quit_inverter_on = can_amk.amk_status.quit_inverter_on;
-      amk_actual_values1.amk_status.inverter_on = can_amk.amk_status.inverter_on;
-      amk_actual_values1.amk_status.derating = can_amk.amk_status.derating;
-      amk_actual_values1.actual_velocity = can_amk.actual_velocity;
-      amk_actual_values1.torque_current = can_amk.torque_current;
-      amk_actual_values1.magnetizing_current = can_amk.magnetizing_current;
+      auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
       amk_front_left_actual_values1_publisher->publish(amk_actual_values1);
-      break;
-    }
-
-    case can_id<AmkFrontLeftActualValues2>: {
-      auto can_amk = convert<AmkFrontLeftActualValues2>(frame);
-      amk_actual_values2.temp_motor = can_amk.temp_motor;
-      amk_actual_values2.temp_inverter = can_amk.temp_inverter;
-      amk_actual_values2.error_info = can_amk.error_info;
-      amk_actual_values2.temp_igbt = can_amk.temp_igbt;
-      amk_front_left_actual_values2_publisher->publish(amk_actual_values2);
       break;
     }
 
     case can_id<AmkFrontRightActualValues1>: {
       auto can_amk = convert<AmkFrontRightActualValues1>(frame);
-      amk_actual_values1.amk_status.system_ready = can_amk.amk_status.system_ready;
-      amk_actual_values1.amk_status.error = can_amk.amk_status.error;
-      amk_actual_values1.amk_status.warn = can_amk.amk_status.warn;
-      amk_actual_values1.amk_status.quit_dc_on = can_amk.amk_status.quit_dc_on;
-      amk_actual_values1.amk_status.dc_on = can_amk.amk_status.dc_on;
-      amk_actual_values1.amk_status.quit_inverter_on = can_amk.amk_status.quit_inverter_on;
-      amk_actual_values1.amk_status.inverter_on = can_amk.amk_status.inverter_on;
-      amk_actual_values1.amk_status.derating = can_amk.amk_status.derating;
-      amk_actual_values1.actual_velocity = can_amk.actual_velocity;
-      amk_actual_values1.torque_current = can_amk.torque_current;
-      amk_actual_values1.magnetizing_current = can_amk.magnetizing_current;
+      auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
       amk_front_right_actual_values1_publisher->publish(amk_actual_values1);
-      break;
-    }
-
-    case can_id<AmkFrontRightActualValues2>: {
-      auto can_amk = convert<AmkFrontRightActualValues2>(frame);
-      amk_actual_values2.temp_motor = can_amk.temp_motor;
-      amk_actual_values2.temp_inverter = can_amk.temp_inverter;
-      amk_actual_values2.error_info = can_amk.error_info;
-      amk_actual_values2.temp_igbt = can_amk.temp_igbt;
-      amk_front_right_actual_values2_publisher->publish(amk_actual_values2);
       break;
     }
 
     case can_id<AmkRearLeftActualValues1>: {
       auto can_amk = convert<AmkRearLeftActualValues1>(frame);
-      amk_actual_values1.amk_status.system_ready = can_amk.amk_status.system_ready;
-      amk_actual_values1.amk_status.error = can_amk.amk_status.error;
-      amk_actual_values1.amk_status.warn = can_amk.amk_status.warn;
-      amk_actual_values1.amk_status.quit_dc_on = can_amk.amk_status.quit_dc_on;
-      amk_actual_values1.amk_status.dc_on = can_amk.amk_status.dc_on;
-      amk_actual_values1.amk_status.quit_inverter_on = can_amk.amk_status.quit_inverter_on;
-      amk_actual_values1.amk_status.inverter_on = can_amk.amk_status.inverter_on;
-      amk_actual_values1.amk_status.derating = can_amk.amk_status.derating;
-      amk_actual_values1.actual_velocity = can_amk.actual_velocity;
-      amk_actual_values1.torque_current = can_amk.torque_current;
-      amk_actual_values1.magnetizing_current = can_amk.magnetizing_current;
+      auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
       amk_rear_left_actual_values1_publisher->publish(amk_actual_values1);
-      break;
-    }
-
-    case can_id<AmkRearLeftActualValues2>: {
-      auto can_amk = convert<AmkRearLeftActualValues2>(frame);
-      amk_actual_values2.temp_motor = can_amk.temp_motor;
-      amk_actual_values2.temp_inverter = can_amk.temp_inverter;
-      amk_actual_values2.error_info = can_amk.error_info;
-      amk_actual_values2.temp_igbt = can_amk.temp_igbt;
-      amk_rear_left_actual_values2_publisher->publish(amk_actual_values2);
       break;
     }
 
     case can_id<AmkRearRightActualValues1>: {
       auto can_amk = convert<AmkRearRightActualValues1>(frame);
-      amk_actual_values1.amk_status.system_ready = can_amk.amk_status.system_ready;
-      amk_actual_values1.amk_status.error = can_amk.amk_status.error;
-      amk_actual_values1.amk_status.warn = can_amk.amk_status.warn;
-      amk_actual_values1.amk_status.quit_dc_on = can_amk.amk_status.quit_dc_on;
-      amk_actual_values1.amk_status.dc_on = can_amk.amk_status.dc_on;
-      amk_actual_values1.amk_status.quit_inverter_on = can_amk.amk_status.quit_inverter_on;
-      amk_actual_values1.amk_status.inverter_on = can_amk.amk_status.inverter_on;
-      amk_actual_values1.amk_status.derating = can_amk.amk_status.derating;
-      amk_actual_values1.actual_velocity = can_amk.actual_velocity;
-      amk_actual_values1.torque_current = can_amk.torque_current;
-      amk_actual_values1.magnetizing_current = can_amk.magnetizing_current;
+      auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
       amk_rear_right_actual_values1_publisher->publish(amk_actual_values1);
+      break;
+    }
+
+    case can_id<AmkFrontLeftActualValues2>: {
+      auto can_amk = convert<AmkFrontLeftActualValues2>(frame);
+      auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
+      amk_front_left_actual_values2_publisher->publish(amk_actual_values2);
+      break;
+    }
+
+    case can_id<AmkFrontRightActualValues2>: {
+      auto can_amk = convert<AmkFrontRightActualValues2>(frame);
+      auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
+      amk_front_right_actual_values2_publisher->publish(amk_actual_values2);
+      break;
+    }
+
+    case can_id<AmkRearLeftActualValues2>: {
+      auto can_amk = convert<AmkRearLeftActualValues2>(frame);
+      auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
+      amk_rear_left_actual_values2_publisher->publish(amk_actual_values2);
       break;
     }
 
     case can_id<AmkRearRightActualValues2>: {
       auto can_amk = convert<AmkRearRightActualValues2>(frame);
-      amk_actual_values2.temp_motor = can_amk.temp_motor;
-      amk_actual_values2.temp_inverter = can_amk.temp_inverter;
-      amk_actual_values2.error_info = can_amk.error_info;
-      amk_actual_values2.temp_igbt = can_amk.temp_igbt;
+      auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
       amk_rear_right_actual_values2_publisher->publish(amk_actual_values2);
       break;
     }
   }
+}
+
+template <typename T>
+msg::AmkActualValues1 CanRxNode::create_amk_actual_values1_msg(const T& can_amk) {
+  msg::AmkActualValues1 amk_actual_values1;
+  amk_actual_values1.amk_status.system_ready = can_amk.amk_status.system_ready;
+  amk_actual_values1.amk_status.error = can_amk.amk_status.error;
+  amk_actual_values1.amk_status.warn = can_amk.amk_status.warn;
+  amk_actual_values1.amk_status.quit_dc_on = can_amk.amk_status.quit_dc_on;
+  amk_actual_values1.amk_status.dc_on = can_amk.amk_status.dc_on;
+  amk_actual_values1.amk_status.quit_inverter_on = can_amk.amk_status.quit_inverter_on;
+  amk_actual_values1.amk_status.inverter_on = can_amk.amk_status.inverter_on;
+  amk_actual_values1.amk_status.derating = can_amk.amk_status.derating;
+  amk_actual_values1.actual_velocity = can_amk.actual_velocity;
+  amk_actual_values1.torque_current = can_amk.torque_current;
+  amk_actual_values1.magnetizing_current = can_amk.magnetizing_current;
+  return amk_actual_values1;
+}
+
+template <typename T>
+msg::AmkActualValues2 CanRxNode::create_amk_actual_values2_msg(const T& can_amk) {
+  msg::AmkActualValues2 amk_actual_values2;
+  amk_actual_values2.temp_motor = can_amk.temp_motor;
+  amk_actual_values2.temp_inverter = can_amk.temp_inverter;
+  amk_actual_values2.error_info = can_amk.error_info;
+  amk_actual_values2.temp_igbt = can_amk.temp_igbt;
+  return amk_actual_values2;
 }
 
 int main(int argc, char** argv) {

@@ -14,11 +14,7 @@ class RtdNode : public rclcpp::Node {
   putm_vcl_interfaces::msg::FrontboxDriverInput frontbox_driver_input;
   putm_vcl_interfaces::msg::Dashboard dashboard;
 
-  rclcpp::TimerBase::SharedPtr rtd_timer;
-
   rclcpp::Publisher<putm_vcl_interfaces::msg::Rtd>::SharedPtr rtd_publisher;
-  rclcpp::Subscription<putm_vcl_interfaces::msg::FrontboxDriverInput>::SharedPtr frontbox_driver_input_subscriber;
-  rclcpp::Subscription<putm_vcl_interfaces::msg::Dashboard>::SharedPtr dashboard_subscriber;
 
   void rtd_callback();
   void frontbox_driver_input_callback(const putm_vcl_interfaces::msg::FrontboxDriverInput::SharedPtr msg);

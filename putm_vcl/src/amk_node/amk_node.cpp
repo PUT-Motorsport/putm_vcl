@@ -6,47 +6,45 @@ using namespace putm_vcl;
 using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
 using std::placeholders::_1;
+using std::placeholders::_2;
 
 AmkNode::AmkNode()
     : Node("amk_node"),
       state(StateMachine::UNDEFINED),
 
-      publisher_amk_front_left_setpoints(this->create_publisher<msg::AmkSetpoints>("putm_vcl/amk/front/left/setpoints", 1)),
-      publisher_amk_front_right_setpoints(this->create_publisher<msg::AmkSetpoints>("putm_vcl/amk/front/right/setpoints", 1)),
-      publisher_amk_rear_left_setpoints(this->create_publisher<msg::AmkSetpoints>("putm_vcl/amk/rear/left/setpoints", 1)),
-      publisher_amk_rear_right_setpoints(this->create_publisher<msg::AmkSetpoints>("putm_vcl/amk/rear/right/setpoints", 1)),
-
-      subscription_amk_front_left_actual_values1(this->create_subscription<msg::AmkActualValues1>(
-          "putm_vcl/amk/front/left/actual_values1", 1, std::bind(&AmkNode::amk_front_left_actual_values1_callback, this, _1))),
-      subscription_amk_front_right_actual_values1(this->create_subscription<msg::AmkActualValues1>(
-          "putm_vcl/amk/front/right/actual_values1", 1, std::bind(&AmkNode::amk_front_right_actual_values1_callback, this, _1))),
-      subscription_amk_rear_left_actual_values1(this->create_subscription<msg::AmkActualValues1>(
-          "putm_vcl/amk/rear/left/actual_values1", 1, std::bind(&AmkNode::amk_rear_left_actual_values1_callback, this, _1))),
-      subscription_amk_rear_right_actual_values1(this->create_subscription<msg::AmkActualValues1>(
-          "putm_vcl/amk/rear/right/actual_values1", 1, std::bind(&AmkNode::amk_rear_right_actual_values1_callback, this, _1))),
-
-      subscription_rtd(this->create_subscription<msg::Rtd>("putm_vcl/rtd", 1, std::bind(&AmkNode::rtd_callback, this, _1))),
-      amk_state_machine_timer(this->create_wall_timer(5ms, std::bind(&AmkNode::amk_state_machine_callback, this))),
-      amk_setpoints_timer(this->create_wall_timer(2ms, std::bind(&AmkNode::amk_setpoints_callback, this))),
+      amk_front_left_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/front/left/setpoints", 1)),
+      amk_front_right_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/front/right/setpoints", 1)),
+      amk_rear_left_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/rear/left/setpoints", 1)),
+      amk_rear_right_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/rear/right/setpoints", 1)),
       setpoints_watchdog(this->create_wall_timer(500ms, std::bind(&AmkNode::setpoints_watchdog_callback, this))),
       amk_state_machine_watchdog(this->create_wall_timer(5000ms, std::bind(&AmkNode::amk_state_machine_watchdog_callback, this))) {
+  this->create_subscription<msg::AmkActualValues1>("amk/front/left/actual_values1", 1,
+                                                   std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg)>(
+                                                       std::bind(&AmkNode::amk_actual_values1_callback, this, _1, std::ref(amk_front_left_actual_values1))));
+  this->create_subscription<msg::AmkActualValues1>("amk/front/right/actual_values1", 1,
+                                                   std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg)>(
+                                                       std::bind(&AmkNode::amk_actual_values1_callback, this, _1, std::ref(amk_front_right_actual_values1))));
+  this->create_subscription<msg::AmkActualValues1>("amk/rear/left/actual_values1", 1,
+                                                   std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg)>(
+                                                       std::bind(&AmkNode::amk_actual_values1_callback, this, _1, std::ref(amk_rear_left_actual_values1))));
+  this->create_subscription<msg::AmkActualValues1>("amk/rear/right/actual_values1", 1,
+                                                   std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg)>(
+                                                       std::bind(&AmkNode::amk_actual_values1_callback, this, _1, std::ref(amk_rear_right_actual_values1))));
+  this->create_subscription<msg::Rtd>("rtd", 1, std::bind(&AmkNode::rtd_callback, this, _1));
+  this->create_wall_timer(5ms, std::bind(&AmkNode::amk_state_machine_callback, this));
+  this->create_wall_timer(2ms, std::bind(&AmkNode::amk_setpoints_callback, this));
   setpoints_watchdog->cancel();
   amk_state_machine_watchdog->cancel();
 }
 
-// Subscriber callbacks
 void AmkNode::rtd_callback(const msg::Rtd::SharedPtr msg) { rtd = *msg; }
 void AmkNode::setpoints_callback(const msg::Setpoints::SharedPtr msg) {
   setpoints_watchdog->cancel();
   setpoints = *msg;
   setpoints_watchdog->reset();
 }
-void AmkNode::amk_front_left_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg) { amk_front_left_actual_values1 = *msg; }
-void AmkNode::amk_front_right_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg) { amk_front_right_actual_values1 = *msg; }
-void AmkNode::amk_rear_left_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg) { amk_rear_left_actual_values1 = *msg; }
-void AmkNode::amk_rear_right_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg) { amk_rear_right_actual_values1 = *msg; }
+void AmkNode::amk_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg, msg::AmkActualValues1& target) { target = *msg; }
 
-// Watchdog callbacks
 void AmkNode::setpoints_watchdog_callback() {
   RCLCPP_WARN(this->get_logger(), "Setpoints watchdog triggered");
   setpoints.front_left.torque = 0;
@@ -61,12 +59,11 @@ void AmkNode::amk_state_machine_watchdog_callback() {
   amk_state_machine_watchdog->cancel();
 }
 
-// Timer callbacks
 void AmkNode::amk_setpoints_callback() {
-  publisher_amk_front_left_setpoints->publish(amk_front_left_setpoints);
-  publisher_amk_front_right_setpoints->publish(amk_front_right_setpoints);
-  publisher_amk_rear_left_setpoints->publish(amk_rear_left_setpoints);
-  publisher_amk_rear_right_setpoints->publish(amk_rear_right_setpoints);
+  amk_front_left_setpoints_publisher->publish(amk_front_left_setpoints);
+  amk_front_right_setpoints_publisher->publish(amk_front_right_setpoints);
+  amk_rear_left_setpoints_publisher->publish(amk_rear_left_setpoints);
+  amk_rear_right_setpoints_publisher->publish(amk_rear_right_setpoints);
 }
 void AmkNode::amk_state_machine_callback() {
   switch (state) {

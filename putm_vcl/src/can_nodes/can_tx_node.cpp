@@ -9,13 +9,10 @@ using namespace std::chrono_literals;
 using std::placeholders::_1;
 
 CanTxNode::CanTxNode() : Node("can_tx_node"), can_tx_amk(can_interface_amk), can_tx_common(can_interface_common) {
-  this->create_subscription<msg::AmkSetpoints>("putm_vcl/amk/front/left/setpoints", 1,
-                                               std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontLeftSetpoints>, this, _1));
-  this->create_subscription<msg::AmkSetpoints>("putm_vcl/amk/front/right/setpoints", 1,
-                                               std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontRightSetpoints>, this, _1));
-  this->create_subscription<msg::AmkSetpoints>("putm_vcl/amk/rear/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkRearLeftSetpoints>, this, _1));
-  this->create_subscription<msg::AmkSetpoints>("putm_vcl/amk/rear/right/setpoints", 1,
-                                               std::bind(&CanTxNode::amk_setpoints_callback<AmkRearRightSetpoints>, this, _1));
+  this->create_subscription<msg::AmkSetpoints>("amk/front/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontLeftSetpoints>, this, _1));
+  this->create_subscription<msg::AmkSetpoints>("amk/front/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontRightSetpoints>, this, _1));
+  this->create_subscription<msg::AmkSetpoints>("amk/rear/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkRearLeftSetpoints>, this, _1));
+  this->create_subscription<msg::AmkSetpoints>("amk/rear/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkRearRightSetpoints>, this, _1));
   this->create_wall_timer(10ms, std::bind(&CanTxNode::can_tx_common_callback, this));
 }
 
