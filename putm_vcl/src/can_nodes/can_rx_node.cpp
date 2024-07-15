@@ -33,109 +33,130 @@ CanRxNode::CanRxNode()
       can_rx_common_timer(this->create_wall_timer(1ms, std::bind(&CanRxNode::can_rx_common_callback, this))) {}
 
 void CanRxNode::can_rx_common_callback() {
-  can_frame frame = can_rx_common.receive();
-  switch (frame.can_id) {
-    case can_id<FrontboxDriverInput>: {
-      auto can_frontbox_driver_input = convert<FrontboxDriverInput>(frame);
-      msg::FrontboxDriverInput frontbox_driver_input;
-      frontbox_driver_input.pedal_position = can_frontbox_driver_input.pedal_position;
-      frontbox_driver_input.brake_pressure_front = can_frontbox_driver_input.brake_pressure_front;
-      frontbox_driver_input.brake_pressure_rear = can_frontbox_driver_input.brake_pressure_rear;
-      frontbox_driver_input.steering_wheel_position = can_frontbox_driver_input.steering_wheel_position;
-      frontbox_driver_input_publisher->publish(frontbox_driver_input);
-      break;
-    }
+  can_frame frame;
+  try {
+    frame = can_rx_common.receive();
+  } catch (const std::runtime_error& e) {
+    RCLCPP_ERROR(this->get_logger(), "Failed to receive common CAN frame: %s", e.what());
+    return;
+  }
 
-    case can_id<FrontboxData>: {
-      auto can_frontbox_data = convert<FrontboxData>(frame);
-      msg::FrontboxData frontbox_data;
-      frontbox_data.sense_left_kill = can_frontbox_data.sense_left_kill;
-      frontbox_data.sense_right_kill = can_frontbox_data.sense_right_kill;
-      frontbox_data.sense_driver_kill = can_frontbox_data.sense_driver_kill;
-      frontbox_data.sense_inertia = can_frontbox_data.sense_inertia;
-      frontbox_data.sense_bspd = can_frontbox_data.sense_bspd;
-      frontbox_data.sense_overtravel = can_frontbox_data.sense_overtravel;
-      frontbox_data.sense_right_wheel = can_frontbox_data.sense_right_wheel;
-      frontbox_data.sc_state = can_frontbox_data.sc_state;
-      frontbox_data.front_left_suspension = can_frontbox_data.front_left_suspension;
-      frontbox_data.front_right_suspension = can_frontbox_data.front_right_suspension;
-      frontbox_data.front_left_hub_temperature = can_frontbox_data.front_left_hub_temperature;
-      frontbox_data.front_right_hub_temperature = can_frontbox_data.front_right_hub_temperature;
-      frontbox_data_publisher->publish(frontbox_data);
-      break;
-    }
+  try {
+    switch (frame.can_id) {
+      case can_id<FrontboxDriverInput>: {
+        auto can_frontbox_driver_input = convert<FrontboxDriverInput>(frame);
+        msg::FrontboxDriverInput frontbox_driver_input;
+        frontbox_driver_input.pedal_position = can_frontbox_driver_input.pedal_position;
+        frontbox_driver_input.brake_pressure_front = can_frontbox_driver_input.brake_pressure_front;
+        frontbox_driver_input.brake_pressure_rear = can_frontbox_driver_input.brake_pressure_rear;
+        frontbox_driver_input.steering_wheel_position = can_frontbox_driver_input.steering_wheel_position;
+        frontbox_driver_input_publisher->publish(frontbox_driver_input);
+        break;
+      }
 
-    case can_id<Dashboard>: {
-      auto can_dashboard = convert<Dashboard>(frame);
-      msg::Dashboard dashboard;
-      dashboard.rtd_button = can_dashboard.rtd_button;
-      dashboard.ts_activate_button = can_dashboard.ts_activate_button;
-      dashboard.rfu_button = can_dashboard.rfu_button;
-      dashboard_publisher->publish(dashboard);
-      break;
+      case can_id<FrontboxData>: {
+        auto can_frontbox_data = convert<FrontboxData>(frame);
+        msg::FrontboxData frontbox_data;
+        frontbox_data.sense_left_kill = can_frontbox_data.sense_left_kill;
+        frontbox_data.sense_right_kill = can_frontbox_data.sense_right_kill;
+        frontbox_data.sense_driver_kill = can_frontbox_data.sense_driver_kill;
+        frontbox_data.sense_inertia = can_frontbox_data.sense_inertia;
+        frontbox_data.sense_bspd = can_frontbox_data.sense_bspd;
+        frontbox_data.sense_overtravel = can_frontbox_data.sense_overtravel;
+        frontbox_data.sense_right_wheel = can_frontbox_data.sense_right_wheel;
+        frontbox_data.sc_state = can_frontbox_data.sc_state;
+        frontbox_data.front_left_suspension = can_frontbox_data.front_left_suspension;
+        frontbox_data.front_right_suspension = can_frontbox_data.front_right_suspension;
+        frontbox_data.front_left_hub_temperature = can_frontbox_data.front_left_hub_temperature;
+        frontbox_data.front_right_hub_temperature = can_frontbox_data.front_right_hub_temperature;
+        frontbox_data_publisher->publish(frontbox_data);
+        break;
+      }
+
+      case can_id<Dashboard>: {
+        auto can_dashboard = convert<Dashboard>(frame);
+        msg::Dashboard dashboard;
+        dashboard.rtd_button = can_dashboard.rtd_button;
+        dashboard.ts_activate_button = can_dashboard.ts_activate_button;
+        dashboard.rfu_button = can_dashboard.rfu_button;
+        dashboard_publisher->publish(dashboard);
+        break;
+      }
     }
+  } catch (const std::runtime_error& e) {
+    RCLCPP_ERROR(this->get_logger(), "Failed to convert common CAN frame: %s", e.what());
   }
 }
 
 void CanRxNode::can_rx_amk_callback() {
-  can_frame frame = can_rx_amk.receive();
+  can_frame frame;
+  try {
+    frame = can_rx_amk.receive();
+  } catch (const std::runtime_error& e) {
+    RCLCPP_ERROR(this->get_logger(), "Failed to receive AMK CAN frame: %s", e.what());
+    return;
+  }
 
-  switch (frame.can_id) {
-    case can_id<AmkFrontLeftActualValues1>: {
-      auto can_amk = convert<AmkFrontLeftActualValues1>(frame);
-      auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
-      amk_front_left_actual_values1_publisher->publish(amk_actual_values1);
-      break;
-    }
+  try {
+    switch (frame.can_id) {
+      case can_id<AmkFrontLeftActualValues1>: {
+        auto can_amk = convert<AmkFrontLeftActualValues1>(frame);
+        auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
+        amk_front_left_actual_values1_publisher->publish(amk_actual_values1);
+        break;
+      }
 
-    case can_id<AmkFrontRightActualValues1>: {
-      auto can_amk = convert<AmkFrontRightActualValues1>(frame);
-      auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
-      amk_front_right_actual_values1_publisher->publish(amk_actual_values1);
-      break;
-    }
+      case can_id<AmkFrontRightActualValues1>: {
+        auto can_amk = convert<AmkFrontRightActualValues1>(frame);
+        auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
+        amk_front_right_actual_values1_publisher->publish(amk_actual_values1);
+        break;
+      }
 
-    case can_id<AmkRearLeftActualValues1>: {
-      auto can_amk = convert<AmkRearLeftActualValues1>(frame);
-      auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
-      amk_rear_left_actual_values1_publisher->publish(amk_actual_values1);
-      break;
-    }
+      case can_id<AmkRearLeftActualValues1>: {
+        auto can_amk = convert<AmkRearLeftActualValues1>(frame);
+        auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
+        amk_rear_left_actual_values1_publisher->publish(amk_actual_values1);
+        break;
+      }
 
-    case can_id<AmkRearRightActualValues1>: {
-      auto can_amk = convert<AmkRearRightActualValues1>(frame);
-      auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
-      amk_rear_right_actual_values1_publisher->publish(amk_actual_values1);
-      break;
-    }
+      case can_id<AmkRearRightActualValues1>: {
+        auto can_amk = convert<AmkRearRightActualValues1>(frame);
+        auto amk_actual_values1 = create_amk_actual_values1_msg(can_amk);
+        amk_rear_right_actual_values1_publisher->publish(amk_actual_values1);
+        break;
+      }
 
-    case can_id<AmkFrontLeftActualValues2>: {
-      auto can_amk = convert<AmkFrontLeftActualValues2>(frame);
-      auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
-      amk_front_left_actual_values2_publisher->publish(amk_actual_values2);
-      break;
-    }
+      case can_id<AmkFrontLeftActualValues2>: {
+        auto can_amk = convert<AmkFrontLeftActualValues2>(frame);
+        auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
+        amk_front_left_actual_values2_publisher->publish(amk_actual_values2);
+        break;
+      }
 
-    case can_id<AmkFrontRightActualValues2>: {
-      auto can_amk = convert<AmkFrontRightActualValues2>(frame);
-      auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
-      amk_front_right_actual_values2_publisher->publish(amk_actual_values2);
-      break;
-    }
+      case can_id<AmkFrontRightActualValues2>: {
+        auto can_amk = convert<AmkFrontRightActualValues2>(frame);
+        auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
+        amk_front_right_actual_values2_publisher->publish(amk_actual_values2);
+        break;
+      }
 
-    case can_id<AmkRearLeftActualValues2>: {
-      auto can_amk = convert<AmkRearLeftActualValues2>(frame);
-      auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
-      amk_rear_left_actual_values2_publisher->publish(amk_actual_values2);
-      break;
-    }
+      case can_id<AmkRearLeftActualValues2>: {
+        auto can_amk = convert<AmkRearLeftActualValues2>(frame);
+        auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
+        amk_rear_left_actual_values2_publisher->publish(amk_actual_values2);
+        break;
+      }
 
-    case can_id<AmkRearRightActualValues2>: {
-      auto can_amk = convert<AmkRearRightActualValues2>(frame);
-      auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
-      amk_rear_right_actual_values2_publisher->publish(amk_actual_values2);
-      break;
+      case can_id<AmkRearRightActualValues2>: {
+        auto can_amk = convert<AmkRearRightActualValues2>(frame);
+        auto amk_actual_values2 = create_amk_actual_values2_msg(can_amk);
+        amk_rear_right_actual_values2_publisher->publish(amk_actual_values2);
+        break;
+      }
     }
+  } catch (const std::runtime_error& e) {
+    RCLCPP_ERROR(this->get_logger(), "Failed to convert AMK CAN frame: %s", e.what());
   }
 }
 

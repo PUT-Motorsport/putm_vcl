@@ -32,12 +32,20 @@ void CanTxNode::amk_setpoints_callback(const msg::AmkSetpoints msg) {
   amk_setpoints.target_torque = msg.target_torque;
   amk_setpoints.torque_positive_limit = msg.torque_positive_limit;
   amk_setpoints.torque_negative_limit = msg.torque_negative_limit;
-  can_tx_amk.transmit(amk_setpoints);
+  try {
+    can_tx_amk.transmit(amk_setpoints);
+  } catch (const std::runtime_error& e) {
+    RCLCPP_ERROR(this->get_logger(), "Failed to transmit AMK setpoints: %s", e.what());
+  }
 }
 
 void CanTxNode::can_tx_common_callback() {
-  can_tx_common.transmit(pc_main_data);
-  can_tx_common.transmit(pc_main_data2);
+  try {
+    can_tx_common.transmit(pc_main_data);
+    can_tx_common.transmit(pc_main_data2);
+  } catch (const std::runtime_error& e) {
+    RCLCPP_ERROR(this->get_logger(), "Failed to transmit common CAN frames: %s", e.what());
+  }
 }
 
 int main(int argc, char** argv) {
