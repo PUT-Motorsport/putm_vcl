@@ -36,10 +36,10 @@ class AmkNode : public rclcpp::Node {
   rclcpp::TimerBase::SharedPtr setpoints_watchdog;
   rclcpp::TimerBase::SharedPtr amk_state_machine_watchdog;
 
-  void amk_actual_values1_callback(const typename putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg, putm_vcl_interfaces::msg::AmkActualValues1& target);
-
   void rtd_callback(const putm_vcl_interfaces::msg::Rtd::SharedPtr msg);
   void setpoints_callback(const putm_vcl_interfaces::msg::Setpoints::SharedPtr msg);
+  std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr)> amk_actual_values1_callback_factory(
+      putm_vcl_interfaces::msg::AmkActualValues1& target);
 
   void setpoints_watchdog_callback();
   void amk_state_machine_watchdog_callback();

@@ -18,18 +18,10 @@ AmkNode::AmkNode()
       amk_rear_right_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/rear/right/setpoints", 1)),
       setpoints_watchdog(this->create_wall_timer(500ms, std::bind(&AmkNode::setpoints_watchdog_callback, this))),
       amk_state_machine_watchdog(this->create_wall_timer(5000ms, std::bind(&AmkNode::amk_state_machine_watchdog_callback, this))) {
-  this->create_subscription<msg::AmkActualValues1>("amk/front/left/actual_values1", 1,
-                                                   std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg)>(
-                                                       std::bind(&AmkNode::amk_actual_values1_callback, this, _1, std::ref(amk_front_left_actual_values1))));
-  this->create_subscription<msg::AmkActualValues1>("amk/front/right/actual_values1", 1,
-                                                   std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg)>(
-                                                       std::bind(&AmkNode::amk_actual_values1_callback, this, _1, std::ref(amk_front_right_actual_values1))));
-  this->create_subscription<msg::AmkActualValues1>("amk/rear/left/actual_values1", 1,
-                                                   std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg)>(
-                                                       std::bind(&AmkNode::amk_actual_values1_callback, this, _1, std::ref(amk_rear_left_actual_values1))));
-  this->create_subscription<msg::AmkActualValues1>("amk/rear/right/actual_values1", 1,
-                                                   std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg)>(
-                                                       std::bind(&AmkNode::amk_actual_values1_callback, this, _1, std::ref(amk_rear_right_actual_values1))));
+  this->create_subscription<msg::AmkActualValues1>("amk/front/left/actual_values1", 1, amk_actual_values1_callback_factory(amk_front_left_actual_values1));
+  this->create_subscription<msg::AmkActualValues1>("amk/front/right/actual_values1", 1, amk_actual_values1_callback_factory(amk_front_right_actual_values1));
+  this->create_subscription<msg::AmkActualValues1>("amk/rear/left/actual_values1", 1, amk_actual_values1_callback_factory(amk_rear_left_actual_values1));
+  this->create_subscription<msg::AmkActualValues1>("amk/rear/right/actual_values1", 1, amk_actual_values1_callback_factory(amk_rear_right_actual_values1));
   this->create_subscription<msg::Rtd>("rtd", 1, std::bind(&AmkNode::rtd_callback, this, _1));
   this->create_wall_timer(5ms, std::bind(&AmkNode::amk_state_machine_callback, this));
   this->create_wall_timer(2ms, std::bind(&AmkNode::amk_setpoints_callback, this));
@@ -43,7 +35,9 @@ void AmkNode::setpoints_callback(const msg::Setpoints::SharedPtr msg) {
   setpoints = *msg;
   setpoints_watchdog->reset();
 }
-void AmkNode::amk_actual_values1_callback(const msg::AmkActualValues1::SharedPtr msg, msg::AmkActualValues1& target) { target = *msg; }
+std::function<void(const msg::AmkActualValues1::SharedPtr msg)> AmkNode::amk_actual_values1_callback_factory(msg::AmkActualValues1& target) {
+  return [this, &target](const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr msg) { target = *msg; };
+}
 
 void AmkNode::setpoints_watchdog_callback() {
   RCLCPP_WARN(this->get_logger(), "Setpoints watchdog triggered");
