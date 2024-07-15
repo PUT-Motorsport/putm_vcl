@@ -15,18 +15,8 @@ class CanTxNode : public rclcpp::Node {
   PUTM_CAN::PcMainData pc_main_data;
   PUTM_CAN::PcMainData pc_main_data2;
 
-  rclcpp::TimerBase::SharedPtr can_tx_amk_timer;
-  rclcpp::TimerBase::SharedPtr can_tx_common_timer;
-
-  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr amk_front_left_setpoints_subscription;
-  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr amk_front_right_setpoints_subscription;
-  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr amk_rear_left_setpoints_subscription;
-  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkSetpoints>::SharedPtr amk_rear_right_setpoints_subscription;
-  
   void can_tx_common_callback();
 
-  void amk_front_left_setpoints_callback(const putm_vcl_interfaces::msg::AmkSetpoints msg);
-  void amk_front_right_setpoints_callback(const putm_vcl_interfaces::msg::AmkSetpoints msg);
-  void amk_rear_left_setpoints_callback(const putm_vcl_interfaces::msg::AmkSetpoints msg);
-  void amk_rear_right_setpoints_callback(const putm_vcl_interfaces::msg::AmkSetpoints msg);
+  template <typename T>
+  void amk_setpoints_callback(const putm_vcl_interfaces::msg::AmkSetpoints msg);
 };
