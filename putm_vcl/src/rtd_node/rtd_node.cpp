@@ -10,14 +10,24 @@ RtdNode::RtdNode()
       frontbox_driver_input_subscription(this->create_subscription<msg::FrontboxDriverInput>("frontbox_driver_input", 1, std::bind(&RtdNode::frontbox_driver_input_callback, this, _1))),
       dashboard_subscription(this->create_subscription<msg::Dashboard>("dashboard", 1, std::bind(&RtdNode::dashboard_callback, this, _1))),
       rtd_timer(this->create_wall_timer(100ms, std::bind(&RtdNode::rtd_callback, this))),
-      amk_front_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>("amk/front/left/actual_values1", 1, 
-      amk_actual_values1_callback_factory(amk_front_left_actual_values1))){}
+      amk_front_left_actual_values1_subscriber(
+          this->create_subscription<msg::AmkActualValues1>("amk/front/left/actual_values1", 1, 
+                                                           amk_actual_values1_callback_factory(amk_front_left_actual_values1))),
+      amk_front_right_actual_values1_subscriber(
+          this->create_subscription<msg::AmkActualValues1>("amk/front/right/actual_values1", 1, 
+                                                           amk_actual_values1_callback_factory(amk_front_right_actual_values1))),
+      amk_rear_left_actual_values1_subscriber(
+          this->create_subscription<msg::AmkActualValues1>("amk/rear/left/actual_values1", 1, 
+                                                           amk_actual_values1_callback_factory(amk_rear_left_actual_values1))),
+      amk_rear_right_actual_values1_subscriber(
+          this->create_subscription<msg::AmkActualValues1>("amk/rear/right/actual_values1", 1, 
+                                                           amk_actual_values1_callback_factory(amk_rear_right_actual_values1))){}
 
 void RtdNode::rtd_callback() {
   if ((frontbox_driver_input.brake_pressure_front >= 2200.0 or frontbox_driver_input.brake_pressure_rear >= 2200.0) and dashboard.rtd_button and not rtd.state) {
     RCLCPP_INFO(this->get_logger(), "RTD: on");
     rtd.state = true;
-  } else if (rtd.state and dashboard.rtd_button) {
+  } else if (((rtd.state) and (dashboard.rtd_button)) or (((amk_front_left_actual_values1.amk_status.error or amk_front_right_actual_values1.amk_status.error or amk_rear_left_actual_values1.amk_status.error or amk_rear_right_actual_values1.amk_status.error )))) {
     RCLCPP_INFO(this->get_logger(), "RTD: off");
     rtd.state = false;
   }

@@ -15,14 +15,10 @@ class RtdNode : public rclcpp::Node {
   putm_vcl_interfaces::msg::FrontboxDriverInput frontbox_driver_input;
   putm_vcl_interfaces::msg::Dashboard dashboard;
 
-  putm_vcl_interfaces::msg::AmkActualValues1 amk_front_left_actual_values1;
-  // putm_vcl_interfaces::msg::AmkActualValues1   frontRightInverter;
-  // putm_vcl_interfaces::msg::AmkActualValues1   rearLeftInverter;
-  // putm_vcl_interfaces::msg::AmkActualValues1   rearRightInverter;
-
-  // rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_front_right_actual_values1_subscriber;
-  // rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_rear_left_actual_values1_subscriber;
-  // rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_rear_right_actual_values1_subscriber;
+  putm_vcl_interfaces::msg::AmkActualValues1   amk_front_left_actual_values1;
+  putm_vcl_interfaces::msg::AmkActualValues1   amk_front_right_actual_values1;
+  putm_vcl_interfaces::msg::AmkActualValues1   amk_rear_left_actual_values1;
+  putm_vcl_interfaces::msg::AmkActualValues1   amk_rear_right_actual_values1;
 
   rclcpp::Publisher<putm_vcl_interfaces::msg::Rtd>::SharedPtr rtd_publisher;
   rclcpp::Subscription<putm_vcl_interfaces::msg::FrontboxDriverInput>::SharedPtr frontbox_driver_input_subscription;
@@ -30,6 +26,10 @@ class RtdNode : public rclcpp::Node {
   rclcpp::TimerBase::SharedPtr rtd_timer;
 
   rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_front_left_actual_values1_subscriber;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_front_right_actual_values1_subscriber;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_rear_left_actual_values1_subscriber;
+  rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_rear_right_actual_values1_subscriber;
+
 
   std::function<void(const putm_vcl_interfaces::msg::AmkActualValues1::SharedPtr)> amk_actual_values1_callback_factory(
       putm_vcl_interfaces::msg::AmkActualValues1& target);
