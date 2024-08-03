@@ -13,7 +13,7 @@ RtdNode::RtdNode()
       rtd_timer(this->create_wall_timer(100ms, std::bind(&RtdNode::rtd_callback, this))) {}
 
 void RtdNode::rtd_callback() {
-  if ((frontbox_driver_input.brake_pressure_front >= 2200.0 or frontbox_driver_input.brake_pressure_rear >= 2200.0) and dashboard.rtd_button and not rtd.state) {
+  if ((frontbox_driver_input.brake_pressure_front >= 1000 or frontbox_driver_input.brake_pressure_rear >= 1000) and dashboard.rtd_button and not rtd.state) {
     RCLCPP_INFO(this->get_logger(), "RTD: on");
     rtd.state = true;
   } else if (rtd.state and dashboard.rtd_button) {

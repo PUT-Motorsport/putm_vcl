@@ -42,7 +42,11 @@ CanTxNode::CanTxNode()
       amk_rear_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
           "amk/rear/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkRearRightActualValues2>, this, _1))),
 
+      rtd_subscriber(this->create_subscription<msg::Rtd>("rtd", 1, std::bind(&CanTxNode::rtd_callback, this, _1))),
+
       can_tx_common_timer(this->create_wall_timer(10ms, std::bind(&CanTxNode::can_tx_common_callback, this))) {}
+
+void CanTxNode::rtd_callback(const msg::Rtd msg) { rtd = msg; }
 
 template <typename T>
 void CanTxNode::amk_setpoints_callback(const msg::AmkSetpoints msg) {
@@ -105,6 +109,7 @@ void CanTxNode::can_tx_common_callback() {
 
   PcMainData pc_main_data;
   pc_main_data.time = seconds_since_midnight;
+  pc_main_data.rtd = rtd.state;
 
   try {
     can_tx_common.transmit(pc_main_data);
