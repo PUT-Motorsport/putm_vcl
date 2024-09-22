@@ -82,6 +82,75 @@ void CanRxNode::can_rx_common_callback() {
         dashboard_publisher->publish(dashboard);
         break;
       }
+
+      case can_id<XsensAcceleration>:
+      {
+        break;
+      }
+      case can_id<XsensAccelerationHighRate>:
+      {
+        break;
+      }
+      case can_id<XsensAltitudeEllipsoid>:
+      {
+        break;
+      }
+      case can_id<XsensDeltaQ>:
+      {
+        break;
+      }
+      case can_id<XsensError>:
+      {
+        break;
+      }
+      case can_id<XsensEuler>:
+      {
+        break;
+      }
+      case can_id<XsensFreeAcceleration>:
+      {
+        break;
+      }
+      case can_id<XsensInertialData>:
+      {
+        break;
+      }
+      case can_id<XsensMagneticField>:
+      {
+        break;
+      }
+      case can_id<XsensOrientation>:
+      {
+        break;
+      }
+      case can_id<XsensPosition>:
+      {
+        break;
+      }
+      case can_id<XsensRateOfTurn>:
+      {
+        break;
+      }
+      case can_id<XsensRateOfTurnHighRate>:
+      {
+        break;
+      }
+      case can_id<XsensStatus>:
+      {
+        break;
+      }
+      case can_id<XsensTemperatureAndPressure>:
+      {
+        break;
+      }
+      case can_id<XsensUtc>:
+      {
+        break;
+      }
+      case can_id<XsensVelocity>:
+      {
+        break;
+      }
     }
   } catch (const std::runtime_error& e) {
     RCLCPP_ERROR(this->get_logger(), "Failed to convert common CAN frame: %s", e.what());

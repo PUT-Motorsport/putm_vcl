@@ -6,6 +6,25 @@
 #include "putm_vcl_interfaces/msg/dashboard.hpp"
 #include "putm_vcl_interfaces/msg/frontbox_data.hpp"
 #include "putm_vcl_interfaces/msg/frontbox_driver_input.hpp"
+
+#include "putm_vcl_interfaces/msg/xsens_acceleration.hpp"
+#include "putm_vcl_interfaces/msg/xsens_acceleration_hr.hpp"
+#include "putm_vcl_interfaces/msg/xsens_alltitude_ellipsoid.hpp"
+#include "putm_vcl_interfaces/msg/xsens_delta_q.hpp"
+#include "putm_vcl_interfaces/msg/xsens_error_code.hpp"
+#include "putm_vcl_interfaces/msg/xsens_euler.hpp"
+#include "putm_vcl_interfaces/msg/xsens_free_acceleration.hpp"
+#include "putm_vcl_interfaces/msg/xsens_inertial_data.hpp"
+#include "putm_vcl_interfaces/msg/xsens_magnetic_field.hpp"
+#include "putm_vcl_interfaces/msg/xsens_orientation.hpp"
+#include "putm_vcl_interfaces/msg/xsens_position.hpp"
+#include "putm_vcl_interfaces/msg/xsens_rate_of_turn.hpp"
+#include "putm_vcl_interfaces/msg/xsens_rate_of_turn_hr.hpp"
+#include "putm_vcl_interfaces/msg/xsens_status.hpp"
+#include "putm_vcl_interfaces/msg/xsens_temp_and_pressure.hpp"
+#include "putm_vcl_interfaces/msg/xsens_utc.hpp"
+#include "putm_vcl_interfaces/msg/xsens_velocity.hpp"
+
 #include "rclcpp/rclcpp.hpp"
 
 class CanRxNode : public rclcpp::Node {
