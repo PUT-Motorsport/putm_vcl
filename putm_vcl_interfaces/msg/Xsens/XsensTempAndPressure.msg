@@ -1,0 +1,2 @@
+int16 temperature
+uint32 pressure
