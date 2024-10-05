@@ -1,3 +1,3 @@
-int16 freeAccX
-int16 freeAccy
-int16 freeAccz
+int16 free_acc_x
+int16 free_acc_y
+int16 free_acc_z

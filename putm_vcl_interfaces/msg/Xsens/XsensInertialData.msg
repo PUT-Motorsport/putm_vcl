@@ -1,4 +1,4 @@
-int16 deltaVx
-int16 deltaVy
-int16 deltaVz
+int16 delta_v_x
+int16 delta_v_y
+int16 delta_v_z
 uint8 exponent

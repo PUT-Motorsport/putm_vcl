@@ -1,4 +1,4 @@
-int16 deltaQ0
-int16 deltaQ1
-int16 deltaQ2
-int16 deltaQ3
+int16 delta_q_0
+int16 delta_q_1
+int16 delta_q_2
+int16 delta_q_3
