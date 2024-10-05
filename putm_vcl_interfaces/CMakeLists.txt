@@ -20,7 +20,26 @@ rosidl_generate_interfaces(
   "msg/Setpoints/Setpoints.msg"
   "msg/Setpoints/Setpoint.msg"
   "msg/Dashboard.msg"
-  "msg/Rtd.msg")
+  "msg/Rtd.msg"
+  "msg/Xsens/XsensAcceleration.msg"
+  "msg/Xsens/XsensAccelerationHr.msg"
+  "msg/Xsens/XsensAlltitudeEllipsoid.msg"
+  "msg/Xsens/XsensDeltaQ.msg"
+  "msg/Xsens/XsensErrorCode.msg"
+  "msg/Xsens/XsensEuler.msg"
+  "msg/Xsens/XsensFreeAcceleration.msg"
+  "msg/Xsens/XsensInertialData.msg"
+  "msg/Xsens/XsensMagneticField.msg"
+  "msg/Xsens/XsensOrientation.msg"
+  "msg/Xsens/XsensPosition.msg"
+  "msg/Xsens/XsensRateOfTurn.msg"
+  "msg/Xsens/XsensRateOfTurnHr.msg"
+  "msg/Xsens/XsensStatus.msg"
+  "msg/Xsens/XsensTempAndPressure.msg"
+  "msg/Xsens/XsensUtc.msg"
+  "msg/Xsens/XsensVelocity.msg"
+  )
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

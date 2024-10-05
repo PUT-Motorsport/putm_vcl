@@ -1,3 +1,3 @@
-int16 velX
-int16 velY
-int16 velZ
+int16 vel_x
+int16 vel_y
+int16 vel_z

@@ -1,1 +1,1 @@
-uint32 altEllipsoid
+uint32 alt_ellipsoid

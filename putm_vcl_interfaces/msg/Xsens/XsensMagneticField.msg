@@ -1,3 +1,3 @@
-int16 magX
-int16 magy
-int16 magZ
+int16 mag_x
+int16 mag_y
+int16 mag_z

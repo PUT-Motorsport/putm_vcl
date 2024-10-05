@@ -1,3 +1,3 @@
-int16 accX
-int16 accY
-int16 accZ
+int16 acc_x
+int16 acc_y
+int16 acc_z
