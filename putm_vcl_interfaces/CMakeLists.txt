@@ -38,8 +38,7 @@ rosidl_generate_interfaces(
   "msg/Xsens/XsensTempAndPressure.msg"
   "msg/Xsens/XsensUtc.msg"
   "msg/Xsens/XsensVelocity.msg"
-  )
-
+  "msg/BmsHvMain/BmsHvMain.msg")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
