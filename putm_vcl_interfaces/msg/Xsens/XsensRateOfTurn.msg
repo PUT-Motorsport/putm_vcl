@@ -1,3 +1,3 @@
-int16 gyr_x
-int16 gyr_y
-int16 gyr_z
+float32 gyr_x
+float32 gyr_y
+float32 gyr_z

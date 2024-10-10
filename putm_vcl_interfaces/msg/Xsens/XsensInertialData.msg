@@ -1,4 +1,4 @@
-int16 delta_v_x
-int16 delta_v_y
-int16 delta_v_z
+float32 x
+float32 y
+float32 z
 uint8 exponent

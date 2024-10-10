@@ -52,6 +52,16 @@ class CanRxNode : public rclcpp::Node {
 
   rclcpp::Publisher<putm_vcl_interfaces::msg::Dashboard>::SharedPtr dashboard_publisher;
 
+  rclcpp::Publisher<putm_vcl_interfaces::msg::XsensAcceleration>::SharedPtr xsens_acceleration_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::XsensTempAndPressure>::SharedPtr xsens_temp_and_pressure_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::XsensUtc>::SharedPtr xsens_utc_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::XsensEuler>::SharedPtr xsens_euler_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::XsensRateOfTurn>::SharedPtr xsens_rate_of_turn_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::XsensOrientation>::SharedPtr xsens_orientation_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::XsensVelocity>::SharedPtr xsens_velocity_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::XsensInertialData>::SharedPtr xsens_inertial_data_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::XsensPosition>::SharedPtr xsens_position_publisher;
+
   rclcpp::TimerBase::SharedPtr can_rx_amk_timer;
   rclcpp::TimerBase::SharedPtr can_rx_common_timer;
 

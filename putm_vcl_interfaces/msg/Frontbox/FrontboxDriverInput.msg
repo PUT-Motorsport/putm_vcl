@@ -1,4 +1,4 @@
 uint16 pedal_position
 uint16 brake_pressure_front
 uint16 brake_pressure_rear
-uint16 steering_wheel_position
+int16 steering_wheel_position

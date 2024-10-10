@@ -1,3 +1,3 @@
-int16 vel_x
-int16 vel_y
-int16 vel_z
+float32 x
+float32 y
+float32 z

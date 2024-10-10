@@ -1,2 +1,2 @@
-int32 lat
-int32 lon
+float32 latitude
+float32 longitude

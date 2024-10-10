@@ -1,2 +1,1 @@
-int16 temperature
-uint32 pressure
+float32 temperature

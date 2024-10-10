@@ -1,4 +1,4 @@
-int16 q_0
-int16 q_1
-int16 q_2
-int16 q_3
+float32 q0
+float32 q1
+float32 q2
+float32 q3
