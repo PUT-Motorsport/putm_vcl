@@ -20,7 +20,8 @@ rosidl_generate_interfaces(
   "msg/Setpoints/Setpoints.msg"
   "msg/Setpoints/Setpoint.msg"
   "msg/Dashboard.msg"
-  "msg/Rtd.msg")
+  "msg/Rtd.msg"
+  "msg/BmsHvMain/BmsHvMain.msg")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

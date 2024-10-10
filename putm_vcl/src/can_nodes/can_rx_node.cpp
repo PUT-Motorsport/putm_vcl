@@ -14,6 +14,8 @@ CanRxNode::CanRxNode()
 
       frontbox_driver_input_publisher(this->create_publisher<msg::FrontboxDriverInput>("frontbox_driver_input", 1)),
       frontbox_data_publisher(this->create_publisher<msg::FrontboxData>("frontbox_data", 1)),
+      bms_hv_main_publisher(this->create_publisher<msg::BmsHvMain>("bms_hv_main", 1)),
+
 
       amk_front_left_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("amk/front/left/actual_values1", 1)),
       amk_front_left_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("amk/front/left/actual_values2", 1)),
@@ -70,6 +72,18 @@ void CanRxNode::can_rx_common_callback() {
         frontbox_data.front_left_hub_temperature = can_frontbox_data.front_left_hub_temperature;
         frontbox_data.front_right_hub_temperature = can_frontbox_data.front_right_hub_temperature;
         frontbox_data_publisher->publish(frontbox_data);
+        break;
+      }
+
+      case can_id<BmsHvMain>: {
+        auto can_bms_hv_main = convert<BmsHvMain>(frame);
+        msg::BmsHvMain bms_hv_main;
+        bms_hv_main.voltage_sum = can_bms_hv_main.voltage_sum;
+        bms_hv_main.current = can_bms_hv_main.current;
+        bms_hv_main.temp_max = can_bms_hv_main.temp_max;
+        bms_hv_main.temp_avg = can_bms_hv_main.temp_avg;
+        bms_hv_main.soc = can_bms_hv_main.soc;
+        bms_hv_main_publisher->publish(bms_hv_main);
         break;
       }
 
