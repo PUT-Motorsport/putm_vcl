@@ -36,6 +36,11 @@ class CanTxNode : public rclcpp::Node {
   rclcpp::TimerBase::SharedPtr can_tx_common_timer;
 
   putm_vcl_interfaces::msg::Rtd rtd;
+  putm_vcl_interfaces::msg::AmkActualValues2 frontLeftActualValues2;
+  putm_vcl_interfaces::msg::AmkActualValues2 frontRightActualValues2;
+  putm_vcl_interfaces::msg::AmkActualValues2 rearLeftActualValues2;
+  putm_vcl_interfaces::msg::AmkActualValues2 rearRightActualValues2;
+
 
   void rtd_callback(const putm_vcl_interfaces::msg::Rtd msg);
   void can_tx_common_callback();
