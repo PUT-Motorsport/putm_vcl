@@ -1,0 +1,5 @@
+uint16 voltage_sum
+uint16 current
+uint8 temp_max
+uint8 temp_avg
+uint16 soc
