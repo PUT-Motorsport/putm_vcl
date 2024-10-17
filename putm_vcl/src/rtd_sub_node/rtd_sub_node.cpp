@@ -23,7 +23,7 @@ class MinimalSubscriber : public rclcpp::Node
   private:
     void topic_callback(const msg::Rtd::SharedPtr msg) const
     {
-      RCLCPP_INFO(this->get_logger(), "I heard: ''", msg->rtd_state);
+      RCLCPP_INFO(this->get_logger(), "I heard: '%d'", msg->state);
     }
     rclcpp::Subscription<msg::Rtd>::SharedPtr subscription_;
 };
