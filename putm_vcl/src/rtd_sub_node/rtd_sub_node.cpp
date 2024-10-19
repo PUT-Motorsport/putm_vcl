@@ -3,7 +3,6 @@
 #include "rclcpp/rclcpp.hpp"
 //#include "std_msgs/msg/string.hpp"
 #include "putm_vcl_interfaces/msg/rtd.hpp"
-
 //#include "rtd_sub_node/rtd_sub_node.hpp"
 
 using namespace putm_vcl_interfaces;
@@ -23,7 +22,7 @@ class MinimalSubscriber : public rclcpp::Node
   private:
     void topic_callback(const msg::Rtd::SharedPtr msg) const
     {
-      RCLCPP_INFO(this->get_logger(), "I heard: ''", msg->rtd_state);
+      RCLCPP_INFO(this->get_logger(), "I heard: ''", msg->state);
     }
     rclcpp::Subscription<msg::Rtd>::SharedPtr subscription_;
 };

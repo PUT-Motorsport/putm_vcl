@@ -28,6 +28,8 @@
 #include "rclcpp/rclcpp.hpp"
 #include "putm_vcl_interfaces/msg/bms_hv_main.hpp"
 
+#include "putm_vcl_interfaces/msg/bms_lv_main.hpp"
+
 class CanRxNode : public rclcpp::Node {
  public:
   CanRxNode();
@@ -39,6 +41,8 @@ class CanRxNode : public rclcpp::Node {
   rclcpp::Publisher<putm_vcl_interfaces::msg::FrontboxDriverInput>::SharedPtr frontbox_driver_input_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::FrontboxData>::SharedPtr frontbox_data_publisher;
   rclcpp::Publisher<putm_vcl_interfaces::msg::BmsHvMain>::SharedPtr bms_hv_main_publisher;
+  
+  rclcpp::Publisher<putm_vcl_interfaces::msg::BmsLvMain>::SharedPtr bms_lv_main_publisher;
 
 
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_front_left_actual_values1_publisher;
