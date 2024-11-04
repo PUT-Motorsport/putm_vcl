@@ -181,16 +181,28 @@ void AmkNode::amk_state_machine_callback() {
         state = StateMachine::SWITCH_OFF;
       }
       amk_front_left_setpoints.torque_positive_limit = 2000;
+      amk_front_left_setpoints.torque_negative_limit = -2000;
       amk_front_left_setpoints.target_torque = setpoints.front_left.torque;
 
       amk_front_right_setpoints.torque_positive_limit = 2000;
+      amk_front_right_setpoints.torque_negative_limit = -2000;
       amk_front_right_setpoints.target_torque = setpoints.front_right.torque;
 
       amk_rear_left_setpoints.torque_positive_limit = 2000;
+      amk_rear_left_setpoints.torque_negative_limit = -2000;
       amk_rear_left_setpoints.target_torque = setpoints.rear_left.torque;
 
       amk_rear_right_setpoints.torque_positive_limit = 2000;
+      amk_rear_right_setpoints.torque_negative_limit = -2000;
       amk_rear_right_setpoints.target_torque = setpoints.rear_right.torque;
+
+      if (amk_front_left_actual_values1.actual_velocity > 20000 || amk_front_right_actual_values1.actual_velocity > 20000 || amk_rear_left_actual_values1.actual_velocity > 20000 || amk_rear_right_actual_values1.actual_velocity > 20000)
+      {
+        amk_front_left_setpoints.target_torque = 0;
+        amk_front_right_setpoints.target_torque = 0;
+        amk_rear_left_setpoints.target_torque = 0;
+        amk_rear_right_setpoints.target_torque = 0;
+      }
 
       if (rtd.state == false) {
         state = StateMachine::SWITCH_OFF;
@@ -219,6 +231,13 @@ void AmkNode::amk_state_machine_callback() {
       amk_rear_left_setpoints.torque_positive_limit = 0;
       amk_rear_left_setpoints.torque_negative_limit = 0;
       amk_rear_left_setpoints.target_torque = 0;
+
+      amk_rear_right_setpoints.amk_control.inverter_on = false;
+      amk_rear_right_setpoints.amk_control.enable = false;
+      amk_rear_right_setpoints.amk_control.dc_on = false;
+      amk_rear_right_setpoints.torque_positive_limit = 0;
+      amk_rear_right_setpoints.torque_negative_limit = 0;
+      amk_rear_right_setpoints.target_torque = 0;
 
       RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Inverters OFF");
       /* Wait until inverter 0 is switched-off.*/
