@@ -104,7 +104,6 @@ void CanRxNode::can_rx_common_callback() {
         bms_lv_main.soc = can_bms_lv_main.soc;
         bms_lv_main.temp_avg = can_bms_lv_main.temp_avg;
         bms_lv_main.current = can_bms_lv_main.current;
-        bms_lv_main.device_state = can_bms_lv_main.device_state;
         bms_lv_main_publisher->publish(bms_lv_main);
         break;
       }

@@ -24,10 +24,12 @@ RtdNode::RtdNode()
                                                            amk_actual_values1_callback_factory(amk_rear_right_actual_values1))){}
 
 void RtdNode::rtd_callback() {
-  if ((frontbox_driver_input.brake_pressure_front >= 1000 and frontbox_driver_input.brake_pressure_rear >= 1000) and (dashboard.rtd_button) and (not rtd.state)) {
+  if ((frontbox_driver_input.brake_pressure_front >= 900 )and (frontbox_driver_input.brake_pressure_rear >= 900) and (dashboard.rtd_button) and (not rtd.state)) 
+  {
     RCLCPP_INFO(this->get_logger(), "RTD: on");
     rtd.state = true;
-  } else if (((rtd.state) and (dashboard.rtd_button)) or (((amk_front_left_actual_values1.amk_status.error or amk_front_right_actual_values1.amk_status.error or amk_rear_left_actual_values1.amk_status.error or amk_rear_right_actual_values1.amk_status.error )))) {
+  } else if (dashboard.rtd_button and rtd.state) //or (amk_front_left_actual_values1.amk_status.error or amk_front_right_actual_values1.amk_status.error or amk_rear_left_actual_values1.amk_status.error or amk_rear_right_actual_values1.amk_status.error )) 
+  { 
     RCLCPP_INFO(this->get_logger(), "RTD: off");
     rtd.state = false;
   }
