@@ -40,7 +40,7 @@ rosidl_generate_interfaces(
   "msg/Xsens/XsensVelocity.msg"
   "msg/BmsHvMain/BmsHvMain.msg"
   "msg/BmsLvMain/BmsLvMain.msg"
-  "msg/VpData/VpData.msg")
+  "msg/VpData/YawRef.msg")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
