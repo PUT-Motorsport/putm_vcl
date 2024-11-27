@@ -1,2 +1,2 @@
 float32 yaw_rate_ref
-flaot32 gps
+float32 gps
