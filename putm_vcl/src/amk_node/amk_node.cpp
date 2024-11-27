@@ -104,6 +104,12 @@ void AmkNode::amk_state_machine_callback() {
       }
     } break;
     case StateMachine::IDLING: {
+      //check error and reset error
+      if (amk_front_left_actual_values1.amk_status.error || amk_front_right_actual_values1.amk_status.error || amk_rear_left_actual_values1.amk_status.error ||
+          amk_rear_right_actual_values1.amk_status.error) {
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "error happeneed ");
+        state = StateMachine::ERROR_RESET;
+      }
       /* Check for RTD*/
       if (rtd.state == true) {
         state = StateMachine::STARTUP;
