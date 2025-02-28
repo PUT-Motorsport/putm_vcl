@@ -289,7 +289,7 @@ void CanRxNode::can_rx_common_callback() {
       }
     }
   } catch (const std::runtime_error& e) {
-    RCLCPP_ERROR(this->get_logger(), "Failed to convert common CAN frame: %s", e.what());
+    //RCLCPP_ERROR(this->get_logger(), "Failed to convert common CAN frame: %s", e.what());
   }
 }
 
