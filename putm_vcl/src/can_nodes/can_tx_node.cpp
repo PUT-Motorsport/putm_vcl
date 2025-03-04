@@ -24,23 +24,23 @@ CanTxNode::CanTxNode()
       amk_rear_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
           "amk/rear/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkRearRightSetpoints>, this, _1))),
 
-      // amk_front_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
-      //      "amk/front/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontLeftActualValues1>, this, _1))),
-      // amk_front_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
-      //      "amk/front/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontRightActualValues1>, this, _1))),
-      // amk_rear_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
-      //      "amk/rear/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkRearLeftActualValues1>, this, _1))),
-      // amk_rear_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
-      //      "amk/rear/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkRearRightActualValues1>, this, _1))),
+      amk_front_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
+           "amk/front/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontLeftActualValues1>, this, _1))),
+      amk_front_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
+           "amk/front/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontRightActualValues1>, this, _1))),
+      amk_rear_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
+           "amk/rear/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkRearLeftActualValues1>, this, _1))),
+      amk_rear_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
+           "amk/rear/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkRearRightActualValues1>, this, _1))),
 
-      // amk_front_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-      //      "amk/front/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontLeftActualValues2>, this, _1))),
-      //  amk_front_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-      //      "amk/front/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontRightActualValues2>, this, _1))),
-      //  amk_rear_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-      //      "amk/rear/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkRearLeftActualValues2>, this, _1))),
-      //  amk_rear_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-      //      "amk/rear/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkRearRightActualValues2>, this, _1))),
+      amk_front_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
+           "amk/front/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontLeftActualValues2>, this, _1))),
+       amk_front_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
+           "amk/front/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontRightActualValues2>, this, _1))),
+       amk_rear_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
+           "amk/rear/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkRearLeftActualValues2>, this, _1))),
+       amk_rear_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
+           "amk/rear/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkRearRightActualValues2>, this, _1))),
 
       rtd_subscriber(this->create_subscription<msg::Rtd>("rtd", 1, std::bind(&CanTxNode::rtd_callback, this, _1))),
 
@@ -105,14 +105,12 @@ void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
 void CanTxNode::can_tx_common_callback() {
 
   PcMainData pc_main_data;
-  pc_main_data.rearLeftInverterTemperature = 255;
-  pc_main_data.rearLeftMotorTemperature =  255;
-  pc_main_data.rearRightInverterTemperature = 255;
-  pc_main_data.rearRightMotorTemperature = 11;
-  pc_main_data.rpm = 0; 
-  pc_main_data.vehicleSpeed = 255;
+  pc_main_data.rearLeftInverterTemperature = 0;
+  pc_main_data.rearLeftMotorTemperature =  0;
+  pc_main_data.rearRightInverterTemperature = 0;
+  pc_main_data.rearRightMotorTemperature = 0;
+  pc_main_data.vehicleSpeed = 0;
   pc_main_data.rtd = rtd.state;
-
 
   try {
    can_tx_common.transmit(pc_main_data);
