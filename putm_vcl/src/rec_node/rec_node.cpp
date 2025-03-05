@@ -55,7 +55,7 @@ void RecNode::start_recording() {
 void RecNode::stop_recording() {
     if (recording) 
     {
-        stop_command = "kill " + std::to_string(process_pid_);
+        stop_command = "pkill -f ros2 bag";
         std::system(stop_command.c_str());
         recording = false;
     }
