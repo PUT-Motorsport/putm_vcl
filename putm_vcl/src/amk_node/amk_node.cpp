@@ -140,6 +140,10 @@ void AmkNode::amk_state_machine_callback() {
       if (!amk_front_left_actual_values1.amk_status.dc_on && !amk_front_right_actual_values1.amk_status.dc_on && !amk_rear_left_actual_values1.amk_status.dc_on &&
           !amk_rear_right_actual_values1.amk_status.dc_on) {
         RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Waiting for bdc_on");
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "%f",amk_front_left_actual_values1.amk_status.dc_on);
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "%f",amk_front_right_actual_values1.amk_status.dc_on);
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "%f",amk_rear_left_actual_values1.amk_status.dc_on);
+        RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "%f",amk_rear_right_actual_values1.amk_status.dc_on);
         rclcpp::sleep_for(10ms);
         break;
       }

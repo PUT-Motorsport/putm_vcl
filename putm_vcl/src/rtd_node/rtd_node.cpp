@@ -28,7 +28,7 @@ void RtdNode::rtd_callback() {
   {
     RCLCPP_INFO(this->get_logger(), "RTD: on");
     rtd.state = true;
-  } else if ((dashboard.rtd_button and rtd.state) or (amk_front_left_actual_values1.amk_status.error or amk_front_right_actual_values1.amk_status.error or amk_rear_left_actual_values1.amk_status.error or amk_rear_right_actual_values1.amk_status.error ))
+  } else if (dashboard.rtd_button and rtd.state) //or (amk_front_left_actual_values1.amk_status.error or amk_front_right_actual_values1.amk_status.error or amk_rear_left_actual_values1.amk_status.error or amk_rear_right_actual_values1.amk_status.error )) 
   { 
     RCLCPP_INFO(this->get_logger(), "RTD: off");
     rtd.state = false;
