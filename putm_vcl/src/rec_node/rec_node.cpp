@@ -1,6 +1,7 @@
 #include <rec_node/rec_node.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <putm_vcl_interfaces/msg/rtd.hpp>
+#include <fstream>
 
 using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
@@ -21,7 +22,7 @@ if (msg->state && !recording) {
         stop_timer_.reset();
     }
 } else if (!msg->state && recording && !stop_timer_) {
-        RCLCPP_INFO(this->get_logger(), "Car is not ready. Stopping data recording.");
+        RCLCPP_INFO(this->get_logger(), "Car is not ready. Stopping data recording aftet 20 seconds.");
         stop_timer_ = this->create_wall_timer(
             20s,
             [this]() 
@@ -46,20 +47,25 @@ void RecNode::start_recording() {
 
     RCLCPP_INFO(this->get_logger(), "Recording to: %s", bag_file_name_.c_str());
 
-    start_command = "ros2 bag record -a -s mcap -o" + bag_file_name_ + " & echo $!";
+    start_command = "ros2 bag record -a -s mcap -o " + bag_file_name_ + " & echo $!";
     process_pid_ = std::system(start_command.c_str());
+    RCLCPP_INFO(this->get_logger(), "Recording started with PID: %d", process_pid_);
 
     recording = true;
 }
 
-void RecNode::stop_recording() {
-    if (recording) 
+void RecNode::stop_recording()
+{
+    if (recording)
     {
-        stop_command = "pkill -f ros2 bag";
+        std::string kill_command = "kill " + std::to_string(process_pid_);
         std::system(stop_command.c_str());
         recording = false;
     }
+    
 }
+
+
 int main(int argc, char* argv[]) {
     rclcpp::init(argc, argv);
     rclcpp::spin(std::make_shared<RecNode>());
