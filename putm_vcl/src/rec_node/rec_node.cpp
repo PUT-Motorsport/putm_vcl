@@ -1,7 +1,4 @@
 #include <rec_node/rec_node.hpp>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
 
 using namespace putm_vcl_interfaces;
 using namespace std::chrono_literals;
@@ -43,23 +40,20 @@ void RecNode::start_recording() {
     std::ostringstream oss;
     oss << std::put_time(std::localtime(&time_t_now), "%Y-%m-%d_%H-%M-%S")
     ;
-    std::string filename = "/home/putm/rosbag/recording_" + oss.str();
+    std::string filename = "/home/putm/rosbag/recording_" + oss.str(); // Path to the directory where the recordings will be saved
     
     pid_ = fork();
     if (pid_ == -1) {
-        RCLCPP_ERROR(this->get_logger(), "Błąd podczas tworzenia procesu!");
+        RCLCPP_ERROR(this->get_logger(), "Error while creating the process!");
         return;
     }
 
     if (pid_ == 0) {
-        // Proces potomny - wykonuje `ros2 bag record -a`
         execlp("ros2", "ros2", "bag", "record", "-a", "-s", "mcap", "-o", filename.c_str(), nullptr);
-        // Jeśli execlp się nie powiodło
-        RCLCPP_ERROR(this->get_logger(), "Nie udało się uruchomić `ros2 bag record`!");
+        RCLCPP_ERROR(this->get_logger(), "Failed to launch `ros2 bag record`!");
         _exit(1);
     } else {
-        // Proces macierzysty - zapamiętuje PID i kontynuuje
-        RCLCPP_INFO(this->get_logger(), "Rozpoczęto nagrywanie. PID: %d", pid_);
+        RCLCPP_INFO(this->get_logger(), "Started recording with PID: %d", pid_);
         recording = true;
     }
 
@@ -68,19 +62,18 @@ void RecNode::start_recording() {
 void RecNode::stop_recording() {
     if (recording) {
         if (pid_ > 0) {
-            RCLCPP_INFO(this->get_logger(), "Zatrzymuję proces nagrywania (PID: %d)...", pid_);
+            RCLCPP_INFO(this->get_logger(), "Stopping procces number (PID: %d)...", pid_);
             kill(pid_, SIGTERM);
 
-            // Oczekiwanie na zakończenie procesu
             int status;
             waitpid(pid_, &status, 0);
             if (WIFEXITED(status)) {
-                RCLCPP_INFO(this->get_logger(), "Proces ros2 bag record zakończony poprawnie.");
+                RCLCPP_INFO(this->get_logger(), "Procces ros2 bag record completed correctly.");
             } else {
-                RCLCPP_WARN(this->get_logger(), "Proces ros2 bag record zakończył się w sposób nieoczekiwany.");
+                RCLCPP_WARN(this->get_logger(), "Procces ros2 bag record completed incorrectly.");
             }
         } else {
-            RCLCPP_ERROR(this->get_logger(), "Niepoprawny PID procesu ros2 bag record.");
+            RCLCPP_ERROR(this->get_logger(), "Incorrect PID of the process ros2 bag record.");
         }
         recording = false;
     }
