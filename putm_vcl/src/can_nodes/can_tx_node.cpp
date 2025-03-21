@@ -44,9 +44,15 @@ CanTxNode::CanTxNode()
 
       rtd_subscriber(this->create_subscription<msg::Rtd>("rtd", 1, std::bind(&CanTxNode::rtd_callback, this, _1))),
 
+      lap_timer_subscriber(this->create_subscription<msg::LapTimer>(
+        "lap_timer", 1, std::bind(&CanTxNode::lap_timer_callback, this, _1))),
+
       can_tx_common_timer(this->create_wall_timer(10ms, std::bind(&CanTxNode::can_tx_common_callback, this))) {}
 
 void CanTxNode::rtd_callback(const msg::Rtd msg) { rtd = msg; }
+void CanTxNode::lap_timer_callback(const msg::LapTimer msg){
+  RCLCPP_INFO(this->get_logger(), "laptimer_callback rclcpp info");
+}
 
 template <typename T>
 void CanTxNode::amk_setpoints_callback(const msg::AmkSetpoints msg) {

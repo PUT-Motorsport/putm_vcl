@@ -5,6 +5,8 @@
 #include "putm_vcl_interfaces/msg/amk_actual_values2.hpp"
 #include "putm_vcl_interfaces/msg/amk_setpoints.hpp"
 #include "putm_vcl_interfaces/msg/rtd.hpp"
+#include "putm_vcl_interfaces/msg/lap_timer.hpp"
+
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -35,6 +37,8 @@ class CanTxNode : public rclcpp::Node {
 
   rclcpp::TimerBase::SharedPtr can_tx_common_timer;
 
+  rclcpp::Subscription<putm_vcl_interfaces::msg::LapTimer>::SharedPtr lap_timer_subscriber;
+
   putm_vcl_interfaces::msg::Rtd rtd;
   putm_vcl_interfaces::msg::AmkActualValues2 frontLeftActualValues2;
   putm_vcl_interfaces::msg::AmkActualValues2 frontRightActualValues2;
@@ -43,6 +47,8 @@ class CanTxNode : public rclcpp::Node {
 
 
   void rtd_callback(const putm_vcl_interfaces::msg::Rtd msg);
+  void lap_timer_callback(const putm_vcl_interfaces::msg::LapTimer msg);
+
   void can_tx_common_callback();
 
   template <typename T>
