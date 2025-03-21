@@ -52,6 +52,16 @@ CanTxNode::CanTxNode()
 void CanTxNode::rtd_callback(const msg::Rtd msg) { rtd = msg; }
 void CanTxNode::lap_timer_callback(const msg::LapTimer msg){
   RCLCPP_INFO(this->get_logger(), "laptimer_callback rclcpp info");
+  LapTimer lap_timer;
+  lap_timer.best_lap = msg.best_lap;
+  lap_timer.current_lap = msg.current_lap;
+  lap_timer.delta = msg.delta;
+  lap_timer.lap_counter = msg.lap_counter;
+  try {
+    can_tx_common.transmit(lap_timer);
+  } catch (const std::runtime_error& e) {
+    RCLCPP_ERROR(this->get_logger(), "Failed to transmit Lap Timer: %s", e.what());
+  }
 }
 
 template <typename T>
