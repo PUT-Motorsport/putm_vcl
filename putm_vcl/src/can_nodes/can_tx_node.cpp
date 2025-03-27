@@ -98,10 +98,25 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
   amk_actual_values1.magnetizing_current = msg.magnetizing_current;
   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues1E") == 0){
     inverter_current_rl = msg.torque_current;
+    inverter_on_rl = msg.amk_status.inverter_on;
+    inverter_error_rl = msg.amk_status.error;
   }
-  if(std::strcmp(typeid(T).name(),"24AmkRearLeftActualValues1") <= 0){
-    wheel_speed_fl = msg.actual_velocity;
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
+    wheel_speed_fr = msg.actual_velocity;
+    inverter_on_fr = msg.amk_status.inverter_on;
+    inverter_error_fr = msg.amk_status.error;
   }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues1E") == 0){
+    inverter_ready_rr = msg.amk_status.system_ready;
+    inverter_on_rr = msg.amk_status.inverter_on;
+    inverter_error_rr = msg.amk_status.error;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues1E") == 0){
+    inverter_on_fl = msg.amk_status.inverter_on;
+    inverter_error_fl = msg.amk_status.error;
+  }
+  
+
 
   //  try {
   //    can_tx_common.transmit(amk_actual_values1);
@@ -128,11 +143,21 @@ void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
 void CanTxNode::can_tx_common_callback() {
 
   PcMainData pc_main_data;
-  pc_main_data.vechicle_speed = wheel_speed_fl;
+  pc_main_data.vechicle_speed = wheel_speed_fr;
   pc_main_data.torque_current = inverter_current_rl;
   pc_main_data.rtd = rtd.state;
+  pc_main_data.inverter_ready = inverter_ready_rr;
+  pc_main_data.inverter_error_fr = inverter_error_fr;
+  pc_main_data.inverter_error_fl = inverter_error_fl;
+  pc_main_data.inverter_error_rl = inverter_error_rl;
+  pc_main_data.inverter_error_rr = inverter_error_rr;
+  pc_main_data.inverter_on_fr = inverter_on_fr;
+  pc_main_data.inverter_on_fl = inverter_on_fl;
+  pc_main_data.inverter_on_rr = inverter_on_rr;
+  pc_main_data.inverter_on_rl = inverter_on_rl;
 
-  RCLCPP_INFO(this -> get_logger(), "TX node, pcmaindata typeid.name: %i %i",inverter_current_rl, wheel_speed_fl);
+
+  RCLCPP_INFO(this -> get_logger(), "Wheel speed of fl is:  %i", inverter_on_fl);
   try {
    can_tx_common.transmit(pc_main_data);
   } catch (const std::runtime_error& e) {
