@@ -50,6 +50,7 @@ CanTxNode::CanTxNode()
       can_tx_common_timer(this->create_wall_timer(10ms, std::bind(&CanTxNode::can_tx_common_callback, this))) {}
 
 void CanTxNode::rtd_callback(const msg::Rtd msg) { rtd = msg; }
+
 void CanTxNode::lap_timer_callback(const msg::LapTimer msg){
   RCLCPP_INFO(this->get_logger(), "laptimer_callback rclcpp info");
   LapTimer lap_timer;
