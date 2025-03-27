@@ -39,7 +39,8 @@ class CanTxNode : public rclcpp::Node {
 
   rclcpp::Subscription<putm_vcl_interfaces::msg::LapTimer>::SharedPtr lap_timer_subscriber;
 
-  int16_t inverter_current;
+  int16_t inverter_current_rl;
+  int16_t wheel_speed_fl;
 
   putm_vcl_interfaces::msg::Rtd rtd;
   putm_vcl_interfaces::msg::AmkActualValues2 frontLeftActualValues2;

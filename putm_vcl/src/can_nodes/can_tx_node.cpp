@@ -96,6 +96,12 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
   amk_actual_values1.actual_velocity = msg.actual_velocity;
   amk_actual_values1.torque_current = msg.torque_current;
   amk_actual_values1.magnetizing_current = msg.magnetizing_current;
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues1E") == 0){
+    inverter_current_rl = msg.torque_current;
+  }
+  if(std::strcmp(typeid(T).name(),"24AmkRearLeftActualValues1") <= 0){
+    wheel_speed_fl = msg.actual_velocity;
+  }
 
   //  try {
   //    can_tx_common.transmit(amk_actual_values1);
@@ -122,13 +128,11 @@ void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
 void CanTxNode::can_tx_common_callback() {
 
   PcMainData pc_main_data;
-  pc_main_data.rearLeftInverterTemperature = 0;
-  pc_main_data.rearLeftMotorTemperature =  0;
-  pc_main_data.rearRightInverterTemperature = 0;
-  pc_main_data.rearRightMotorTemperature = 0;
-  pc_main_data.vehicleSpeed = 0;
+  pc_main_data.vechicle_speed = wheel_speed_fl;
+  pc_main_data.torque_current = inverter_current_rl;
   pc_main_data.rtd = rtd.state;
 
+  RCLCPP_INFO(this -> get_logger(), "TX node, pcmaindata typeid.name: %i %i",inverter_current_rl, wheel_speed_fl);
   try {
    can_tx_common.transmit(pc_main_data);
   } catch (const std::runtime_error& e) {
