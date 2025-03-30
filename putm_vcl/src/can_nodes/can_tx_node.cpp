@@ -133,6 +133,23 @@ void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
   amk_actual_values2.error_info = msg.error_info;
   amk_actual_values2.temp_igbt = msg.temp_igbt;
 
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues2E") == 0){
+    inverter_temp_fl = msg.temp_inverter/2;
+    motor_temp_fl = msg.temp_motor/2;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues2E") == 0){
+    inverter_temp_fr = msg.temp_inverter/2;
+    motor_temp_fr = msg.temp_motor/2;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues2E") == 0){
+    inverter_temp_rl = msg.temp_inverter/2;
+    motor_temp_rl = msg.temp_motor/2;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues2E") == 0){
+    inverter_temp_rr = msg.temp_inverter/2;
+    motor_temp_rr = msg.temp_motor/2;
+  }
+
   //  try {
   //   can_tx_common.transmit(amk_actual_values2);
   //  } catch (const std::runtime_error& e) {
@@ -141,7 +158,7 @@ void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
 }
 
 void CanTxNode::can_tx_common_callback() {
-
+  AmkTempData amk_temp_data;
   PcMainData pc_main_data;
   pc_main_data.vechicle_speed = wheel_speed_fr;
   pc_main_data.torque_current = inverter_current_rl;
@@ -156,13 +173,32 @@ void CanTxNode::can_tx_common_callback() {
   pc_main_data.inverter_on_rr = inverter_on_rr;
   pc_main_data.inverter_on_rl = inverter_on_rl;
 
+  amk_temp_data.inverter_temp_fl = inverter_temp_fl;
+  amk_temp_data.inverter_temp_fr = inverter_temp_fr;
+  amk_temp_data.inverter_temp_rl = inverter_temp_rl;
+  amk_temp_data.inverter_temp_rr = inverter_temp_rr;
+  amk_temp_data.motor_temp_fl = motor_temp_fl;
+  amk_temp_data.motor_temp_fr = motor_temp_fr;
+  amk_temp_data.motor_temp_rl = motor_temp_rl;
+  amk_temp_data.motor_temp_rr = motor_temp_rr;
 
-  RCLCPP_INFO(this -> get_logger(), "Wheel speed of fl is:  %i", inverter_on_fl);
+
+  RCLCPP_INFO(this -> get_logger(), "motor speed %i", wheel_speed_fr );
+
+  // RCLCPP_INFO(this -> get_logger(), "inverter fl temperaqture is %i %i %i %i", (motor_temp_rr*2),(motor_temp_rl*2), motor_temp_fl*2, motor_temp_fr*2);
+  
   try {
    can_tx_common.transmit(pc_main_data);
   } catch (const std::runtime_error& e) {
    RCLCPP_ERROR(this->get_logger(), "Failed to transmit common CAN frames: %s", e.what());
  }
+ amk_data_limiter++;
+ if(amk_data_limiter == 0)
+    try {
+      can_tx_common.transmit(amk_temp_data);
+    } catch (const std::runtime_error& e) {
+      RCLCPP_ERROR(this->get_logger(), "Failed to transmit AmkTempData frames: %s", e.what());
+    }
 }
 
 int main(int argc, char** argv) {

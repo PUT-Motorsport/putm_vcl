@@ -57,6 +57,12 @@ class CanTxNode : public rclcpp::Node {
   int8_t inverter_temp_fr;
   int8_t inverter_temp_fl;
 
+  int8_t motor_temp_rr;
+  int8_t motor_temp_rl;
+  int8_t motor_temp_fr;
+  int8_t motor_temp_fl;
+
+  int8_t amk_data_limiter;
 
   putm_vcl_interfaces::msg::Rtd rtd;
   putm_vcl_interfaces::msg::AmkActualValues2 frontLeftActualValues2;
