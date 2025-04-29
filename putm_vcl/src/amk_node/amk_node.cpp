@@ -188,6 +188,9 @@ void AmkNode::amk_state_machine_callback() {
       /* Check some stop conditions*/
       if (!(amk_front_left_actual_values1.amk_status.inverter_on && amk_front_right_actual_values1.amk_status.inverter_on &&
             amk_rear_left_actual_values1.amk_status.inverter_on && amk_rear_right_actual_values1.amk_status.inverter_on)) {
+            // if (!(amk_front_left_actual_values1.amk_status.quit_inverter_on && amk_front_right_actual_values1.amk_status.quit_inverter_on &&
+            // amk_rear_left_actual_values1.amk_status.quit_inverter_on && amk_rear_right_actual_values1.amk_status.quit_inverter_on)) {
+
         state = StateMachine::SWITCH_OFF;
       }
       amk_front_left_setpoints.torque_positive_limit = 2000;
@@ -248,7 +251,8 @@ void AmkNode::amk_state_machine_callback() {
       amk_rear_right_setpoints.torque_positive_limit = 0;
       amk_rear_right_setpoints.torque_negative_limit = 0;
       amk_rear_right_setpoints.target_torque = 0;
-
+      // here you can put rtd.state = false.
+      // rtd.state = false; // 30 april
       RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "Inverters OFF");
       /* Wait until inverter 0 is switched-off.*/
       if (amk_front_left_actual_values1.amk_status.inverter_on || amk_front_right_actual_values1.amk_status.inverter_on ||
