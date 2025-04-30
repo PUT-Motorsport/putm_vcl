@@ -206,13 +206,16 @@ void CanTxNode::can_tx_common_callback() {
   } catch (const std::runtime_error& e) {
    RCLCPP_ERROR(this->get_logger(), "Failed to transmit common CAN frames: %s", e.what());
  }
- amk_data_limiter++;
+ amk_data_limiter--;
  if(amk_data_limiter == 0)
     try {
       can_tx_common.transmit(amk_temp_data);
     } catch (const std::runtime_error& e) {
       RCLCPP_ERROR(this->get_logger(), "Failed to transmit AmkTempData frames: %s", e.what());
     }
+  if(amk_data_limiter ==0){
+    amk_data_limiter = 90;
+  }
 }
 
 int main(int argc, char** argv) {
