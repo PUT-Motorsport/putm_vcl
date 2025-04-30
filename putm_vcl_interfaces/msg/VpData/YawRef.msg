@@ -1,1 +1,3 @@
 float32 yaw_rate_ref
+float32 est_batt_curr
+float32 current_change
