@@ -44,9 +44,26 @@ CanTxNode::CanTxNode()
 
       rtd_subscriber(this->create_subscription<msg::Rtd>("rtd", 1, std::bind(&CanTxNode::rtd_callback, this, _1))),
 
+      lap_timer_subscriber(this->create_subscription<msg::LapTimer>(
+        "lap_timer", 1, std::bind(&CanTxNode::lap_timer_callback, this, _1))),
+
       can_tx_common_timer(this->create_wall_timer(10ms, std::bind(&CanTxNode::can_tx_common_callback, this))) {}
 
 void CanTxNode::rtd_callback(const msg::Rtd msg) { rtd = msg; }
+
+void CanTxNode::lap_timer_callback(const msg::LapTimer msg){
+  // RCLCPP_INFO(this->get_logger(), "laptimer_callback rclcpp info");
+  LapTimer lap_timer;
+  lap_timer.best_lap = msg.best_lap;
+  lap_timer.current_lap = msg.current_lap;
+  lap_timer.delta = msg.delta;
+  lap_timer.lap_counter = msg.lap_counter;
+  try {
+    can_tx_common.transmit(lap_timer);
+  } catch (const std::runtime_error& e) {
+    RCLCPP_ERROR(this->get_logger(), "Failed to transmit Lap Timer: %s", e.what());
+  }
+}
 
 template <typename T>
 void CanTxNode::amk_setpoints_callback(const msg::AmkSetpoints msg) {
@@ -79,6 +96,29 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
   amk_actual_values1.actual_velocity = msg.actual_velocity;
   amk_actual_values1.torque_current = msg.torque_current;
   amk_actual_values1.magnetizing_current = msg.magnetizing_current;
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues1E") == 0){
+    inverter_current_rl = msg.torque_current;
+    // inverter_on_rl = msg.amk_status.inverter_on;
+    inverter_on_rl = msg.amk_status.quit_inverter_on;
+
+    inverter_error_rl = msg.amk_status.error;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
+    wheel_speed_fr = msg.actual_velocity;
+    inverter_on_fr = msg.amk_status.inverter_on;
+    inverter_error_fr = msg.amk_status.error;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues1E") == 0){
+    inverter_ready_rr = msg.amk_status.system_ready;
+    inverter_on_rr = msg.amk_status.inverter_on;
+    inverter_error_rr = msg.amk_status.error;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues1E") == 0){
+    inverter_on_fl = msg.amk_status.inverter_on;
+    inverter_error_fl = msg.amk_status.error;
+  }
+  
+
 
   //  try {
   //    can_tx_common.transmit(amk_actual_values1);
@@ -95,6 +135,26 @@ void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
   amk_actual_values2.error_info = msg.error_info;
   amk_actual_values2.temp_igbt = msg.temp_igbt;
 
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues2E") == 0){
+    inverter_temp_fl = abs(msg.temp_inverter)/10;
+    motor_temp_fl = abs( msg.temp_motor)/10;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues2E") == 0){
+    inverter_temp_fr = abs(msg.temp_inverter)/10;
+    motor_temp_fr = abs(msg.temp_motor)/10;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues2E") == 0){
+    inverter_temp_rl = abs(msg.temp_inverter)/10;
+    motor_temp_rl =abs(msg.temp_motor)/10;
+
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues2E") == 0){
+    inverter_temp_rr = abs(msg.temp_inverter)/10;
+    motor_temp_rr = abs(msg.temp_motor)/10;
+    // RCLCPP_ERROR(this->get_logger(), "wartosci silnika rear right: %i", motor_temp_rr);
+
+  }
+
   //  try {
   //   can_tx_common.transmit(amk_actual_values2);
   //  } catch (const std::runtime_error& e) {
@@ -103,20 +163,59 @@ void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
 }
 
 void CanTxNode::can_tx_common_callback() {
-
+  AmkTempData amk_temp_data;
   PcMainData pc_main_data;
-  pc_main_data.rearLeftInverterTemperature = 0;
-  pc_main_data.rearLeftMotorTemperature =  0;
-  pc_main_data.rearRightInverterTemperature = 0;
-  pc_main_data.rearRightMotorTemperature = 0;
-  pc_main_data.vehicleSpeed = 0;
+  pc_main_data.vechicle_speed = wheel_speed_fr;
+  pc_main_data.torque_current = inverter_current_rl;
   pc_main_data.rtd = rtd.state;
 
+  // pc_main_data.inverter_ready = inverter_ready_rr;
+  // if(inverter_on_fl && inverter_on_fr && inverter_on_rl && inverter_on_rr){
+  //   pc_main_data.inverter_ready = 1;
+  // }
+  // else{
+  //   pc_main_data.inverter_ready = 0;
+  // }
+  pc_main_data.inverter_ready = inverter_on_rl;
+
+  pc_main_data.inverter_error_fr = inverter_error_fr;
+  pc_main_data.inverter_error_fl = inverter_error_fl;
+  pc_main_data.inverter_error_rl = inverter_error_rl;
+  pc_main_data.inverter_error_rr = inverter_error_rr;
+  pc_main_data.inverter_on_fr = inverter_on_fr;
+  pc_main_data.inverter_on_fl = inverter_on_fl;
+  pc_main_data.inverter_on_rr = inverter_on_rr;
+  pc_main_data.inverter_on_rl = inverter_on_rl;
+
+  amk_temp_data.inverter_temp_fl = inverter_temp_fl;
+  amk_temp_data.inverter_temp_fr = inverter_temp_fr;
+  amk_temp_data.inverter_temp_rl = inverter_temp_rl;
+  amk_temp_data.inverter_temp_rr = inverter_temp_rr;
+  amk_temp_data.motor_temp_fl = motor_temp_fl;
+  amk_temp_data.motor_temp_fr = motor_temp_fr;
+  amk_temp_data.motor_temp_rl = motor_temp_rl;
+  amk_temp_data.motor_temp_rr = motor_temp_rr;
+
+
+  // RCLCPP_INFO(this -> get_logger(), "motor speed %i", wheel_speed_fr );
+
+  // RCLCPP_INFO(this -> get_logger(), "inverter fl temperaqture is %i %i %i %i", (motor_temp_rr*2),(motor_temp_rl*2), motor_temp_fl*2, motor_temp_fr*2);
+  
   try {
    can_tx_common.transmit(pc_main_data);
   } catch (const std::runtime_error& e) {
    RCLCPP_ERROR(this->get_logger(), "Failed to transmit common CAN frames: %s", e.what());
  }
+ amk_data_limiter--;
+ if(amk_data_limiter == 0)
+    try {
+      can_tx_common.transmit(amk_temp_data);
+    } catch (const std::runtime_error& e) {
+      RCLCPP_ERROR(this->get_logger(), "Failed to transmit AmkTempData frames: %s", e.what());
+    }
+  if(amk_data_limiter ==0){
+    amk_data_limiter = 90;
+  }
 }
 
 int main(int argc, char** argv) {

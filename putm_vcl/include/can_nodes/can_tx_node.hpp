@@ -5,6 +5,8 @@
 #include "putm_vcl_interfaces/msg/amk_actual_values2.hpp"
 #include "putm_vcl_interfaces/msg/amk_setpoints.hpp"
 #include "putm_vcl_interfaces/msg/rtd.hpp"
+#include "putm_vcl_interfaces/msg/lap_timer.hpp"
+
 
 #include "rclcpp/rclcpp.hpp"
 
@@ -35,6 +37,33 @@ class CanTxNode : public rclcpp::Node {
 
   rclcpp::TimerBase::SharedPtr can_tx_common_timer;
 
+  rclcpp::Subscription<putm_vcl_interfaces::msg::LapTimer>::SharedPtr lap_timer_subscriber;
+
+  int16_t inverter_current_rl;
+  int16_t wheel_speed_fr;
+
+  bool inverter_ready_rr;
+  bool inverter_on_rr;
+  bool inverter_error_rr;
+  bool inverter_on_rl;
+  bool inverter_error_rl;
+  bool inverter_on_fr;
+  bool inverter_error_fr;
+  bool inverter_on_fl;
+  bool inverter_error_fl;
+
+  int8_t inverter_temp_rr;
+  int8_t inverter_temp_rl;
+  int8_t inverter_temp_fr;
+  int8_t inverter_temp_fl;
+
+  int8_t motor_temp_rr;
+  int8_t motor_temp_rl;
+  int8_t motor_temp_fr;
+  int8_t motor_temp_fl;
+
+  int8_t amk_data_limiter;
+
   putm_vcl_interfaces::msg::Rtd rtd;
   putm_vcl_interfaces::msg::AmkActualValues2 frontLeftActualValues2;
   putm_vcl_interfaces::msg::AmkActualValues2 frontRightActualValues2;
@@ -42,7 +71,11 @@ class CanTxNode : public rclcpp::Node {
   putm_vcl_interfaces::msg::AmkActualValues2 rearRightActualValues2;
 
 
+
+
   void rtd_callback(const putm_vcl_interfaces::msg::Rtd msg);
+  void lap_timer_callback(const putm_vcl_interfaces::msg::LapTimer msg);
+
   void can_tx_common_callback();
 
   template <typename T>
