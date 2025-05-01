@@ -193,6 +193,12 @@ void AmkNode::amk_state_machine_callback() {
 
         state = StateMachine::SWITCH_OFF;
       }
+      if (!(amk_front_left_actual_values1.amk_status.quit_inverter_on && amk_front_right_actual_values1.amk_status.quit_inverter_on &&
+            amk_rear_left_actual_values1.amk_status.quit_inverter_on && amk_rear_right_actual_values1.amk_status.quit_inverter_on)) {
+
+        rtd.state = false;
+        state = StateMachine::SWITCH_OFF;
+      }
       amk_front_left_setpoints.torque_positive_limit = 2000;
       amk_front_left_setpoints.torque_negative_limit = -2000;
       amk_front_left_setpoints.target_torque = setpoints.front_left.torque;
