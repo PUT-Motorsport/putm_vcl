@@ -70,6 +70,11 @@ void CanRxNode::can_rx_common_callback() {
       case can_id<FrontboxData>: {
         auto can_frontbox_data = convert<FrontboxData>(frame);
         msg::FrontboxData frontbox_data;
+        // frontbox_data.sc_state = can_frontbox_data.sc_state;
+        frontbox_data.front_left_suspension = can_frontbox_data.front_left_suspension;
+        frontbox_data.front_right_suspension = can_frontbox_data.front_right_suspension;
+        frontbox_data.front_left_hub_temperature = can_frontbox_data.front_left_hub_temperature;
+        frontbox_data.front_right_hub_temperature = can_frontbox_data.front_right_hub_temperature;
         frontbox_data.sense_left_kill = can_frontbox_data.sense_left_kill;
         frontbox_data.sense_right_kill = can_frontbox_data.sense_right_kill;
         frontbox_data.sense_driver_kill = can_frontbox_data.sense_driver_kill;
@@ -78,11 +83,7 @@ void CanRxNode::can_rx_common_callback() {
         frontbox_data.sense_overtravel = can_frontbox_data.sense_overtravel;
         frontbox_data.sense_right_wheel = can_frontbox_data.sense_right_wheel;
         frontbox_data.is_braking = can_frontbox_data.is_braking;
-        // frontbox_data.sc_state = can_frontbox_data.sc_state;
-        frontbox_data.front_left_suspension = can_frontbox_data.front_left_suspension;
-        frontbox_data.front_right_suspension = can_frontbox_data.front_right_suspension;
-        frontbox_data.front_left_hub_temperature = can_frontbox_data.front_left_hub_temperature;
-        frontbox_data.front_right_hub_temperature = can_frontbox_data.front_right_hub_temperature;
+
         frontbox_data_publisher->publish(frontbox_data);
         break;
       }
