@@ -6,8 +6,8 @@ bool sense_bspd
 bool sense_overtravel
 bool sense_right_wheel
 bool is_braking
+bool apps
+uint8 apps_implausibility
 int16 front_left_suspension
 int16 front_right_suspension
-uint8 front_left_hub_temperature
-uint8 front_right_hub_temperature
 
