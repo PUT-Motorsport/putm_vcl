@@ -41,7 +41,8 @@ rosidl_generate_interfaces(
   "msg/BmsHvMain/BmsHvMain.msg"
   "msg/BmsLvMain/BmsLvMain.msg"
   "msg/VpData/YawRef.msg"
-  "msg/LapTimer/LapTimer.msg")
+  "msg/LapTimer/LapTimer.msg"
+  "msg/StateMachine/StateMachine.msg")
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
