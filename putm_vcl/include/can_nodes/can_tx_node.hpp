@@ -86,10 +86,17 @@ class CanTxNode : public rclcpp::Node {
   void amk_front_right_actual_values2_callback(const putm_vcl_interfaces::msg::AmkActualValues2 msg);
   void amk_front_left_actual_values2_callback(const putm_vcl_interfaces::msg::AmkActualValues2 msg);
 
+  void amk_rear_left_actual_values1_callback(const putm_vcl_interfaces::msg::AmkActualValues1 msg);
+  void amk_rear_right_actual_values1_callback(const putm_vcl_interfaces::msg::AmkActualValues1 msg);
+  void amk_front_right_actual_values1_callback(const putm_vcl_interfaces::msg::AmkActualValues1 msg);
+  void amk_front_left_actual_values1_callback(const putm_vcl_interfaces::msg::AmkActualValues1 msg);
+
+
+
   template <typename T>
   void amk_setpoints_callback(const putm_vcl_interfaces::msg::AmkSetpoints msg);
-  template <typename T>
-  void amk_actual_values1_callback(const putm_vcl_interfaces::msg::AmkActualValues1 msg);
+  // template <typename T>
+  // void amk_actual_values1_callback(const putm_vcl_interfaces::msg::AmkActualValues1 msg);
   // template <typename T>
   // void amk_actual_values2_callback(const putm_vcl_interfaces::msg::AmkActualValues2 msg);
 };
