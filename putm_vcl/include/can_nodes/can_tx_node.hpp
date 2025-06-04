@@ -44,6 +44,9 @@ class CanTxNode : public rclcpp::Node {
 
   int16_t inverter_current_rl;
   int16_t wheel_speed_fr;
+  int16_t wheel_speed_fl
+  int16_t wheel_speed_rl;
+  int16_t wheel_speed_rr;
 
   bool inverter_ready_rr;
   bool inverter_on_rr;

@@ -143,18 +143,23 @@ void CanTxNode::amk_rear_right_actual_values1_callback(const msg::AmkActualValue
   inverter_ready_rr = msg.amk_status.system_ready;
   inverter_on_rr = msg.amk_status.inverter_on;
   inverter_error_rr = msg.amk_status.error;
+  wheel_speed_rr = msg.actual_velocity;
 }
 void CanTxNode::amk_rear_left_actual_values1_callback(const msg::AmkActualValues1 msg) {
   AmkRearLeftActualValues1 amk_actual_values1;
     inverter_current_rl = msg.torque_current;
     // inverter_on_rl = msg.amk_status.inverter_on;
-    inverter_on_rl = msg.amk_status.quit_inverter_on;
+    inverter_on_rl = msg.amk_status.inverter_on;
     inverter_error_rl = msg.amk_status.error;
+      wheel_speed_rl = msg.actual_velocity;
+
 }
 void CanTxNode::amk_front_left_actual_values1_callback(const msg::AmkActualValues1 msg) {
   AmkFrontLeftActualValues1 amk_actual_values1;
     inverter_on_fl = msg.amk_status.inverter_on;
     inverter_error_fl = msg.amk_status.error;
+      wheel_speed_fl = msg.actual_velocity;
+
 }
 void CanTxNode::amk_front_right_actual_values1_callback(const msg::AmkActualValues1 msg) {
   AmkFrontRightActualValues1 amk_actual_values1;
@@ -247,7 +252,7 @@ void CanTxNode::amk_front_right_actual_values1_callback(const msg::AmkActualValu
 void CanTxNode::can_tx_common_callback() {
   AmkTempData amk_temp_data;
   PcMainData pc_main_data;
-  pc_main_data.vechicle_speed = wheel_speed_fr;
+  pc_main_data.vechicle_speed = (wheel_speed_fr+wheel_speed_fl+wheel_speed_rl+wheel_speed_rr)/4;
   pc_main_data.torque_current = inverter_current_rl;
   pc_main_data.rtd = rtd.state;
 
