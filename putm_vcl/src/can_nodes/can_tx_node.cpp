@@ -188,7 +188,26 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
 //   amk_actual_values2.temp_inverter = msg.temp_inverter;
 //   amk_actual_values2.error_info = msg.error_info;
 //   amk_actual_values2.temp_igbt = msg.temp_igbt;
- 
+
+//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues2E") == 0){
+//     inverter_temp_fl = abs(msg.temp_inverter)/10;
+//     motor_temp_fl = abs( msg.temp_motor)/10;
+//   }
+//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues2E") == 0){
+//     inverter_temp_fr = abs(msg.temp_inverter)/10;
+//     motor_temp_fr = abs(msg.temp_motor)/10;
+//   }
+//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues2E") == 0){
+//     inverter_temp_rl = abs(msg.temp_inverter)/10;
+//     motor_temp_rl =abs(msg.temp_motor)/10;
+
+//   }
+//  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues2E") == 0){
+//    inverter_temp_rr = abs(msg.temp_inverter)/10;
+//    motor_temp_rr = abs(msg.temp_motor)/10;
+//    // RCLCPP_ERROR(this->get_logger(), "wartosci silnika rear right: %i", motor_temp_rr);
+
+// }
 
   //  try {
   //   can_tx_common.transmit(amk_actual_values2);
