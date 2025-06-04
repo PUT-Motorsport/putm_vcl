@@ -33,6 +33,9 @@ class CanTxNode : public rclcpp::Node {
   rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues2>::SharedPtr amk_rear_left_actual_values2_subscriber;
   rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues2>::SharedPtr amk_rear_right_actual_values2_subscriber;
 
+  // rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues2>::SharedPtr amk_rear_left_actual_values2_subscriber;
+  // rclcpp::Subscription<putm_vcl_interfaces::msg::AmkActualValues2>::SharedPtr amk_rear_right_actual_values2_subscriber;
+
   rclcpp::Subscription<putm_vcl_interfaces::msg::Rtd>::SharedPtr rtd_subscriber;
 
   rclcpp::TimerBase::SharedPtr can_tx_common_timer;
@@ -78,10 +81,15 @@ class CanTxNode : public rclcpp::Node {
 
   void can_tx_common_callback();
 
+  void amk_rear_left_actual_values2_callback(const putm_vcl_interfaces::msg::AmkActualValues2 msg);
+  void amk_rear_right_actual_values2_callback(const putm_vcl_interfaces::msg::AmkActualValues2 msg);
+  void amk_front_right_actual_values2_callback(const putm_vcl_interfaces::msg::AmkActualValues2 msg);
+  void amk_front_left_actual_values2_callback(const putm_vcl_interfaces::msg::AmkActualValues2 msg);
+
   template <typename T>
   void amk_setpoints_callback(const putm_vcl_interfaces::msg::AmkSetpoints msg);
   template <typename T>
   void amk_actual_values1_callback(const putm_vcl_interfaces::msg::AmkActualValues1 msg);
-  template <typename T>
-  void amk_actual_values2_callback(const putm_vcl_interfaces::msg::AmkActualValues2 msg);
+  // template <typename T>
+  // void amk_actual_values2_callback(const putm_vcl_interfaces::msg::AmkActualValues2 msg);
 };
