@@ -15,10 +15,10 @@ CanTxNode::CanTxNode()
       can_tx_amk(can_interface_amk),
       can_tx_common(can_interface_common),
 
-      amk_front_left_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
-          "amk/front/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontLeftSetpoints>, this, _1))),
-      amk_front_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
-          "amk/front/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontRightSetpoints>, this, _1))),
+      // amk_front_left_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
+      //     "amk/front/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontLeftSetpoints>, this, _1))),
+      // amk_front_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
+      //     "amk/front/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontRightSetpoints>, this, _1))),
       amk_rear_left_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
           "amk/rear/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkRearLeftSetpoints>, this, _1))),
       amk_rear_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
@@ -178,21 +178,21 @@ void CanTxNode::can_tx_common_callback() {
   // }
   pc_main_data.inverter_ready = inverter_on_rl;
 
-  pc_main_data.inverter_error_fr = inverter_error_fr;
-  pc_main_data.inverter_error_fl = inverter_error_fl;
+  // pc_main_data.inverter_error_fr = inverter_error_fr;
+  // pc_main_data.inverter_error_fl = inverter_error_fl;
   pc_main_data.inverter_error_rl = inverter_error_rl;
   pc_main_data.inverter_error_rr = inverter_error_rr;
-  pc_main_data.inverter_on_fr = inverter_on_fr;
-  pc_main_data.inverter_on_fl = inverter_on_fl;
+  // pc_main_data.inverter_on_fr = inverter_on_fr;
+  // pc_main_data.inverter_on_fl = inverter_on_fl;
   pc_main_data.inverter_on_rr = inverter_on_rr;
   pc_main_data.inverter_on_rl = inverter_on_rl;
 
-  amk_temp_data.inverter_temp_fl = inverter_temp_fl;
-  amk_temp_data.inverter_temp_fr = inverter_temp_fr;
+  // amk_temp_data.inverter_temp_fl = inverter_temp_fl;
+  // amk_temp_data.inverter_temp_fr = inverter_temp_fr;
   amk_temp_data.inverter_temp_rl = inverter_temp_rl;
   amk_temp_data.inverter_temp_rr = inverter_temp_rr;
-  amk_temp_data.motor_temp_fl = motor_temp_fl;
-  amk_temp_data.motor_temp_fr = motor_temp_fr;
+  // amk_temp_data.motor_temp_fl = motor_temp_fl;
+  // amk_temp_data.motor_temp_fr = motor_temp_fr;
   amk_temp_data.motor_temp_rl = motor_temp_rl;
   amk_temp_data.motor_temp_rr = motor_temp_rr;
 
