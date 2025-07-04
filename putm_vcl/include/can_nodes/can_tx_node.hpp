@@ -58,15 +58,15 @@ class CanTxNode : public rclcpp::Node {
   bool inverter_on_fl;
   bool inverter_error_fl;
 
-  int8_t inverter_temp_rr;
-  int8_t inverter_temp_rl;
-  int8_t inverter_temp_fr;
-  int8_t inverter_temp_fl;
+  int8_t inverter_temp_rr=0;
+  int8_t inverter_temp_rl=0;
+  int8_t inverter_temp_fr=0;
+  int8_t inverter_temp_fl=0;
 
-  int8_t motor_temp_rr;
-  int8_t motor_temp_rl;
-  int8_t motor_temp_fr;
-  int8_t motor_temp_fl;
+  int8_t motor_temp_rr=0;
+  int8_t motor_temp_rl=0;
+  int8_t motor_temp_fr=0;
+  int8_t motor_temp_fl=0;
 
   int8_t amk_data_limiter;
 

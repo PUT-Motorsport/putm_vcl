@@ -12,8 +12,8 @@ AmkNode::AmkNode()
     : Node("amk_node"),
       state(StateMachine::UNDEFINED),
       state_machine_publisher(this->create_publisher<msg::StateMachine>("state_machine", 1)),
-      amk_front_left_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/front/left/setpoints", 1)),
-      amk_front_right_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/front/right/setpoints", 1)),
+      // amk_front_left_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/front/left/setpoints", 1)),
+      // amk_front_right_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/front/right/setpoints", 1)),
       amk_rear_left_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/rear/left/setpoints", 1)),
       amk_rear_right_setpoints_publisher(this->create_publisher<msg::AmkSetpoints>("amk/rear/right/setpoints", 1)),
       // clang-format off
@@ -73,8 +73,8 @@ std::function<void(const msg::AmkActualValues1::SharedPtr msg)> AmkNode::amk_act
 void AmkNode::setpoints_watchdog_callback()
 {
   RCLCPP_WARN(this->get_logger(), "Setpoints watchdog triggered");
-  setpoints.front_left.torque = 0;
-  setpoints.front_right.torque = 0;
+  // setpoints.front_left.torque = 0;
+  // setpoints.front_right.torque = 0;
   setpoints.rear_left.torque = 0;
   setpoints.rear_right.torque = 0;
   setpoints_watchdog->cancel();
@@ -90,8 +90,8 @@ void AmkNode::amk_state_machine_watchdog_callback()
 
 void AmkNode::amk_setpoints_callback()
 {
-  amk_front_left_setpoints_publisher->publish(amk_front_left_setpoints);
-  amk_front_right_setpoints_publisher->publish(amk_front_right_setpoints);
+  // amk_front_left_setpoints_publisher->publish(amk_front_left_setpoints);
+  // amk_front_right_setpoints_publisher->publish(amk_front_right_setpoints);
   amk_rear_left_setpoints_publisher->publish(amk_rear_left_setpoints);
   amk_rear_right_setpoints_publisher->publish(amk_rear_right_setpoints);
 }
@@ -103,48 +103,61 @@ bool AmkNode::check_rtd()
 
 bool AmkNode::check_dc_on()
 {
-  return (amk_front_left_actual_values1.amk_status.quit_dc_on && amk_front_right_actual_values1.amk_status.quit_dc_on && amk_rear_left_actual_values1.amk_status.quit_dc_on && amk_rear_right_actual_values1.amk_status.quit_dc_on) == true;
+  // return (amk_front_left_actual_values1.amk_status.quit_dc_on && amk_front_right_actual_values1.amk_status.quit_dc_on && amk_rear_left_actual_values1.amk_status.quit_dc_on && amk_rear_right_actual_values1.amk_status.quit_dc_on) == true;
+  return (amk_rear_left_actual_values1.amk_status.quit_dc_on && amk_rear_right_actual_values1.amk_status.quit_dc_on) == true;
 }
 
 bool AmkNode::check_inv_errors()
 {
-  return (amk_front_left_actual_values1.amk_status.error || amk_front_right_actual_values1.amk_status.error || amk_rear_left_actual_values1.amk_status.error ||
-          amk_rear_right_actual_values1.amk_status.error) == true;
+  // return (amk_front_left_actual_values1.amk_status.error || amk_front_right_actual_values1.amk_status.error || amk_rear_left_actual_values1.amk_status.error ||
+  //         amk_rear_right_actual_values1.amk_status.error) == true;
+  return (amk_rear_left_actual_values1.amk_status.error || amk_rear_right_actual_values1.amk_status.error) == true;
 }
 
 bool AmkNode::check_quit_inverter_on()
 {
-  return (!amk_front_left_actual_values1.amk_status.quit_inverter_on || !amk_front_right_actual_values1.amk_status.quit_inverter_on ||
-          !amk_rear_left_actual_values1.amk_status.quit_inverter_on || !amk_rear_right_actual_values1.amk_status.quit_inverter_on) == false;
+  // return (!amk_front_left_actual_values1.amk_status.quit_inverter_on || !amk_front_right_actual_values1.amk_status.quit_inverter_on ||
+  //         !amk_rear_left_actual_values1.amk_status.quit_inverter_on || !amk_rear_right_actual_values1.amk_status.quit_inverter_on) == false;
+  return (!amk_rear_left_actual_values1.amk_status.quit_inverter_on || !amk_rear_right_actual_values1.amk_status.quit_inverter_on) == false;
 }
 
 bool AmkNode::system_ready()
 {
-  return (amk_front_left_actual_values1.amk_status.system_ready && amk_front_right_actual_values1.amk_status.system_ready &&
-          amk_rear_left_actual_values1.amk_status.system_ready && amk_rear_left_actual_values1.amk_status.system_ready) == true;
+  // return (amk_front_left_actual_values1.amk_status.system_ready && amk_front_right_actual_values1.amk_status.system_ready &&
+  //         amk_rear_left_actual_values1.amk_status.system_ready && amk_rear_left_actual_values1.amk_status.system_ready) == true;
+  return (amk_rear_left_actual_values1.amk_status.system_ready && amk_rear_left_actual_values1.amk_status.system_ready) == true;
 }
 bool AmkNode::check_inv_on()
 {
-  return (amk_front_left_actual_values1.amk_status.quit_inverter_on && amk_front_right_actual_values1.amk_status.quit_inverter_on &&
-          amk_rear_left_actual_values1.amk_status.quit_inverter_on && amk_rear_right_actual_values1.amk_status.quit_inverter_on &&
-         amk_front_left_actual_values1.amk_status.quit_dc_on && amk_front_right_actual_values1.amk_status.quit_dc_on &&
-         amk_rear_left_actual_values1.amk_status.quit_dc_on && amk_rear_right_actual_values1.amk_status.quit_dc_on&&
-         amk_front_left_actual_values1.amk_status.inverter_on && amk_front_right_actual_values1.amk_status.inverter_on &&
+  // return (amk_front_left_actual_values1.amk_status.quit_inverter_on && amk_front_right_actual_values1.amk_status.quit_inverter_on &&
+  //         amk_rear_left_actual_values1.amk_status.quit_inverter_on && amk_rear_right_actual_values1.amk_status.quit_inverter_on &&
+  //        amk_front_left_actual_values1.amk_status.quit_dc_on && amk_front_right_actual_values1.amk_status.quit_dc_on &&
+  //        amk_rear_left_actual_values1.amk_status.quit_dc_on && amk_rear_right_actual_values1.amk_status.quit_dc_on&&
+  //        amk_front_left_actual_values1.amk_status.inverter_on && amk_front_right_actual_values1.amk_status.inverter_on &&
+  //         amk_rear_left_actual_values1.amk_status.inverter_on && amk_rear_right_actual_values1.amk_status.inverter_on &&
+  //        amk_front_left_actual_values1.amk_status.dc_on && amk_front_right_actual_values1.amk_status.dc_on &&
+  //        amk_rear_left_actual_values1.amk_status.dc_on && amk_rear_right_actual_values1.amk_status.dc_on) == true;
+
+  return (amk_rear_left_actual_values1.amk_status.quit_inverter_on && amk_rear_right_actual_values1.amk_status.quit_inverter_on &&
+          amk_rear_left_actual_values1.amk_status.quit_dc_on && amk_rear_right_actual_values1.amk_status.quit_dc_on &&
           amk_rear_left_actual_values1.amk_status.inverter_on && amk_rear_right_actual_values1.amk_status.inverter_on &&
-         amk_front_left_actual_values1.amk_status.dc_on && amk_front_right_actual_values1.amk_status.dc_on &&
-         amk_rear_left_actual_values1.amk_status.dc_on && amk_rear_right_actual_values1.amk_status.dc_on) == true;
+          amk_rear_left_actual_values1.amk_status.dc_on && amk_rear_right_actual_values1.amk_status.dc_on) == true;
 }
 
 bool AmkNode::all_inv_on()
 {
-  return (amk_front_left_actual_values1.amk_status.quit_inverter_on || amk_front_right_actual_values1.amk_status.quit_inverter_on ||
-          amk_rear_left_actual_values1.amk_status.quit_inverter_on || amk_rear_right_actual_values1.amk_status.quit_inverter_on ||
-         amk_front_left_actual_values1.amk_status.quit_dc_on || amk_front_right_actual_values1.amk_status.quit_dc_on || 
-         amk_rear_left_actual_values1.amk_status.quit_dc_on || amk_rear_right_actual_values1.amk_status.quit_dc_on||
-         amk_front_left_actual_values1.amk_status.inverter_on || amk_front_right_actual_values1.amk_status.inverter_on ||
+  // return (amk_front_left_actual_values1.amk_status.quit_inverter_on || amk_front_right_actual_values1.amk_status.quit_inverter_on ||
+  //         amk_rear_left_actual_values1.amk_status.quit_inverter_on || amk_rear_right_actual_values1.amk_status.quit_inverter_on ||
+  //         amk_front_left_actual_values1.amk_status.quit_dc_on || amk_front_right_actual_values1.amk_status.quit_dc_on || 
+  //         amk_rear_left_actual_values1.amk_status.quit_dc_on || amk_rear_right_actual_values1.amk_status.quit_dc_on||
+  //         amk_front_left_actual_values1.amk_status.inverter_on || amk_front_right_actual_values1.amk_status.inverter_on ||
+  //         amk_rear_left_actual_values1.amk_status.inverter_on || amk_rear_right_actual_values1.amk_status.inverter_on ||
+  //         amk_front_left_actual_values1.amk_status.dc_on || amk_front_right_actual_values1.amk_status.dc_on || 
+  //         amk_rear_left_actual_values1.amk_status.dc_on || amk_rear_right_actual_values1.amk_status.dc_on || rtd.state) == false;
+  return (amk_rear_left_actual_values1.amk_status.quit_inverter_on || amk_rear_right_actual_values1.amk_status.quit_inverter_on ||
+          amk_rear_left_actual_values1.amk_status.quit_dc_on || amk_rear_right_actual_values1.amk_status.quit_dc_on||
           amk_rear_left_actual_values1.amk_status.inverter_on || amk_rear_right_actual_values1.amk_status.inverter_on ||
-         amk_front_left_actual_values1.amk_status.dc_on || amk_front_right_actual_values1.amk_status.dc_on || 
-         amk_rear_left_actual_values1.amk_status.dc_on || amk_rear_right_actual_values1.amk_status.dc_on || rtd.state) == false;
+          amk_rear_left_actual_values1.amk_status.dc_on || amk_rear_right_actual_values1.amk_status.dc_on || rtd.state) == false;
 }
 
 void AmkNode::amk_state_machine_callback()
@@ -201,6 +214,7 @@ void AmkNode::on_enter(StateMachine state)
 
   case StateMachine::ERROR_RESET:
     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "[ERROR_RESET] Entered state");
+    //FIXME: to chyba można zostawić?
     amk_front_left_setpoints.amk_control.error_reset = true;
     amk_front_right_setpoints.amk_control.error_reset = true;
     amk_rear_left_setpoints.amk_control.error_reset = true;
@@ -222,15 +236,15 @@ void AmkNode::on_update(StateMachine state)
     break;
 
   case StateMachine::DC_STARTUP:
-    amk_front_left_setpoints.amk_control.dc_on = true;
-    amk_front_left_setpoints.torque_positive_limit = 0;
-    amk_front_left_setpoints.torque_negative_limit = 0;
-    amk_front_left_setpoints.target_torque = 0;
+    // amk_front_left_setpoints.amk_control.dc_on = true;
+    // amk_front_left_setpoints.torque_positive_limit = 0;
+    // amk_front_left_setpoints.torque_negative_limit = 0;
+    // amk_front_left_setpoints.target_torque = 0;
 
-    amk_front_right_setpoints.amk_control.dc_on = true;
-    amk_front_right_setpoints.torque_positive_limit = 0;
-    amk_front_right_setpoints.torque_negative_limit = 0;
-    amk_front_right_setpoints.target_torque = 0;
+    // amk_front_right_setpoints.amk_control.dc_on = true;
+    // amk_front_right_setpoints.torque_positive_limit = 0;
+    // amk_front_right_setpoints.torque_negative_limit = 0;
+    // amk_front_right_setpoints.target_torque = 0;
 
     amk_rear_left_setpoints.amk_control.dc_on = true;
     amk_rear_left_setpoints.torque_positive_limit = 0;
@@ -246,11 +260,11 @@ void AmkNode::on_update(StateMachine state)
     break;
 
   case StateMachine::INVERTER_STARTUP:
-    amk_front_left_setpoints.amk_control.inverter_on = true;
-    amk_front_left_setpoints.amk_control.enable = true;
+    // amk_front_left_setpoints.amk_control.inverter_on = true;
+    // amk_front_left_setpoints.amk_control.enable = true;
 
-    amk_front_right_setpoints.amk_control.inverter_on = true;
-    amk_front_right_setpoints.amk_control.enable = true;
+    // amk_front_right_setpoints.amk_control.inverter_on = true;
+    // amk_front_right_setpoints.amk_control.enable = true;
 
     amk_rear_left_setpoints.amk_control.inverter_on = true;
     amk_rear_left_setpoints.amk_control.enable = true;
@@ -262,8 +276,8 @@ void AmkNode::on_update(StateMachine state)
     break;
 
   case StateMachine::STARTUP:
-    amk_front_left_setpoints.amk_control.enable = true;
-    amk_front_right_setpoints.amk_control.enable = true;
+    // amk_front_left_setpoints.amk_control.enable = true;
+    // amk_front_right_setpoints.amk_control.enable = true;
     amk_rear_left_setpoints.amk_control.enable = true;
     amk_rear_right_setpoints.amk_control.enable = true;
     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "[STARTUP] Waiting for bquit inverter on");
@@ -271,13 +285,13 @@ void AmkNode::on_update(StateMachine state)
     break;
 
   case StateMachine::TORQUE_CONTROL:
-    amk_front_left_setpoints.torque_positive_limit = 2000;
-    amk_front_left_setpoints.torque_negative_limit = -2000;
-    amk_front_left_setpoints.target_torque = setpoints.front_left.torque;
+    // amk_front_left_setpoints.torque_positive_limit = 2000;
+    // amk_front_left_setpoints.torque_negative_limit = -2000;
+    // amk_front_left_setpoints.target_torque = setpoints.front_left.torque;
 
-    amk_front_right_setpoints.torque_positive_limit = 2000;
-    amk_front_right_setpoints.torque_negative_limit = -2000;
-    amk_front_right_setpoints.target_torque = setpoints.front_right.torque;
+    // amk_front_right_setpoints.torque_positive_limit = 2000;
+    // amk_front_right_setpoints.torque_negative_limit = -2000;
+    // amk_front_right_setpoints.target_torque = setpoints.front_right.torque;
 
     amk_rear_left_setpoints.torque_positive_limit = 2000;
     amk_rear_left_setpoints.torque_negative_limit = -2000;
@@ -286,29 +300,30 @@ void AmkNode::on_update(StateMachine state)
     amk_rear_right_setpoints.torque_positive_limit = 2000;
     amk_rear_right_setpoints.torque_negative_limit = -2000;
     amk_rear_right_setpoints.target_torque = setpoints.rear_right.torque;
-    if (amk_front_left_actual_values1.actual_velocity > 20000 || amk_front_right_actual_values1.actual_velocity > 20000 || amk_rear_left_actual_values1.actual_velocity > 20000 || amk_rear_right_actual_values1.actual_velocity > 20000)
+    // if (amk_front_left_actual_values1.actual_velocity > 20000 || amk_front_right_actual_values1.actual_velocity > 20000 || amk_rear_left_actual_values1.actual_velocity > 20000 || amk_rear_right_actual_values1.actual_velocity > 20000)
+    if (amk_rear_left_actual_values1.actual_velocity > 20000 || amk_rear_right_actual_values1.actual_velocity > 20000)
     {
-      amk_front_left_setpoints.target_torque = 0;
-      amk_front_right_setpoints.target_torque = 0;
+      // amk_front_left_setpoints.target_torque = 0;
+      // amk_front_right_setpoints.target_torque = 0;
       amk_rear_left_setpoints.target_torque = 0;
       amk_rear_right_setpoints.target_torque = 0;
     }
     break;
 
   case StateMachine::SWITCH_OFF:
-    amk_front_left_setpoints.amk_control.inverter_on = false;
-    amk_front_left_setpoints.amk_control.enable = false;
-    amk_front_left_setpoints.amk_control.dc_on = false;
-    amk_front_left_setpoints.torque_positive_limit = 0;
-    amk_front_left_setpoints.torque_negative_limit = 0;
-    amk_front_left_setpoints.target_torque = 0;
+    // amk_front_left_setpoints.amk_control.inverter_on = false;
+    // amk_front_left_setpoints.amk_control.enable = false;
+    // amk_front_left_setpoints.amk_control.dc_on = false;
+    // amk_front_left_setpoints.torque_positive_limit = 0;
+    // amk_front_left_setpoints.torque_negative_limit = 0;
+    // amk_front_left_setpoints.target_torque = 0;
 
-    amk_front_right_setpoints.amk_control.inverter_on = false;
-    amk_front_right_setpoints.amk_control.enable = false;
-    amk_front_right_setpoints.amk_control.dc_on = false;
-    amk_front_right_setpoints.torque_positive_limit = 0;
-    amk_front_right_setpoints.torque_negative_limit = 0;
-    amk_front_right_setpoints.target_torque = 0;
+    // amk_front_right_setpoints.amk_control.inverter_on = false;
+    // amk_front_right_setpoints.amk_control.enable = false;
+    // amk_front_right_setpoints.amk_control.dc_on = false;
+    // amk_front_right_setpoints.torque_positive_limit = 0;
+    // amk_front_right_setpoints.torque_negative_limit = 0;
+    // amk_front_right_setpoints.target_torque = 0;
 
     amk_rear_left_setpoints.amk_control.inverter_on = false;
     amk_rear_left_setpoints.amk_control.enable = false;
@@ -384,8 +399,8 @@ void AmkNode::on_exit(StateMachine state)
 
   case StateMachine::ERROR_RESET:
     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "[ERROR_RESET] Error recovered");
-    amk_front_left_setpoints.amk_control.error_reset = false;
-    amk_front_right_setpoints.amk_control.error_reset = false;
+    // amk_front_left_setpoints.amk_control.error_reset = false;
+    // amk_front_right_setpoints.amk_control.error_reset = false;
     amk_rear_left_setpoints.amk_control.error_reset = false;
     amk_rear_right_setpoints.amk_control.error_reset = false;
     break;
