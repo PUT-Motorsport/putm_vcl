@@ -100,23 +100,24 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
     inverter_current_rl = msg.torque_current;
     // inverter_on_rl = msg.amk_status.inverter_on;
     inverter_on_rl = msg.amk_status.quit_inverter_on;
-
     inverter_error_rl = msg.amk_status.error;
+    wheel_speed_rl = msg.actual_velocity;
   }
-  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
-    wheel_speed_fr = msg.actual_velocity;
-    inverter_on_fr = msg.amk_status.inverter_on;
-    inverter_error_fr = msg.amk_status.error;
-  }
+  // if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
+  //   wheel_speed_fr = msg.actual_velocity;
+  //   inverter_on_fr = msg.amk_status.inverter_on;
+  //   inverter_error_fr = msg.amk_status.error;
+  // }
   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues1E") == 0){
     inverter_ready_rr = msg.amk_status.system_ready;
     inverter_on_rr = msg.amk_status.inverter_on;
     inverter_error_rr = msg.amk_status.error;
+    wheel_speed_rr = msg.actual_velocity;
   }
-  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues1E") == 0){
-    inverter_on_fl = msg.amk_status.inverter_on;
-    inverter_error_fl = msg.amk_status.error;
-  }
+  // if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues1E") == 0){
+  //   inverter_on_fl = msg.amk_status.inverter_on;
+  //   inverter_error_fl = msg.amk_status.error;
+  // }
   
 
 
@@ -146,6 +147,7 @@ void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues2E") == 0){
     inverter_temp_rl = abs(msg.temp_inverter)/10;
     motor_temp_rl =abs(msg.temp_motor)/10;
+    
 
   }
   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues2E") == 0){
@@ -176,8 +178,9 @@ void CanTxNode::can_tx_common_callback() {
   // else{
   //   pc_main_data.inverter_ready = 0;
   // }
-  pc_main_data.inverter_ready = inverter_on_rl;
-
+  pc_main_data.inverter_ready = inverter_on_rl & inverter_on_rr;
+  pc_main_data.vehicle_speed = (wheel_speed_rr + wheel_speed_rl) / 2;
+  
   // pc_main_data.inverter_error_fr = inverter_error_fr;
   // pc_main_data.inverter_error_fl = inverter_error_fl;
   pc_main_data.inverter_error_rl = inverter_error_rl;
@@ -206,16 +209,14 @@ void CanTxNode::can_tx_common_callback() {
   } catch (const std::runtime_error& e) {
    RCLCPP_ERROR(this->get_logger(), "Failed to transmit common CAN frames: %s", e.what());
  }
- amk_data_limiter--;
- if(amk_data_limiter == 0)
+ amk_data_limiter_counter--;
+ if(amk_data_limiter_counter == 0)
+     amk_data_limiter_counter = amk_data_limiter;
     try {
       can_tx_common.transmit(amk_temp_data);
     } catch (const std::runtime_error& e) {
       RCLCPP_ERROR(this->get_logger(), "Failed to transmit AmkTempData frames: %s", e.what());
     }
-  if(amk_data_limiter ==0){
-    amk_data_limiter = 90;
-  }
 }
 
 int main(int argc, char** argv) {

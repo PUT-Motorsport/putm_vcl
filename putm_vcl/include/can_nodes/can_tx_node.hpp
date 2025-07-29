@@ -39,30 +39,34 @@ class CanTxNode : public rclcpp::Node {
 
   rclcpp::Subscription<putm_vcl_interfaces::msg::LapTimer>::SharedPtr lap_timer_subscriber;
 
-  int16_t inverter_current_rl;
-  int16_t wheel_speed_fr;
+  int16_t avg_inverter_current = 0;
+  int16_t avg_wheel_speed = 0;
 
-  bool inverter_ready_rr;
-  bool inverter_on_rr;
-  bool inverter_error_rr;
-  bool inverter_on_rl;
-  bool inverter_error_rl;
-  bool inverter_on_fr;
-  bool inverter_error_fr;
-  bool inverter_on_fl;
-  bool inverter_error_fl;
+  int16_t wheel_speed_rl = 0;
+  int16_t wheel_speed_rr = 0;
 
-  int8_t inverter_temp_rr;
-  int8_t inverter_temp_rl;
-  int8_t inverter_temp_fr;
-  int8_t inverter_temp_fl;
+  bool inverter_ready_rr = 0;
+  bool inverter_on_rr = 0;
+  bool inverter_error_rr = 0;
+  bool inverter_on_rl = 0;
+  // bool inverter_error_rl = 0;
+  // bool inverter_on_fr = 0;
+  // bool inverter_error_fr = 0;
+  // bool inverter_on_fl = 0;
+  // bool inverter_error_fl = 0;
 
-  int8_t motor_temp_rr;
-  int8_t motor_temp_rl;
-  int8_t motor_temp_fr;
-  int8_t motor_temp_fl;
+  int8_t inverter_temp_rr = 0;
+  int8_t inverter_temp_rl = 0;
+  // int8_t inverter_temp_fr = 0;
+  // int8_t inverter_temp_fl = 0;
 
-  int8_t amk_data_limiter;
+  int8_t motor_temp_rr = 0;
+  int8_t motor_temp_rl = 0;
+  // int8_t motor_temp_fr = 0;
+  // int8_t motor_temp_fl = 0;
+
+  const uint8_t amk_data_limiter = 90; // amk_data_limiter is a const value that limits how often inverters info is sent on CAN frame. A value "90" means 10ms * 90 = 900ms.
+  uint8_t amk_data_limiter_counter = 0; // amk_data_limiter_counter is a variable that counts down from "amkdatalimiter" value to 0, for every call of can_tx_common_callback. When amkdatalimiter reaches "0" only then will the AMKTEMP Frame be sent to CAN1.
 
   putm_vcl_interfaces::msg::Rtd rtd;
   putm_vcl_interfaces::msg::AmkActualValues2 frontLeftActualValues2;
