@@ -24,19 +24,19 @@ CanTxNode::CanTxNode()
       amk_rear_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
           "amk/rear/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkRearRightSetpoints>, this, _1))),
 
-      amk_front_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
-           "amk/front/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontLeftActualValues1>, this, _1))),
-      amk_front_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
-           "amk/front/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontRightActualValues1>, this, _1))),
+      // amk_front_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
+      //      "amk/front/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontLeftActualValues1>, this, _1))),
+      // amk_front_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
+      //      "amk/front/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontRightActualValues1>, this, _1))),
       amk_rear_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
            "amk/rear/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkRearLeftActualValues1>, this, _1))),
       amk_rear_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
            "amk/rear/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkRearRightActualValues1>, this, _1))),
 
-      amk_front_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-           "amk/front/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontLeftActualValues2>, this, _1))),
-       amk_front_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-           "amk/front/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontRightActualValues2>, this, _1))),
+      // amk_front_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
+      //      "amk/front/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontLeftActualValues2>, this, _1))),
+      //  amk_front_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
+      //      "amk/front/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontRightActualValues2>, this, _1))),
        amk_rear_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
            "amk/rear/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkRearLeftActualValues2>, this, _1))),
        amk_rear_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
@@ -104,9 +104,11 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
     wheel_speed_rl = msg.actual_velocity;
   }
   // if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
-  //   wheel_speed_fr = msg.actual_velocity;
-  //   inverter_on_fr = msg.amk_status.inverter_on;
-  //   inverter_error_fr = msg.amk_status.error;
+    torque_current_fr = msg.torque_current;
+    inverter_on_fr = msg.amk_status.inverter_on;
+    inverter_error_fr = msg.amk_status.error;
+    inverter_ready_fr = msg.amk_status.system_ready;
+    wheel_speed_fr = msg.actual_velocity;
   // }
   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues1E") == 0){
     inverter_ready_rr = msg.amk_status.system_ready;
@@ -116,8 +118,11 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
     torque_current_rr = msg.torque_current;
   }
   // if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues1E") == 0){
-  //   inverter_on_fl = msg.amk_status.inverter_on;
-  //   inverter_error_fl = msg.amk_status.error;
+    torque_current_fl = msg.torque_current;
+    inverter_on_fl = msg.amk_status.inverter_on;
+    inverter_error_fl = msg.amk_status.error;
+    inverter_ready_fl = msg.amk_status.system_ready;
+    wheel_speed_fl = msg.actual_velocity;
   // }
   
 
@@ -177,7 +182,7 @@ void CanTxNode::can_tx_common_callback() {
   // else{
   //   pc_main_data.inverter_ready = 0;
   // }
-  pc_main_data.inverter_ready = inverter_on_rl & inverter_on_rr;
+  pc_main_data.inverter_ready = inverter_on_rl & inverter_on_rr; 
   pc_main_data.vehicle_speed = (wheel_speed_rr + wheel_speed_rl) /2;
   pc_main_data.torque_current = (torque_current_rr + torque_current_rl) /2;
   pc_main_data.inverter_error_fr = 0;//inverter_error_fr;

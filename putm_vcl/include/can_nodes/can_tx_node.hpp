@@ -42,24 +42,34 @@ class CanTxNode : public rclcpp::Node {
   int16_t avg_torque_current = 0;
   int16_t torque_current_rr = 0;
   int16_t torque_current_rl = 0;
-
+  //
+  int16_t torque_current_fr = 0;
+  int16_t torque_current_fl = 0;
 
   int16_t avg_wheel_speed = 0;
   int16_t wheel_speed_rl = 0;
   int16_t wheel_speed_rr = 0;
+  //_________
+  int16_t wheel_speed_fr = 0;
+  int16_t wheel_speed_fl = 0;
 
   bool inverter_ready_rr = 0;
   bool inverter_ready_rl = 0;
+  //_______
+  bool inverter_ready_fr = 0;
+  bool inverter_ready_fl = 0;
 
   bool inverter_on_rr = 0;
-  bool inverter_error_rr = 0;
   bool inverter_on_rl = 0;
-  bool inverter_error_rl = 0;
+//___________
+  bool inverter_on_fr = 0;
+  bool inverter_on_fl = 0;
 
-  // bool inverter_on_fr = 0;
-  // bool inverter_error_fr = 0;
-  // bool inverter_on_fl = 0;
-  // bool inverter_error_fl = 0;
+  bool inverter_error_rr = 0;
+  bool inverter_error_rl = 0;
+//_________
+  bool inverter_error_fr = 0;
+  bool inverter_error_fl = 0;
 
   int8_t inverter_temp_rr = 0;
   int8_t inverter_temp_rl = 0;
