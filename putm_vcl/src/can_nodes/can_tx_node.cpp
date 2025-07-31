@@ -104,11 +104,11 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
     wheel_speed_rl = msg.actual_velocity;
   }
   // if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
-    torque_current_fr = msg.torque_current;
-    inverter_on_fr = msg.amk_status.inverter_on;
-    inverter_error_fr = msg.amk_status.error;
-    inverter_ready_fr = msg.amk_status.system_ready;
-    wheel_speed_fr = msg.actual_velocity;
+    // torque_current_fr = msg.torque_current;
+    // inverter_on_fr = msg.amk_status.inverter_on;
+    // inverter_error_fr = msg.amk_status.error;
+    // inverter_ready_fr = msg.amk_status.system_ready;
+    // wheel_speed_fr = msg.actual_velocity;
   // }
   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues1E") == 0){
     inverter_ready_rr = msg.amk_status.system_ready;
@@ -118,11 +118,11 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
     torque_current_rr = msg.torque_current;
   }
   // if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues1E") == 0){
-    torque_current_fl = msg.torque_current;
-    inverter_on_fl = msg.amk_status.inverter_on;
-    inverter_error_fl = msg.amk_status.error;
-    inverter_ready_fl = msg.amk_status.system_ready;
-    wheel_speed_fl = msg.actual_velocity;
+    // torque_current_fl = msg.torque_current;
+    // inverter_on_fl = msg.amk_status.inverter_on;
+    // inverter_error_fl = msg.amk_status.error;
+    // inverter_ready_fl = msg.amk_status.system_ready;
+    // wheel_speed_fl = msg.actual_velocity;
   // }
   
 
