@@ -182,7 +182,7 @@ void CanTxNode::can_tx_common_callback() {
   // else{
   //   pc_main_data.inverter_ready = 0;
   // }
-  pc_main_data.inverter_ready = inverter_ready_rr & inverter_ready_rl; 
+  pc_main_data.inverter_ready = inverter_on_rr & inverter_on_rl; // inverter_on_rr & inverter_on_rl & inverter_on_fl & inverter_on_fr;
   pc_main_data.vehicle_speed = (wheel_speed_rr + wheel_speed_rl) /2;
   pc_main_data.torque_current = (torque_current_rr + torque_current_rl) /2;
   pc_main_data.inverter_error_fr = 0;//inverter_error_fr;

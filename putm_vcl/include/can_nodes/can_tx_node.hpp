@@ -81,6 +81,9 @@ class CanTxNode : public rclcpp::Node {
   int8_t motor_temp_fr = 0;
   int8_t motor_temp_fl = 0;
 
+
+
+
   const uint8_t amk_data_limiter = 60; // amk_data_limiter is a const value that limits how often inverters info is sent on CAN frame. A value "90" means 10ms * 90 = 900ms.
   uint8_t amk_data_limiter_counter = 0; // amk_data_limiter_counter is a variable that counts down from "amkdatalimiter" value to 0, for every call of can_tx_common_callback. When amkdatalimiter reaches "0" only then will the AMKTEMP Frame be sent to CAN1.
 
