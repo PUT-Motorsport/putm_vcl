@@ -267,10 +267,10 @@ void AmkNode::on_update(StateMachine state)
     // amk_front_right_setpoints.amk_control.enable = true;
 
     amk_rear_left_setpoints.amk_control.inverter_on = true;
-    // amk_rear_left_setpoints.amk_control.enable = true;
+    amk_rear_left_setpoints.amk_control.enable = true;
 
     amk_rear_right_setpoints.amk_control.inverter_on = true;
-    // amk_rear_right_setpoints.amk_control.enable = true;
+    amk_rear_right_setpoints.amk_control.enable = true;
     RCLCPP_INFO_THROTTLE(this->get_logger(), *this->get_clock(), 1000, "[INVERTER_STARTUP] Waiting for inverter enable");
     rclcpp::sleep_for(10ms);
     break;
@@ -300,14 +300,14 @@ void AmkNode::on_update(StateMachine state)
     amk_rear_right_setpoints.torque_positive_limit = 2000;
     amk_rear_right_setpoints.torque_negative_limit = -2000;
     amk_rear_right_setpoints.target_torque = -setpoints.rear_right.torque;
-    if (amk_rear_left_setpoints.target_torque != 0 || amk_rear_right_setpoints.target_torque) {
-      amk_rear_left_setpoints.amk_control.enable = true;
-      amk_rear_right_setpoints.amk_control.enable = true;
-    }
-    else {
-      amk_rear_left_setpoints.amk_control.enable = false;
-      amk_rear_right_setpoints.amk_control.enable = false;
-    }
+    // if (amk_rear_left_setpoints.target_torque != 0 || amk_rear_right_setpoints.target_torque) {
+    //   amk_rear_left_setpoints.amk_control.enable = true;
+    //   amk_rear_right_setpoints.amk_control.enable = true;
+    // }
+    // else {
+    //   amk_rear_left_setpoints.amk_control.enable = false;
+    //   amk_rear_right_setpoints.amk_control.enable = false;
+    // }
     // if (amk_front_left_actual_values1.actual_velocity > 20000 || amk_front_right_actual_values1.actual_velocity > 20000 || amk_rear_left_actual_values1.actual_velocity > 20000 || amk_rear_right_actual_values1.actual_velocity > 20000)
     if (amk_rear_left_actual_values1.actual_velocity > 20000 || amk_rear_right_actual_values1.actual_velocity > 20000)
     {
