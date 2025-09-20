@@ -79,7 +79,9 @@ void CanRxNode::can_rx_common_callback() {
         frontbox_data.sense_inertia = can_frontbox_data.sense_inertia;
         frontbox_data.sense_bspd = can_frontbox_data.sense_bspd;
         frontbox_data.sense_overtravel = can_frontbox_data.sense_overtravel;
-        frontbox_data.sense_right_wheel = can_frontbox_data.sense_right_wheel;
+
+        frontbox_data.sense_suspension_fl = can_frontbox_data.sense_suspension_fl;
+        frontbox_data.sense_suspension_fr = can_frontbox_data.sense_suspension_fr;
         frontbox_data.is_braking = can_frontbox_data.is_braking;
 
         frontbox_data.apps = can_frontbox_data.apps;

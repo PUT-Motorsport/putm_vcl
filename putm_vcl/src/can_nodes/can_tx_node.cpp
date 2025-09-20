@@ -15,8 +15,8 @@ CanTxNode::CanTxNode()
       can_tx_amk(can_interface_amk),
       can_tx_common(can_interface_common),
 
-      amk_front_left_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
-          "amk/front/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontLeftSetpoints>, this, _1))),
+      // amk_front_left_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
+      //     "amk/front/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontLeftSetpoints>, this, _1))),
       amk_front_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
           "amk/front/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontRightSetpoints>, this, _1))),
       amk_rear_left_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
@@ -24,24 +24,19 @@ CanTxNode::CanTxNode()
       amk_rear_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
           "amk/rear/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkRearRightSetpoints>, this, _1))),
 
-      amk_front_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
-           "amk/front/left/actual_values1", 1, std::bind(&CanTxNode::amk_front_left_actual_values1_callback, this, _1))),
+      // amk_front_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
+      //      "amk/front/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontLeftActualValues1>, this, _1))),
       amk_front_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
            "amk/front/right/actual_values1", 1, std::bind(&CanTxNode::amk_front_right_actual_values1_callback, this, _1))),
       amk_rear_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
            "amk/rear/left/actual_values1", 1, std::bind(&CanTxNode::amk_rear_left_actual_values1_callback, this, _1))),
       amk_rear_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
-           "amk/rear/right/actual_values1", 1, std::bind(&CanTxNode::amk_rear_right_actual_values1_callback, this, _1))),
+           "amk/rear/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkRearRightActualValues1>, this, _1))),
 
       // amk_front_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
       //      "amk/front/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontLeftActualValues2>, this, _1))),
-      //  amk_front_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-      //      "amk/front/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontRightActualValues2>, this, _1))),
-      //  amk_rear_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-      //      "amk/rear/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkRearLeftActualValues2>, this, _1))),
-      //  amk_rear_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-      //      "amk/rear/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkRearRightActualValues2>, this, _1))),
-
+       amk_front_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
+           "amk/front/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontRightActualValues2>, this, _1))),
        amk_rear_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
            "amk/rear/left/actual_values2", 1, std::bind(&CanTxNode::amk_rear_left_actual_values2_callback, this, _1))),
        amk_rear_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
@@ -93,117 +88,48 @@ void CanTxNode::amk_setpoints_callback(const msg::AmkSetpoints msg) {
    }
 }
 
-void CanTxNode::amk_rear_left_actual_values2_callback(const msg::AmkActualValues2 msg){
-  AmkRearLeftActualValues2 amk_actual_values2;
-  amk_actual_values2.temp_motor = msg.temp_motor;
-  amk_actual_values2.temp_inverter = msg.temp_inverter;
-  amk_actual_values2.error_info = msg.error_info;
-  amk_actual_values2.temp_igbt = msg.temp_igbt;
-  RCLCPP_INFO(this->get_logger(), "IN DIVIDED SUBSCRIBER REAR LEFT :");
-
-  inverter_temp_rl = 29;//abs(msg.temp_inverter)/10;
-    motor_temp_rl = 69;//abs(msg.temp_motor)/10;
-
-}
-void CanTxNode::amk_rear_right_actual_values2_callback(const msg::AmkActualValues2 msg){
-  AmkRearRightActualValues2 amk_actual_values2;
-  amk_actual_values2.temp_motor = msg.temp_motor;
-  amk_actual_values2.temp_inverter = msg.temp_inverter;
-  amk_actual_values2.error_info = msg.error_info;
-  amk_actual_values2.temp_igbt = msg.temp_igbt;
-  //  RCLCPP_INFO(this->get_logger(), "IN DIVIDED SUBSCRIBER REAR LEFT :");
-  inverter_temp_rr = 81;//abs(msg.temp_inverter)/10;
-  motor_temp_rr = 69;//abs(msg.temp_motor)/10;
-}
-void CanTxNode::amk_front_right_actual_values2_callback(const msg::AmkActualValues2 msg){
-  AmkFrontRightActualValues2 amk_actual_values2;
-  amk_actual_values2.temp_motor = msg.temp_motor;
-  amk_actual_values2.temp_inverter = msg.temp_inverter;
-  amk_actual_values2.error_info = msg.error_info;
-  amk_actual_values2.temp_igbt = msg.temp_igbt;
-  //  RCLCPP_INFO(this->get_logger(), "IN DIVIDED SUBSCRIBER REAR LEFT :");
-  inverter_temp_fr = 6;//abs(msg.temp_inverter)/10;
-  motor_temp_fr = 69;//abs(msg.temp_motor)/10;
-}
-void CanTxNode::amk_front_left_actual_values2_callback(const msg::AmkActualValues2 msg){
-  AmkFrontLeftActualValues2 amk_actual_values2;
-  amk_actual_values2.temp_motor = msg.temp_motor;
-  amk_actual_values2.temp_inverter = msg.temp_inverter;
-  amk_actual_values2.error_info = msg.error_info;
-  amk_actual_values2.temp_igbt = msg.temp_igbt;
-  //  RCLCPP_INFO(this->get_logger(), "IN DIVIDED SUBSCRIBER REAR LEFT :");
-  inverter_temp_fl = 81;//abs(msg.temp_inverter)/10;
-  motor_temp_fl = 69;//abs(msg.temp_motor)/10;
-}
-
-
-
-void CanTxNode::amk_rear_right_actual_values1_callback(const msg::AmkActualValues1 msg) {
-  AmkRearRightActualValues1 amk_actual_values1;
-  inverter_ready_rr = msg.amk_status.system_ready;
-  inverter_on_rr = msg.amk_status.inverter_on;
-  inverter_error_rr = msg.amk_status.error;
-  wheel_speed_rr = msg.actual_velocity;
-}
-void CanTxNode::amk_rear_left_actual_values1_callback(const msg::AmkActualValues1 msg) {
-  AmkRearLeftActualValues1 amk_actual_values1;
-    inverter_current_rl = msg.torque_current;
-    // inverter_on_rl = msg.amk_status.inverter_on;
+template <typename T>
+void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
+  // T amk_actual_values1;
+  // amk_actual_values1.amk_status.system_ready = msg.amk_status.system_ready;
+  // amk_actual_values1.amk_status.error = msg.amk_status.error;
+  // amk_actual_values1.amk_status.warn = msg.amk_status.warn;
+  // amk_actual_values1.amk_status.quit_dc_on = msg.amk_status.quit_dc_on;
+  // amk_actual_values1.amk_status.dc_on = msg.amk_status.dc_on;
+  // amk_actual_values1.amk_status.quit_inverter_on = msg.amk_status.quit_inverter_on;
+  // amk_actual_values1.amk_status.inverter_on = msg.amk_status.inverter_on;
+  // amk_actual_values1.amk_status.derating = msg.amk_status.derating;
+  // amk_actual_values1.actual_velocity = msg.actual_velocity;
+  // amk_actual_values1.torque_current = msg.torque_current;
+  // amk_actual_values1.magnetizing_current = msg.magnetizing_current;
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues1E") == 0){
+    torque_current_rl = msg.torque_current;
     inverter_on_rl = msg.amk_status.inverter_on;
     inverter_error_rl = msg.amk_status.error;
-      wheel_speed_rl = msg.actual_velocity;
-
-}
-void CanTxNode::amk_front_left_actual_values1_callback(const msg::AmkActualValues1 msg) {
-  AmkFrontLeftActualValues1 amk_actual_values1;
-    inverter_on_fl = msg.amk_status.inverter_on;
-    inverter_error_fl = msg.amk_status.error;
-      wheel_speed_fl = msg.actual_velocity;
-
-}
-void CanTxNode::amk_front_right_actual_values1_callback(const msg::AmkActualValues1 msg) {
-  AmkFrontRightActualValues1 amk_actual_values1;
-    wheel_speed_fr = msg.actual_velocity;
+    inverter_ready_rl = msg.amk_status.system_ready;
+    wheel_speed_rl = msg.actual_velocity;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
+    torque_current_fr = msg.torque_current;
+    inverter_ready_fr = msg.amk_status.system_ready;
     inverter_on_fr = msg.amk_status.inverter_on;
     inverter_error_fr = msg.amk_status.error;
-}
-
-// template <typename T>
-// void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
-//   T amk_actual_values1;
-//   amk_actual_values1.amk_status.system_ready = msg.amk_status.system_ready;
-//   amk_actual_values1.amk_status.error = msg.amk_status.error;
-//   amk_actual_values1.amk_status.warn = msg.amk_status.warn;
-//   amk_actual_values1.amk_status.quit_dc_on = msg.amk_status.quit_dc_on;
-//   amk_actual_values1.amk_status.dc_on = msg.amk_status.dc_on;
-//   amk_actual_values1.amk_status.quit_inverter_on = msg.amk_status.quit_inverter_on;
-//   amk_actual_values1.amk_status.inverter_on = msg.amk_status.inverter_on;
-//   amk_actual_values1.amk_status.derating = msg.amk_status.derating;
-//   amk_actual_values1.actual_velocity = msg.actual_velocity;
-//   amk_actual_values1.torque_current = msg.torque_current;
-//   amk_actual_values1.magnetizing_current = msg.magnetizing_current;
-
-//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues1E") == 0){
-//     inverter_current_rl = msg.torque_current;
-//     // inverter_on_rl = msg.amk_status.inverter_on;
-//     inverter_on_rl = msg.amk_status.quit_inverter_on;
-
-//     inverter_error_rl = msg.amk_status.error;
-//   }
-//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
-//     wheel_speed_fr = msg.actual_velocity;
-//     inverter_on_fr = msg.amk_status.inverter_on;
-//     inverter_error_fr = msg.amk_status.error;
-//   }
-//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues1E") == 0){
-//     inverter_ready_rr = msg.amk_status.system_ready;
-//     inverter_on_rr = msg.amk_status.inverter_on;
-//     inverter_error_rr = msg.amk_status.error;
-//   }
-//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues1E") == 0){
-//     inverter_on_fl = msg.amk_status.inverter_on;
-//     inverter_error_fl = msg.amk_status.error;
-//   }
+    wheel_speed_fr = msg.actual_velocity;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues1E") == 0){
+    torque_current_rr = msg.torque_current;
+    inverter_ready_rr = msg.amk_status.system_ready;
+    inverter_on_rr = msg.amk_status.inverter_on;
+    inverter_error_rr = msg.amk_status.error;
+    wheel_speed_rr = msg.actual_velocity;
+  }
+  // if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues1E") == 0){
+  //   torque_current_fl = msg.torque_current;
+  //   inverter_ready_fl = msg.amk_status.system_ready;
+  //   inverter_on_fl = msg.amk_status.inverter_on;
+  //   inverter_error_fl = msg.amk_status.error;
+  //   wheel_speed_fl = msg.actual_velocity;
+  // }
   
 
 
@@ -214,33 +140,30 @@ void CanTxNode::amk_front_right_actual_values1_callback(const msg::AmkActualValu
   //  }
 // }
 
-// template <typename T>
-// void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
-//   T amk_actual_values2;
-//   amk_actual_values2.temp_motor = msg.temp_motor;
-//   amk_actual_values2.temp_inverter = msg.temp_inverter;
-//   amk_actual_values2.error_info = msg.error_info;
-//   amk_actual_values2.temp_igbt = msg.temp_igbt;
+template <typename T>
+void CanTxNode::amk_actual_values2_callback(const msg::AmkActualValues2 msg) {
+  // T amk_actual_values2;
+  // amk_actual_values2.temp_motor = msg.temp_motor;
+  // amk_actual_values2.temp_inverter = msg.temp_inverter;
+  // amk_actual_values2.error_info = msg.error_info;
+  // amk_actual_values2.temp_igbt = msg.temp_igbt;
 
-//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues2E") == 0){
-//     inverter_temp_fl = abs(msg.temp_inverter)/10;
-//     motor_temp_fl = abs( msg.temp_motor)/10;
-//   }
-//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues2E") == 0){
-//     inverter_temp_fr = abs(msg.temp_inverter)/10;
-//     motor_temp_fr = abs(msg.temp_motor)/10;
-//   }
-//   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues2E") == 0){
-//     inverter_temp_rl = abs(msg.temp_inverter)/10;
-//     motor_temp_rl =abs(msg.temp_motor)/10;
-
-//   }
-//  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues2E") == 0){
-//    inverter_temp_rr = abs(msg.temp_inverter)/10;
-//    motor_temp_rr = abs(msg.temp_motor)/10;
-//    // RCLCPP_ERROR(this->get_logger(), "wartosci silnika rear right: %i", motor_temp_rr);
-
-// }
+  // if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkFrontLeftActualValues2E") == 0){
+  //   inverter_temp_fl = abs(msg.temp_inverter)/10;
+  //   motor_temp_fl = abs( msg.temp_motor)/10;
+  // }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues2E") == 0){
+    inverter_temp_fr = abs(msg.temp_inverter)/10;
+    motor_temp_fr = abs(msg.temp_motor)/10;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN24AmkRearLeftActualValues2E") == 0){
+    inverter_temp_rl = abs(msg.temp_inverter)/10;
+    motor_temp_rl =abs(msg.temp_motor)/10;
+  }
+  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues2E") == 0){
+    inverter_temp_rr = abs(msg.temp_inverter)/10;
+    motor_temp_rr = abs(msg.temp_motor)/10;
+  }
 
   //  try {
   //   can_tx_common.transmit(amk_actual_values2);
@@ -252,33 +175,28 @@ void CanTxNode::amk_front_right_actual_values1_callback(const msg::AmkActualValu
 void CanTxNode::can_tx_common_callback() {
   AmkTempData amk_temp_data;
   PcMainData pc_main_data;
-  pc_main_data.vechicle_speed = (wheel_speed_fr+wheel_speed_fl+wheel_speed_rl+wheel_speed_rr)/4;
-  pc_main_data.torque_current = inverter_current_rl;
   pc_main_data.rtd = rtd.state;
 
-  // pc_main_data.inverter_ready = inverter_ready_rr;
-  // if(inverter_on_fl && inverter_on_fr && inverter_on_rl && inverter_on_rr){
-  //   pc_main_data.inverter_ready = 1;
-  // }
-  // else{
-  //   pc_main_data.inverter_ready = 0;
-  // }
-  pc_main_data.inverter_ready = inverter_on_rl;
 
+  pc_main_data.inverter_ready = inverter_on_rr & inverter_on_rl & inverter_on_fr; // inverter_on_fl
+  pc_main_data.vehicle_speed = (wheel_speed_rr + wheel_speed_rl + wheel_speed_fr) /3;
+  pc_main_data.torque_current = (torque_current_rr + torque_current_rl + torque_current_fr) /3;
   pc_main_data.inverter_error_fr = inverter_error_fr;
-  pc_main_data.inverter_error_fl = inverter_error_fl;
+  pc_main_data.inverter_error_fl = 0;
   pc_main_data.inverter_error_rl = inverter_error_rl;
   pc_main_data.inverter_error_rr = inverter_error_rr;
+
   pc_main_data.inverter_on_fr = inverter_on_fr;
-  pc_main_data.inverter_on_fl = inverter_on_fl;
+  pc_main_data.inverter_on_fl = 0;
   pc_main_data.inverter_on_rr = inverter_on_rr;
   pc_main_data.inverter_on_rl = inverter_on_rl;
 
-  amk_temp_data.inverter_temp_fl = inverter_temp_fl;
+  amk_temp_data.inverter_temp_fl = 0;
   amk_temp_data.inverter_temp_fr = inverter_temp_fr;
   amk_temp_data.inverter_temp_rl = inverter_temp_rl;
   amk_temp_data.inverter_temp_rr = inverter_temp_rr;
-  amk_temp_data.motor_temp_fl = motor_temp_fl;
+
+  amk_temp_data.motor_temp_fl = 0;
   amk_temp_data.motor_temp_fr = motor_temp_fr;
   amk_temp_data.motor_temp_rl = motor_temp_rl;
   amk_temp_data.motor_temp_rr = motor_temp_rr;
@@ -293,16 +211,14 @@ void CanTxNode::can_tx_common_callback() {
   } catch (const std::runtime_error& e) {
    RCLCPP_ERROR(this->get_logger(), "Failed to transmit common CAN frames: %s", e.what());
  }
- amk_data_limiter--;
- if(amk_data_limiter == 0)
+ amk_data_limiter_counter--;
+ if(amk_data_limiter_counter == 0){
+     amk_data_limiter_counter = amk_data_limiter;
     try {
       can_tx_common.transmit(amk_temp_data);
     } catch (const std::runtime_error& e) {
       RCLCPP_ERROR(this->get_logger(), "Failed to transmit AmkTempData frames: %s", e.what());
-    }
-  if(amk_data_limiter ==0){
-    amk_data_limiter = 70;
-  }
+    }}
 }
 
 int main(int argc, char** argv) {
