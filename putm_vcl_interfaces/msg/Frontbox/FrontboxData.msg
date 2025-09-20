@@ -4,10 +4,10 @@ bool sense_driver_kill
 bool sense_inertia
 bool sense_bspd
 bool sense_overtravel
-bool sense_right_wheel
+bool sense_suspension_fl
+bool sense_suspension_fr
 bool is_braking
 bool apps
 uint8 apps_implausibility
 int16 front_left_suspension
 int16 front_right_suspension
-
