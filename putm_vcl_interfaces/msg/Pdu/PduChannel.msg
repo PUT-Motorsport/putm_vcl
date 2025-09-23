@@ -1,0 +1,10 @@
+uint32 pc_status
+uint32 fan_status
+uint32 pump_status
+uint32 inverter_status
+uint32 fbox_status 
+uint32 sdc_status
+uint32 dash_status
+uint32 tsal_hv_status
+uint32 rbox_diagport_brake_l_status
+uint32 brake_ir_air_status

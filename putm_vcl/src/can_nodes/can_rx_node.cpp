@@ -16,6 +16,9 @@ CanRxNode::CanRxNode()
       frontbox_data_publisher(this->create_publisher<msg::FrontboxData>("frontbox_data", 1)),
       bms_hv_main_publisher(this->create_publisher<msg::BmsHvMain>("bms_hv_main", 1)),
       bms_lv_main_publisher(this->create_publisher<msg::BmsLvMain>("bms_lv_main", 1)),
+      
+      pdu_data_publisher(this->create_publisher<msg::PduData>("pdu_data",1)),
+      pdu_channel_publisher(this->create_publisher<msg::PduChannel>("pdu_channel",1)),
 
 
       amk_front_left_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("amk/front/left/actual_values1", 1)),
@@ -30,6 +33,7 @@ CanRxNode::CanRxNode()
       amk_rear_right_actual_values1_publisher(this->create_publisher<msg::AmkActualValues1>("amk/rear/right/actual_values1", 1)),
       amk_rear_right_actual_values2_publisher(this->create_publisher<msg::AmkActualValues2>("amk/rear/right/actual_values2", 1)),
       
+
       dashboard_publisher(this->create_publisher<msg::Dashboard>("dashboard", 1)),
 
       xsens_acceleration_publisher(this->create_publisher<msg::XsensAcceleration>("xsens_acceleration", 1)),
@@ -88,6 +92,35 @@ void CanRxNode::can_rx_common_callback() {
         frontbox_data.apps_implausibility = can_frontbox_data.apps_implausibility;
 
         frontbox_data_publisher->publish(frontbox_data);
+        break;
+      }
+      case can_id<PduData>:{
+        auto can_pdu_data = convert<PduData>(frame);
+        msg::PduData pdu_data;
+        pdu_data.pc_current  = can_pdu_data.pc_current;
+        pdu_data.pump_current = can_pdu_data.pump_current;
+        pdu_data.fan_current = can_pdu_data.fan_current;
+        pdu_data.inverter_current = can_pdu_data.inverter_current;
+        pdu_data.fbox_current= can_pdu_data.fbox_current;
+        pdu_data.sdc_current = can_pdu_data.sdc_current;
+        pdu_data.total_current = can_pdu_data.total_current;
+        pdu_data_publisher->publish(pdu_data);
+        break;
+      }
+      case can_id<PduChannel>:{
+        auto can_pdu_channel = convert<PduChannel>(frame);
+        msg::PduChannel pdu_channel;
+        pdu_channel.pc_status = can_pdu_channel.pc_status;
+        pdu_channel.fan_status = can_pdu_channel.fan_status;
+        pdu_channel.pump_status = can_pdu_channel.pump_status;
+        pdu_channel.inverter_status = can_pdu_channel.inverter_status;
+        pdu_channel.fbox_status = can_pdu_channel.fbox_status;
+        pdu_channel.sdc_status= can_pdu_channel.sdc_status;
+        pdu_channel.dash_status = can_pdu_channel.dash_status;
+        pdu_channel.tsal_hv_status = can_pdu_channel.tsal_hv_status;
+        pdu_channel.rbox_diagport_brake_l_status = can_pdu_channel.rbox_diagport_brake_l_status;
+        pdu_channel.brake_ir_air_status = can_pdu_channel.brake_ir_air_status;
+        pdu_channel_publisher->publish(pdu_channel);
         break;
       }
 

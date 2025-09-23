@@ -6,6 +6,8 @@
 #include "putm_vcl_interfaces/msg/dashboard.hpp"
 #include "putm_vcl_interfaces/msg/frontbox_data.hpp"
 #include "putm_vcl_interfaces/msg/frontbox_driver_input.hpp"
+#include "putm_vcl_interfaces/msg/pdu_data.hpp"
+#include "putm_vcl_interfaces/msg/pdu_channel.hpp"
 
 #include "putm_vcl_interfaces/msg/xsens_acceleration.hpp"
 #include "putm_vcl_interfaces/msg/xsens_acceleration_hr.hpp"
@@ -25,6 +27,7 @@
 #include "putm_vcl_interfaces/msg/xsens_utc.hpp"
 #include "putm_vcl_interfaces/msg/xsens_velocity.hpp"
 
+
 #include "rclcpp/rclcpp.hpp"
 #include "putm_vcl_interfaces/msg/bms_hv_main.hpp"
 
@@ -43,6 +46,9 @@ class CanRxNode : public rclcpp::Node {
   rclcpp::Publisher<putm_vcl_interfaces::msg::BmsHvMain>::SharedPtr bms_hv_main_publisher;
   
   rclcpp::Publisher<putm_vcl_interfaces::msg::BmsLvMain>::SharedPtr bms_lv_main_publisher;
+
+  rclcpp::Publisher<putm_vcl_interfaces::msg::PduData>::SharedPtr pdu_data_publisher;
+  rclcpp::Publisher<putm_vcl_interfaces::msg::PduChannel>::SharedPtr pdu_channel_publisher;
 
 
   rclcpp::Publisher<putm_vcl_interfaces::msg::AmkActualValues1>::SharedPtr amk_front_left_actual_values1_publisher;
