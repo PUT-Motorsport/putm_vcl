@@ -17,8 +17,8 @@ CanTxNode::CanTxNode()
 
       // amk_front_left_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
       //     "amk/front/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontLeftSetpoints>, this, _1))),
-      amk_front_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
-          "amk/front/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontRightSetpoints>, this, _1))),
+      // amk_front_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
+      //     "amk/front/right/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkFrontRightSetpoints>, this, _1))),
       amk_rear_left_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
           "amk/rear/left/setpoints", 1, std::bind(&CanTxNode::amk_setpoints_callback<AmkRearLeftSetpoints>, this, _1))),
       amk_rear_right_setpoints_subscriber(this->create_subscription<msg::AmkSetpoints>(
@@ -26,8 +26,8 @@ CanTxNode::CanTxNode()
 
       // amk_front_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
       //      "amk/front/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontLeftActualValues1>, this, _1))),
-      amk_front_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
-           "amk/front/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontRightActualValues1>, this, _1))),
+      // amk_front_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
+      //      "amk/front/right/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkFrontRightActualValues1>, this, _1))),
       amk_rear_left_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
            "amk/rear/left/actual_values1", 1, std::bind(&CanTxNode::amk_actual_values1_callback<AmkRearLeftActualValues1>, this, _1))),
       amk_rear_right_actual_values1_subscriber(this->create_subscription<msg::AmkActualValues1>(
@@ -35,8 +35,8 @@ CanTxNode::CanTxNode()
 
       // amk_front_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
       //      "amk/front/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontLeftActualValues2>, this, _1))),
-       amk_front_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
-           "amk/front/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontRightActualValues2>, this, _1))),
+      //  amk_front_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
+      //      "amk/front/right/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkFrontRightActualValues2>, this, _1))),
        amk_rear_left_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
            "amk/rear/left/actual_values2", 1, std::bind(&CanTxNode::amk_actual_values2_callback<AmkRearLeftActualValues2>, this, _1))),
        amk_rear_right_actual_values2_subscriber(this->create_subscription<msg::AmkActualValues2>(
@@ -103,13 +103,13 @@ void CanTxNode::amk_actual_values1_callback(const msg::AmkActualValues1 msg) {
     inverter_ready_rl = msg.amk_status.system_ready;
     wheel_speed_rl = msg.actual_velocity;
   }
-  if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
-    torque_current_fr = msg.torque_current;
-    inverter_ready_fr = msg.amk_status.system_ready;
-    inverter_on_fr = msg.amk_status.inverter_on;
-    inverter_error_fr = msg.amk_status.error;
-    wheel_speed_fr = msg.actual_velocity;
-  }
+  // if(std::strcmp(typeid(T).name(),"N8PUTM_CAN26AmkFrontRightActualValues1E") == 0){
+  //   torque_current_fr = msg.torque_current;
+  //   inverter_ready_fr = msg.amk_status.system_ready;
+  //   inverter_on_fr = msg.amk_status.inverter_on;
+  //   inverter_error_fr = msg.amk_status.error;
+  //   wheel_speed_fr = msg.actual_velocity;
+  // }
   if(std::strcmp(typeid(T).name(),"N8PUTM_CAN25AmkRearRightActualValues1E") == 0){
     torque_current_rr = msg.torque_current;
     inverter_ready_rr = msg.amk_status.system_ready;
@@ -172,26 +172,26 @@ void CanTxNode::can_tx_common_callback() {
   pc_main_data.rtd = rtd.state;
 
 
-  pc_main_data.inverter_ready = inverter_on_rr & inverter_on_rl & inverter_on_fr; // inverter_on_fl
+  pc_main_data.inverter_ready = inverter_on_rr & inverter_on_rl; //inverter_on_fl & inverter_on_fr
   pc_main_data.vehicle_speed = (wheel_speed_rr + wheel_speed_rl + wheel_speed_fr) /3;
   pc_main_data.torque_current = (torque_current_rr + torque_current_rl + torque_current_fr) /3;
-  pc_main_data.inverter_error_fr = inverter_error_fr;
+  pc_main_data.inverter_error_fr = 0;
   pc_main_data.inverter_error_fl = 0;
   pc_main_data.inverter_error_rl = inverter_error_rl;
   pc_main_data.inverter_error_rr = inverter_error_rr;
 
-  pc_main_data.inverter_on_fr = inverter_on_fr;
+  pc_main_data.inverter_on_fr = 0;
   pc_main_data.inverter_on_fl = 0;
   pc_main_data.inverter_on_rr = inverter_on_rr;
   pc_main_data.inverter_on_rl = inverter_on_rl;
 
   amk_temp_data.inverter_temp_fl = 0;
-  amk_temp_data.inverter_temp_fr = inverter_temp_fr;
+  amk_temp_data.inverter_temp_fr = 0;
   amk_temp_data.inverter_temp_rl = inverter_temp_rl;
   amk_temp_data.inverter_temp_rr = inverter_temp_rr;
 
   amk_temp_data.motor_temp_fl = 0;
-  amk_temp_data.motor_temp_fr = motor_temp_fr;
+  amk_temp_data.motor_temp_fr = 0;
   amk_temp_data.motor_temp_rl = motor_temp_rl;
   amk_temp_data.motor_temp_rr = motor_temp_rr;
 
